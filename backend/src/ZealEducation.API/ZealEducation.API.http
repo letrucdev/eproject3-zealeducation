@@ -1,0 +1,6 @@
+@ZealEducation.API_HostAddress = http://localhost:5085
+
+GET {{ZealEducation.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
