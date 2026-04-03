@@ -1,18 +1,13 @@
 using MediatR;
-using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Domain.Entities;
+using ZealEducation.Domain.Interfaces;
 
 namespace ZealEducation.Application.Features.Courses.Commands.CreateCourse;
 
-public class CreateCourseCommandHandler : IRequestHandler<CreateCourseCommand, Guid>
+public class CreateCourseCommandHandler(
+    IRepository<Course> courseRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<CreateCourseCommand, Guid>
 {
-    private readonly IApplicationDbContext _context;
-
-    public CreateCourseCommandHandler(IApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Guid> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
     {
         var course = new Course
@@ -21,12 +16,11 @@ public class CreateCourseCommandHandler : IRequestHandler<CreateCourseCommand, G
             Title = request.Title,
             Description = request.Description,
             Price = request.Price,
-            IsPublished = false,
-            CreatedAt = DateTime.UtcNow
+            IsPublished = false
         };
 
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync(cancellationToken);
+        await courseRepository.AddAsync(course, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return course.Id;
     }

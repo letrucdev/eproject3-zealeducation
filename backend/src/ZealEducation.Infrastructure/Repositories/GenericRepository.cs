@@ -6,19 +6,12 @@ using ZealEducation.Infrastructure.Data;
 
 namespace ZealEducation.Infrastructure.Repositories;
 
-public class GenericRepository<T> : IRepository<T> where T : BaseEntity
+public class GenericRepository<T>(ApplicationDbContext context) : IRepository<T> where T : BaseEntity
 {
-    protected readonly ApplicationDbContext _context;
-    protected readonly DbSet<T> _dbSet;
-
-    public GenericRepository(ApplicationDbContext context)
-    {
-        _context = context;
-        _dbSet = context.Set<T>();
-    }
+    protected readonly DbSet<T> _dbSet = context.Set<T>();
 
     public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        => await _dbSet.FindAsync(new object[] { id }, cancellationToken);
+        => await _dbSet.FindAsync([id], cancellationToken);
 
     public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default)
         => await _dbSet.ToListAsync(cancellationToken);
