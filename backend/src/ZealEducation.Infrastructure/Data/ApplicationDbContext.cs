@@ -1,16 +1,12 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Domain.Entities;
+using ZealEducation.Domain.Interfaces;
 
 namespace ZealEducation.Infrastructure.Data;
 
-public class ApplicationDbContext : DbContext, IApplicationDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IUnitOfWork
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
-
     public DbSet<Course> Courses => Set<Course>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

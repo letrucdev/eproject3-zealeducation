@@ -8,12 +8,12 @@ public class Result
     protected Result(bool succeeded, IEnumerable<string> errors)
     {
         Succeeded = succeeded;
-        Errors = errors.ToArray();
+        Errors = [.. errors];
     }
 
     public static Result Success() => new(true, Array.Empty<string>());
     public static Result Failure(IEnumerable<string> errors) => new(false, errors);
-    public static Result Failure(string error) => new(false, new[] { error });
+    public static Result Failure(string error) => new(false, [error]);
 }
 
 public class Result<T> : Result
@@ -26,7 +26,7 @@ public class Result<T> : Result
         Data = data;
     }
 
-    public static Result<T> Success(T data) => new(true, data, Array.Empty<string>());
+    public static Result<T> Success(T data) => new(true, data, []);
     public new static Result<T> Failure(IEnumerable<string> errors) => new(false, default, errors);
-    public new static Result<T> Failure(string error) => new(false, default, new[] { error });
+    public new static Result<T> Failure(string error) => new(false, default, [error]);
 }
