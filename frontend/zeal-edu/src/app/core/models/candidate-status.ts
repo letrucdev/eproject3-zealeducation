@@ -1,6 +1,6 @@
 export enum CandidateStatus {
-  Active,
-  OnBreak,
-  Graduated,
-  Dropped,
+  Active = 'Active',
+  OnBreak = 'OnBreak',
+  Graduated = 'Graduated',
+  Dropped = 'Dropped',
 }

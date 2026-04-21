@@ -31,4 +31,6 @@ public class GenericRepository<T>(ApplicationDbContext context) : IRepository<T>
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
         => await _dbSet.AnyAsync(e => e.Id == id, cancellationToken);
+
+    public IQueryable<T> Query() => _dbSet.AsNoTracking();
 }
