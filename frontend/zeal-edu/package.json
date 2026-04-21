@@ -11,7 +11,7 @@
   "private": true,
   "packageManager": "npm@10.9.3",
   "dependencies": {
-    "@angular/cdk": "21.0.0",
+    "@angular/cdk": "^21.2.7",
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
@@ -23,6 +23,7 @@
     "@ng-icons/remixicon": "^33.2.2",
     "@spartan-ng/brain": "^0.0.1-alpha.674",
     "@tanstack/angular-query-experimental": "^5.99.2",
+    "@tanstack/angular-table": "^8.21.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "rxjs": "~7.8.0",

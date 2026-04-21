@@ -5,6 +5,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { AuthService } from '../auth/auth-service';
 import { CurrentUser } from '../auth/current-user';
+import { getUserInitials } from '../utils/user-initials';
 import { ROLE_LABELS } from './nav-items';
 
 @Component({
@@ -46,14 +47,9 @@ export class SidebarUserCard {
   protected readonly currentUser = inject(CurrentUser);
   protected readonly auth = inject(AuthService);
 
-  protected readonly initials = computed(() => {
-    const name = this.currentUser.user()?.fullName?.trim() ?? '';
-    if (!name) return '?';
-    const parts = name.split(/\s+/);
-    const first = parts[0]?.[0] ?? '';
-    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
-    return (first + last).toUpperCase() || '?';
-  });
+  protected readonly initials = computed(() =>
+    getUserInitials(this.currentUser.user()?.fullName),
+  );
 
   protected readonly roleLabel = computed(() => {
     const role = this.currentUser.user()?.role;

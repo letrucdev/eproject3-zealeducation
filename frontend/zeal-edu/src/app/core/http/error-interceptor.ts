@@ -4,6 +4,7 @@ import { toast } from '@spartan-ng/brain/sonner';
 import { catchError, throwError } from 'rxjs';
 import { AuthToken } from '../auth/auth-token';
 import { CurrentUser } from '../auth/current-user';
+import { Router } from '@angular/router';
 
 interface ApiErrorBody {
   message?: string;
@@ -20,6 +21,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (err.status === HttpStatusCode.Unauthorized && !isLoginRequest) {
         authToken.clear();
         currentUser.clear();
+        inject(Router).navigateByUrl('/login');
       }
 
       if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {

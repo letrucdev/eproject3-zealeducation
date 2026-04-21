@@ -23,8 +23,6 @@ export class AuthToken {
       return null;
     }
 
-    console.log(this.token)
-
     return localStorage.getItem(TOKEN_STORAGE_KEY);
   }
 }

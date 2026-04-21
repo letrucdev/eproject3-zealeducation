@@ -12,10 +12,12 @@ export const routes: Routes = [
     path: 'app',
     canMatch: [authGuard],
     loadComponent: () => import('./core/layout/app-shell').then((m) => m.AppShell),
+    data: { breadcrumb: 'Home' },
     children: [
       {
         path: 'system',
         canMatch: [hasRole(UserRole.SystemAdmin)],
+        data: { breadcrumb: 'System' },
         loadChildren: () =>
           import('./features/system-admin/system-admin.routes').then((m) => m.SYSTEM_ADMIN_ROUTES),
       },
