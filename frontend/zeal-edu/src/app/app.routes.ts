@@ -5,8 +5,8 @@ import { UserRole } from './core/models/user-role';
 
 export const routes: Routes = [
   {
-    path: 'login',
-    loadComponent: () => import('./features/auth/login/login'),
+    path: '',
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: 'app',
@@ -16,18 +16,8 @@ export const routes: Routes = [
       {
         path: 'system',
         canMatch: [hasRole(UserRole.SystemAdmin)],
-        children: [
-          {
-            path: 'maintenance',
-            loadComponent: () => import('./features/system-admin/maintenance/maintenance-page'),
-          },
-          {
-            path: 'staff-accounts',
-            loadComponent: () =>
-              import('./features/system-admin/staff-accounts/staff-accounts-page'),
-          },
-          { path: '', pathMatch: 'full', redirectTo: 'maintenance' },
-        ],
+        loadChildren: () =>
+          import('./features/system-admin/system-admin.routes').then((m) => m.SYSTEM_ADMIN_ROUTES),
       },
       { path: '', pathMatch: 'full', redirectTo: 'system/maintenance' },
     ],
