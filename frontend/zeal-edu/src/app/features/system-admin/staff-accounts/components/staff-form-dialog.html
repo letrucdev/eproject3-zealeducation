@@ -1,0 +1,270 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-4xl w-3xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isEdit() ? 'Edit Staff Account' : 'Add Staff Account' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isEdit()
+            ? 'Update staff details. Username cannot be changed.'
+            : 'Create a new staff account with a temporary password.'
+        }}
+      </p>
+    </div>
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
+    >
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="staff-username">Username</label>
+            <input
+              hlmInput
+              id="staff-username"
+              type="text"
+              formControlName="username"
+              autocomplete="off"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Username is required.</hlm-field-error>
+            <hlm-field-error validator="minlength">
+              Username must be at least 3 characters.
+            </hlm-field-error>
+            <hlm-field-error validator="pattern">
+              Only letters, digits, dot and underscore are allowed.
+            </hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="staff-fullname">Full Name</label>
+            <input
+              hlmInput
+              id="staff-fullname"
+              type="text"
+              formControlName="fullName"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Full name is required.</hlm-field-error>
+          </hlm-field>
+        </div>
+
+        @if (!isEdit()) {
+          <hlm-field>
+            <label hlmFieldLabel for="staff-password">Temporary password</label>
+            <input
+              hlmInput
+              id="staff-password"
+              type="password"
+              formControlName="password"
+              autocomplete="new-password"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Password is required.</hlm-field-error>
+            <hlm-field-error validator="minlength"> Minimum 8 characters. </hlm-field-error>
+          </hlm-field>
+        }
+
+        <hlm-field>
+          <label hlmFieldLabel for="staff-email">Email</label>
+          <input
+            hlmInput
+            id="staff-email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            class="w-full"
+          />
+          <hlm-field-error validator="required">Email is required.</hlm-field-error>
+          <hlm-field-error validator="email">Invalid email format.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="staff-phone">Phone</label>
+          <input
+            hlmInput
+            id="staff-phone"
+            type="tel"
+            formControlName="phone"
+            autocomplete="tel"
+            class="w-full"
+          />
+          <hlm-field-error validator="required">Phone is required.</hlm-field-error>
+          <hlm-field-error validator="minlength"
+            >Phone number must be 10 numbers</hlm-field-error
+          >
+          <hlm-field-error validator="maxlength"
+            >Phone number must be 10 numbers</hlm-field-error
+          >
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="staff-dob">Date of birth</label>
+            <input hlmInput id="staff-dob" type="date" formControlName="dob" class="w-full" />
+            <hlm-field-error validator="required">Date of birth is required.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="staff-gender">Gender</label>
+            <hlm-select formControlName="gender" [itemToString]="genderLabel" class="w-full">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select gender" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                <hlm-select-item [value]="genders.Male">Male</hlm-select-item>
+                <hlm-select-item [value]="genders.Female">Female</hlm-select-item>
+                <hlm-select-item [value]="genders.Other">Other</hlm-select-item>
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <hlm-field>
+            <label hlmFieldLabel for="staff-role">Role</label>
+            <hlm-select formControlName="role" [itemToString]="roleLabel" class="w-full">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select role" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                @if (canSelectFaculty()) {
+                  <hlm-select-item [value]="roles.Faculty">Faculty</hlm-select-item>
+                }
+                @if (canSelectNonFaculty()) {
+                  <hlm-select-item [value]="roles.Incharge">Incharge</hlm-select-item>
+                  <hlm-select-item [value]="roles.Counselor">Counselor</hlm-select-item>
+                  <hlm-select-item [value]="roles.AccountsStaff"
+                    >Accounts Staff</hlm-select-item
+                  >
+                }
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="staff-position">Position</label>
+            <input
+              hlmInput
+              id="staff-position"
+              type="text"
+              formControlName="position"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Position is required.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="staff-department">Department</label>
+            <input
+              hlmInput
+              id="staff-department"
+              type="text"
+              formControlName="department"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Department is required.</hlm-field-error>
+          </hlm-field>
+        </div>
+
+        @if (isFacultyRole()) {
+          <div class="grid gap-4 sm:grid-cols-2">
+            <hlm-field>
+              <label hlmFieldLabel for="faculty-code">Faculty code</label>
+              <input
+                hlmInput
+                id="faculty-code"
+                type="text"
+                formControlName="facultyCode"
+                class="w-full"
+              />
+              <hlm-field-error validator="required">Faculty code is required.</hlm-field-error>
+              <hlm-field-error validator="maxlength">Max 20 characters.</hlm-field-error>
+            </hlm-field>
+
+            <hlm-field>
+              <label hlmFieldLabel for="faculty-experience">Experience (years)</label>
+              <input
+                hlmInput
+                id="faculty-experience"
+                type="number"
+                min="0"
+                max="80"
+                formControlName="experienceYears"
+                class="w-full"
+              />
+              <hlm-field-error validator="required"
+                >Experience years is required.</hlm-field-error
+              >
+              <hlm-field-error validator="min">Cannot be negative.</hlm-field-error>
+              <hlm-field-error validator="max">Must be 80 or less.</hlm-field-error>
+            </hlm-field>
+          </div>
+
+          <hlm-field>
+            <label hlmFieldLabel for="faculty-qualification">Qualification</label>
+            <input
+              hlmInput
+              id="faculty-qualification"
+              type="text"
+              formControlName="qualification"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Qualification is required.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="faculty-specialization">Specialization</label>
+            <input
+              hlmInput
+              id="faculty-specialization"
+              type="text"
+              formControlName="specialization"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Specialization is required.</hlm-field-error>
+          </hlm-field>
+        }
+
+        <hlm-field>
+          <label hlmFieldLabel for="staff-joined">Joined date</label>
+          <input
+            hlmInput
+            id="staff-joined"
+            type="date"
+            formControlName="joinedDate"
+            class="w-full"
+          />
+        </hlm-field>
+
+        @if (isEdit()) {
+          <hlm-field>
+            <label hlmFieldLabel for="staff-status">Status</label>
+            <hlm-select formControlName="isActive" [itemToString]="statusLabel" class="w-full">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select status" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                <hlm-select-item [value]="true">Active</hlm-select-item>
+                <hlm-select-item [value]="false">Inactive</hlm-select-item>
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+        }
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create staff' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>
