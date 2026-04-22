@@ -8,6 +8,8 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { AuthService } from '../../../core/auth/auth-service';
 import { CurrentUser } from '../../../core/auth/current-user';
 import { navMenusForRole } from '../../../core/layout/nav-items';
+import { HttpStatusCode } from '@angular/common/http';
+import { resolveMessage } from '../../../core/http/error-interceptor';
 
 @Component({
   selector: 'app-login-form',
@@ -79,13 +81,10 @@ export class LoginForm {
   constructor() {
     effect(() => {
       const error = this.auth.loginMutation.error();
-      if (error?.status !== 401) return;
-
-      const body = error.error as { message?: string } | string | null;
-      const message = typeof body === 'string' ? body.trim() : body?.message?.trim();
+      if (error?.status !== HttpStatusCode.Unauthorized) return;
 
       this.form.controls.password.setErrors({
-        incorrectPassword: message || 'Invalid username or password.',
+        incorrectPassword: resolveMessage(error) || 'Invalid username or password.',
       });
     });
 

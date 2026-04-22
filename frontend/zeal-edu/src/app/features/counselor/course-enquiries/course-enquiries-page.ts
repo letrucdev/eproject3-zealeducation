@@ -1,0 +1,259 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { toast } from '@spartan-ng/brain/sonner';
+import { CourseEnquiryListItem } from '../../../core/models/course-enquiry-list-item';
+import { EnquiryFilterBar, EnquiryFilterValue } from './components/enquiry-filter-bar';
+import { EnquiryFormDialog, EnquiryFormSubmit } from './components/enquiry-form-dialog';
+import { EnquiryStatsCards } from './components/enquiry-stats-cards';
+import { EnquiryTable } from './components/enquiry-table';
+import { EnquiryDetailDialog, EnquiryNoteSubmit } from './components/enquiry-detail-dialog';
+import { EnquiryConvertDialog, EnquiryConvertSubmit } from './components/enquiry-convert-dialog';
+import { EnquirySource } from '../../../core/models/enquiry-source';
+import { EnquiryStatus } from '../../../core/models/enquiry-status';
+import { CourseEnquiriesService } from './course-enquiries.service';
+import { EnquiryListQuery } from './models/course-enquiry-payload';
+
+type DialogIntent = 'none' | 'edit' | 'view' | 'convert';
+
+@Component({
+  selector: 'app-course-enquiries-page',
+  imports: [
+    EnquiryStatsCards,
+    EnquiryFilterBar,
+    EnquiryTable,
+    EnquiryFormDialog,
+    EnquiryDetailDialog,
+    EnquiryConvertDialog,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <section class="flex flex-col gap-6">
+      <header class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight">Course Enquiries</h1>
+          <p class="text-muted-foreground mt-1 max-w-2xl text-sm">
+            Capture leads, record follow-ups, and convert interested candidates into enrolled
+            students.
+          </p>
+        </div>
+      </header>
+
+      <app-enquiry-stats-cards [stats]="statsQuery.data()" [isLoading]="statsQuery.isPending()" />
+
+      <app-enquiry-filter-bar
+        [initial]="initialFilter"
+        (filterChanged)="onFilterChanged($event)"
+        (createClicked)="onCreateClicked()"
+      />
+
+      <app-enquiry-table
+        [page]="listQuery.data()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        (viewClicked)="onViewClicked($event)"
+        (editClicked)="onEditClicked($event)"
+        (convertClicked)="onConvertClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+      />
+
+      <app-enquiry-form-dialog
+        #formDialog
+        [submitting]="isSubmittingForm()"
+        (submitted)="onFormSubmitted($event)"
+      />
+
+      <app-enquiry-detail-dialog
+        #detailDialog
+        [detail]="detailQuery.data() ?? null"
+        [isAddingNote]="addNoteMutation.isPending()"
+        (noteSubmitted)="onNoteSubmitted($event)"
+        (convertClicked)="onConvertFromDetail($event)"
+      />
+
+      <app-enquiry-convert-dialog
+        #convertDialog
+        [submitting]="convertMutation.isPending()"
+        (submitted)="onConvertSubmitted($event)"
+      />
+    </section>
+  `,
+})
+export default class CourseEnquiriesPage {
+  private readonly _service = inject(CourseEnquiriesService);
+
+  protected readonly formDialog = viewChild.required<EnquiryFormDialog>('formDialog');
+  protected readonly detailDialog = viewChild.required<EnquiryDetailDialog>('detailDialog');
+  protected readonly convertDialog = viewChild.required<EnquiryConvertDialog>('convertDialog');
+
+  protected readonly page = signal(1);
+  protected readonly pageSize = signal(10);
+  protected readonly search = signal('');
+  protected readonly statusFilter = signal<EnquiryStatus | ''>('');
+  protected readonly sourceFilter = signal<EnquirySource | ''>('');
+  protected readonly dueFollowUpOnly = signal(false);
+
+  protected readonly initialFilter: EnquiryFilterValue = {
+    search: '',
+    status: '',
+    source: '',
+    dueFollowUpOnly: false,
+  };
+
+  protected readonly focusedEnquiryId = signal<string | null>(null);
+  private readonly _dialogIntent = signal<DialogIntent>('none');
+
+  private readonly _listParams = computed<EnquiryListQuery>(() => ({
+    page: this.page(),
+    pageSize: this.pageSize(),
+    search: this.search() || undefined,
+    status: this.statusFilter() || undefined,
+    source: this.sourceFilter() || undefined,
+    dueFollowUpOnly: this.dueFollowUpOnly() || undefined,
+  }));
+
+  protected readonly listQuery = this._service.listQuery(this._listParams);
+  protected readonly statsQuery = this._service.statisticsQuery();
+  protected readonly detailQuery = this._service.detailQuery(this.focusedEnquiryId);
+  protected readonly createMutation = this._service.createMutation();
+  protected readonly updateMutation = this._service.updateMutation();
+  protected readonly addNoteMutation = this._service.addNoteMutation();
+  protected readonly convertMutation = this._service.convertMutation();
+
+  protected readonly isSubmittingForm = computed(
+    () => this.createMutation.isPending() || this.updateMutation.isPending(),
+  );
+
+  constructor() {
+    effect(() => {
+      const detail = this.detailQuery.data();
+      const currentId = this.focusedEnquiryId();
+      const intent = this._dialogIntent();
+      if (!detail || currentId !== detail.enquiryId) return;
+
+      untracked(() => {
+        switch (intent) {
+          case 'edit':
+            this.formDialog().openEdit(detail);
+            break;
+          case 'view':
+            this.detailDialog().open();
+            break;
+          case 'convert':
+            this.convertDialog().open(detail);
+            break;
+        }
+        this._dialogIntent.set('none');
+      });
+    });
+
+    effect(() => {
+      const error = this.detailQuery.error();
+      if (!error) return;
+      untracked(() => {
+        this.focusedEnquiryId.set(null);
+        this._dialogIntent.set('none');
+      });
+    });
+  }
+
+  onFilterChanged(value: EnquiryFilterValue): void {
+    this.search.set(value.search);
+    this.statusFilter.set(value.status);
+    this.sourceFilter.set(value.source);
+    this.dueFollowUpOnly.set(value.dueFollowUpOnly);
+    this.page.set(1);
+  }
+
+  onPageChanged(page: number): void {
+    this.page.set(page);
+  }
+
+  onPageSizeChanged(size: number): void {
+    this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onCreateClicked(): void {
+    this.formDialog().openCreate();
+  }
+
+  onViewClicked(row: CourseEnquiryListItem): void {
+    this._dialogIntent.set('view');
+    this.focusedEnquiryId.set(row.enquiryId);
+  }
+
+  onEditClicked(row: CourseEnquiryListItem): void {
+    this._dialogIntent.set('edit');
+    this.focusedEnquiryId.set(row.enquiryId);
+  }
+
+  onConvertClicked(row: CourseEnquiryListItem): void {
+    this._dialogIntent.set('convert');
+    this.focusedEnquiryId.set(row.enquiryId);
+  }
+
+  onConvertFromDetail(detail: { enquiryId: string }): void {
+    this.detailDialog().close();
+    this._dialogIntent.set('convert');
+    this.focusedEnquiryId.set(detail.enquiryId);
+  }
+
+  onFormSubmitted(event: EnquiryFormSubmit): void {
+    if (event.mode === 'create') {
+      this.createMutation.mutate(event.payload, {
+        onSuccess: () => {
+          toast.success('Enquiry created successfully.');
+          this.formDialog().close();
+        },
+      });
+    } else {
+      this.updateMutation.mutate(
+        { enquiryId: event.enquiryId, payload: event.payload },
+        {
+          onSuccess: () => {
+            toast.success('Enquiry updated successfully.');
+            this.formDialog().close();
+          },
+        },
+      );
+    }
+  }
+
+  onNoteSubmitted(event: EnquiryNoteSubmit): void {
+    this.addNoteMutation.mutate(
+      { enquiryId: event.enquiryId, payload: { content: event.content } },
+      {
+        onSuccess: () => {
+          toast.success('Note added.');
+          // re-open detail by retriggering focusedEnquiryId
+          const id = event.enquiryId;
+          this._dialogIntent.set('view');
+          this.focusedEnquiryId.set(null);
+          queueMicrotask(() => this.focusedEnquiryId.set(id));
+        },
+      },
+    );
+  }
+
+  onConvertSubmitted(event: EnquiryConvertSubmit): void {
+    this.convertMutation.mutate(
+      { enquiryId: event.enquiryId, payload: event.payload },
+      {
+        onSuccess: (result) => {
+          toast.success('Enquiry converted successfully.');
+          this.convertDialog().showCredentials(result);
+        },
+      },
+    );
+  }
+}

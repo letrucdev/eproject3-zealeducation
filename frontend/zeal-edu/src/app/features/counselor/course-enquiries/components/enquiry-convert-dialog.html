@@ -1,0 +1,131 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ showResult() ? 'Candidate Created' : 'Convert Enquiry' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          showResult()
+            ? 'Share the login details below with the candidate. Email delivery will be automated in a later release — please copy and send manually for now.'
+            : 'Enter candidate personal info. A Candidate account will be created with a temporary password (inactive until activated).'
+        }}
+      </p>
+    </div>
+
+    @if (!showResult()) {
+      <form
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
+      >
+        <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
+          <hlm-field>
+            <label hlmFieldLabel for="convert-email">Email (for login info)</label>
+            <input
+              hlmInput
+              id="convert-email"
+              type="email"
+              formControlName="email"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Email is required.</hlm-field-error>
+            <hlm-field-error validator="email">Invalid email format.</hlm-field-error>
+          </hlm-field>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <hlm-field>
+              <label hlmFieldLabel for="convert-dob">Date of birth</label>
+              <input hlmInput id="convert-dob" type="date" formControlName="dob" class="w-full" />
+              <hlm-field-error validator="required">Date of birth is required.</hlm-field-error>
+            </hlm-field>
+
+            <hlm-field>
+              <label hlmFieldLabel for="convert-gender">Gender</label>
+              <hlm-select formControlName="gender" [itemToString]="genderLabel" class="w-full">
+                <hlm-select-trigger class="w-full">
+                  <hlm-select-value placeholder="Select gender" />
+                </hlm-select-trigger>
+                <hlm-select-content *hlmSelectPortal>
+                  <hlm-select-item [value]="genders.Male">Male</hlm-select-item>
+                  <hlm-select-item [value]="genders.Female">Female</hlm-select-item>
+                  <hlm-select-item [value]="genders.Other">Other</hlm-select-item>
+                </hlm-select-content>
+              </hlm-select>
+            </hlm-field>
+          </div>
+
+          <hlm-field>
+            <label hlmFieldLabel for="convert-address">Address (optional)</label>
+            <textarea
+              hlmTextarea
+              id="convert-address"
+              rows="2"
+              formControlName="address"
+              class="w-full"
+            ></textarea>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="convert-emergency">Emergency contact (optional)</label>
+            <input
+              hlmInput
+              id="convert-emergency"
+              type="text"
+              formControlName="emergencyContact"
+              class="w-full"
+            />
+          </hlm-field>
+        </hlm-field-group>
+
+        <div hlmDialogFooter class="shrink-0">
+          <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+          <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+            <ng-icon hlm name="lucideUserCheck" size="sm" />
+            {{ submitting() ? 'Converting...' : 'Convert to Candidate' }}
+          </button>
+        </div>
+      </form>
+    } @else if (result(); as r) {
+      <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+        <div class="bg-muted/40 grid gap-3 rounded-md border p-4 text-sm">
+          <div>
+            <p class="text-muted-foreground text-xs">Username</p>
+            <p class="font-mono font-medium">{{ r.username }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Temporary password</p>
+            <p class="font-mono font-medium">{{ r.temporaryPassword }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Email</p>
+            <p class="font-medium">{{ r.email }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Candidate code</p>
+            <p class="font-mono font-medium">{{ r.candidateCode }}</p>
+          </div>
+        </div>
+        <p class="text-amber-700 text-xs">
+          Note: Account will be activated upon completion of required tuition fees.
+        </p>
+      </div>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" (click)="copyCredentials()">
+          <ng-icon
+            hlm
+            [name]="copyState() === 'copied' ? 'lucideCheckCheck' : 'lucideCopy'"
+            size="sm"
+          />
+          {{ copyState() === 'copied' ? 'Copied!' : 'Copy details' }}
+        </button>
+        <button hlmBtn type="button" hlmDialogClose>Done</button>
+      </div>
+    }
+  </hlm-dialog-content>
+</hlm-dialog>
