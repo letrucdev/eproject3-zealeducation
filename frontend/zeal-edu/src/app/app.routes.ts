@@ -24,6 +24,6 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'system/maintenance' },
     ],
   },
-  { path: '', pathMatch: 'full', redirectTo: 'app' },
-  { path: '**', redirectTo: 'app' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
+  { path: '**', redirectTo: 'login' },
 ];

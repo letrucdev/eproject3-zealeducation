@@ -1,7 +1,7 @@
 export enum UserRole {
   SystemAdmin = 'SystemAdmin',
   Incharge = 'Incharge',
-  Faculty = 'Falcuty',
+  Faculty = 'Faculty',
   Counselor = 'Counselor',
   AccountsStaff = 'AccountsStaff',
   Candidate = 'Candidate',

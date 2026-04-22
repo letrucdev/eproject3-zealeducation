@@ -14,6 +14,7 @@ public class GetStaffsQueryHandler(
     [
         UserRole.Incharge,
         UserRole.Counselor,
+        UserRole.Faculty,
         UserRole.AccountsStaff
     ];
 

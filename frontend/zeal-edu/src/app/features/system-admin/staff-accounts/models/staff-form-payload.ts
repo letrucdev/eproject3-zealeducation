@@ -28,6 +28,39 @@ export interface UpdateStaffPayload {
   isActive: boolean;
 }
 
+export interface CreateFacultyPayload {
+  username: string;
+  password: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  gender: Gender;
+  position: string;
+  department: string;
+  joinedDate: string | null;
+  facultyCode: string;
+  qualification: string;
+  specialization: string;
+  experienceYears: number;
+}
+
+export interface UpdateFacultyPayload {
+  fullName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  gender: Gender;
+  position: string;
+  department: string;
+  joinedDate: string;
+  isActive: boolean;
+  facultyCode: string;
+  qualification: string;
+  specialization: string;
+  experienceYears: number;
+}
+
 export interface StaffListQuery {
   page: number;
   pageSize: number;

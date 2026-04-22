@@ -9,8 +9,10 @@ import { StaffDetail } from '../../../core/models/staff-detail';
 import { StaffListItem } from '../../../core/models/staff-list-item';
 import { StaffStatistics } from '../../../core/models/staff-statistics';
 import {
+  CreateFacultyPayload,
   CreateStaffPayload,
   StaffListQuery,
+  UpdateFacultyPayload,
   UpdateStaffPayload,
 } from './models/staff-form-payload';
 
@@ -61,6 +63,26 @@ export class StaffAccountsService {
     >(() => ({
       mutationFn: ({ staffId, payload }) =>
         firstValueFrom(this._http.put<ApiResponse<unknown>>(`/staff/${staffId}`, payload)),
+      onSuccess: () => this._invalidateAll(),
+    }));
+  }
+
+  createFacultyMutation() {
+    return injectMutation<unknown, HttpErrorResponse, CreateFacultyPayload>(() => ({
+      mutationFn: (payload) =>
+        firstValueFrom(this._http.post<ApiResponse<unknown>>('/faculty', payload)),
+      onSuccess: () => this._invalidateAll(),
+    }));
+  }
+
+  updateFacultyMutation() {
+    return injectMutation<
+      unknown,
+      HttpErrorResponse,
+      { staffId: string; payload: UpdateFacultyPayload }
+    >(() => ({
+      mutationFn: ({ staffId, payload }) =>
+        firstValueFrom(this._http.put<ApiResponse<unknown>>(`/faculty/${staffId}`, payload)),
       onSuccess: () => this._invalidateAll(),
     }));
   }

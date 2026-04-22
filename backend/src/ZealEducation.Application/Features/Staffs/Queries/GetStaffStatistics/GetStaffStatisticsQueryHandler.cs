@@ -14,7 +14,8 @@ public class GetStaffStatisticsQueryHandler(
     [
         UserRole.Incharge,
         UserRole.Counselor,
-        UserRole.AccountsStaff
+        UserRole.AccountsStaff,
+        UserRole.Faculty
     ];
 
     public async Task<StaffStatisticsDto> Handle(GetStaffStatisticsQuery request, CancellationToken cancellationToken)

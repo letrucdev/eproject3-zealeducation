@@ -18,4 +18,10 @@ public class StaffDetailDto
     public string Department { get; set; } = default!;
     public DateOnly JoinedDate { get; set; }
     public DateTime? LastLogin { get; set; }
+
+    public Guid? FacultyId { get; set; }
+    public string? FacultyCode { get; set; }
+    public string? Qualification { get; set; }
+    public string? Specialization { get; set; }
+    public int? ExperienceYears { get; set; }
 }

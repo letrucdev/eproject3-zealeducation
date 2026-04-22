@@ -40,7 +40,7 @@ import { SidebarUserCard } from './sidebar-user-card';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <hlm-sidebar-wrapper>
+    <hlm-sidebar-wrapper class="max-w-full overflow-y-hidden">
       <hlm-sidebar collapsible="icon" variant="inset">
         <hlm-sidebar-header>
           <div class="flex items-center gap-2 px-1 py-1">
@@ -91,7 +91,7 @@ import { SidebarUserCard } from './sidebar-user-card';
         </hlm-sidebar-footer>
         <button hlmSidebarRail aria-label="Toggle sidebar"></button>
       </hlm-sidebar>
-      <main hlmSidebarInset>
+      <main hlmSidebarInset class="overflow-hidden">
         <header class="flex h-14 items-center gap-2 border-b px-4">
           <button hlmSidebarTrigger type="button" aria-label="Toggle sidebar"></button>
           <hlm-separator orientation="vertical" class="mx-1 h-4" />

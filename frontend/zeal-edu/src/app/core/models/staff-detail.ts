@@ -16,4 +16,9 @@ export interface StaffDetail {
   department: string;
   joinedDate: string;
   lastLogin: string | null;
+  facultyId: string | null;
+  facultyCode: string | null;
+  qualification: string | null;
+  specialization: string | null;
+  experienceYears: number | null;
 }
