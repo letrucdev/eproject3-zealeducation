@@ -11,6 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Staff> Staff => Set<Staff>();
     public DbSet<Faculty> Faculties => Set<Faculty>();
     public DbSet<Candidate> Candidates => Set<Candidate>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

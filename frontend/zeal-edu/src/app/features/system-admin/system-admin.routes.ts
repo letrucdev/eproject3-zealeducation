@@ -11,5 +11,10 @@ export const SYSTEM_ADMIN_ROUTES: Routes = [
     data: { breadcrumb: 'Staff Accounts' },
     loadComponent: () => import('./staff-accounts/staff-accounts-page'),
   },
+  {
+    path: 'audit-log',
+    data: { breadcrumb: 'Audit Log' },
+    loadComponent: () => import('./audit-log/audit-log-page'),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'maintenance' },
 ];

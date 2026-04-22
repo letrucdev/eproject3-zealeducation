@@ -24,7 +24,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         inject(Router).navigateByUrl('/login');
       }
 
-      if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {
+      if (
+        (err.status !== HttpStatusCode.Unauthorized && err.status !== HttpStatusCode.BadRequest) ||
+        !isLoginRequest
+      ) {
         toast.error(resolveMessage(err));
       }
 

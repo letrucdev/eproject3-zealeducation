@@ -19,6 +19,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        services.AddScoped<ISaveChangesInterceptor, AuditLogInterceptor>();
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
@@ -31,6 +32,10 @@ public static class DependencyInjection
         services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 
         services.AddScoped<ApplicationDbContextInitialiser>();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUserService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
 
         services.AddAuthenticationServices(configuration);
 

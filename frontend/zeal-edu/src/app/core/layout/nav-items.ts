@@ -31,6 +31,12 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideUserPlus',
         roles: [UserRole.SystemAdmin],
       },
+      {
+        label: 'Audit Log',
+        route: '/app/system/audit-log',
+        icon: 'lucideScrollText',
+        roles: [UserRole.SystemAdmin],
+      },
     ],
   },
 ];
