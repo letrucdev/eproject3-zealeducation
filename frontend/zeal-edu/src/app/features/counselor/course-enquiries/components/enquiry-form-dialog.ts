@@ -14,6 +14,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { DigitsOnlyDirective } from '../../../../shared/directives/digits-only.directive';
 import { CourseEnquiryDetail } from '../../../../core/models/course-enquiry-detail';
 import { EnquirySource } from '../../../../core/models/enquiry-source';
 import { EnquiryStatus } from '../../../../core/models/enquiry-status';
@@ -45,6 +46,7 @@ export type EnquiryFormSubmit = EnquiryFormSubmitCreate | EnquiryFormSubmitUpdat
     HlmInputImports,
     HlmSelectImports,
     HlmButtonImports,
+    DigitsOnlyDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'enquiry-form-dialog.html',
@@ -74,7 +76,7 @@ export class EnquiryFormDialog {
     fullName: ['', [Validators.required, Validators.maxLength(100)]],
     phone: [
       '',
-      [Validators.required, Validators.minLength(6), Validators.maxLength(20)],
+      [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern(/^\d+$/)],
     ],
     email: ['', [Validators.email, Validators.maxLength(100)]],
     courseInterested: ['', [Validators.required, Validators.maxLength(150)]],

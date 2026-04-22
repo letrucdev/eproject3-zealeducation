@@ -94,14 +94,14 @@
           <span class="text-muted-foreground">Page</span>
           <input
             hlmInput
+            appDigitsOnly
             type="text"
-            inputmode="numeric"
             class="h-9 w-14 text-center"
             aria-label="Go to page"
             [value]="pageInputValue()"
             [disabled]="isLoading() || pg.totalPages <= 1"
-            (keydown)="onPageInputKeyDown($event)"
-            (input)="onPageInput($event)"
+            (input)="pageInputValue.set($any($event.target).value)"
+            (keydown.enter)="commitPageInput(); $event.preventDefault()"
             (blur)="commitPageInput()"
           />
           <span class="text-muted-foreground">of {{ pg.totalPages }}</span>

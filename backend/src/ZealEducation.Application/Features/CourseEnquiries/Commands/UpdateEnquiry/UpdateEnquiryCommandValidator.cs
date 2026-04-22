@@ -15,8 +15,8 @@ public class UpdateEnquiryCommandValidator : AbstractValidator<UpdateEnquiryComm
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone is required")
-            .MaximumLength(20)
-            .Matches(@"^\+?[0-9\-\s]{6,20}$").WithMessage("Phone number is invalid");
+            .Length(10).WithMessage("Phone number must be 10 digits")
+            .Matches(@"^\d+$").WithMessage("Only digits are allowed");
 
         RuleFor(x => x.Email)
             .EmailAddress().When(x => !string.IsNullOrWhiteSpace(x.Email))

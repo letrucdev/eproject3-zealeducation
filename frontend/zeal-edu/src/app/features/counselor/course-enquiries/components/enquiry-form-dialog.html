@@ -32,8 +32,11 @@
 
           <hlm-field>
             <label hlmFieldLabel for="enquiry-phone">Phone</label>
-            <input hlmInput id="enquiry-phone" type="tel" formControlName="phone" class="w-full" />
+            <input hlmInput appDigitsOnly id="enquiry-phone" type="tel" formControlName="phone" class="w-full" />
             <hlm-field-error validator="required">Phone is required.</hlm-field-error>
+            <hlm-field-error validator="minlength">Phone number must be 10 digits</hlm-field-error>
+            <hlm-field-error validator="maxlength">Phone number must be 10 digits</hlm-field-error>
+            <hlm-field-error validator="pattern">Only digits are allowed</hlm-field-error>
           </hlm-field>
         </div>
 
