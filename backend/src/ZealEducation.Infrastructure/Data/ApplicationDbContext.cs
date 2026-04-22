@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<CourseEnquiry> CourseEnquiries => Set<CourseEnquiry>();
     public DbSet<EnquiryNote> EnquiryNotes => Set<EnquiryNote>();
+    public DbSet<SystemAsset> SystemAssets => Set<SystemAsset>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
