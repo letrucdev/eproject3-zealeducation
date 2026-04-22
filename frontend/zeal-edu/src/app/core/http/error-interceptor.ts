@@ -7,10 +7,6 @@ import { CurrentUser } from '../auth/current-user';
 import { Router } from '@angular/router';
 import { ApiResponse } from './api-response';
 
-interface ApiErrorBody {
-  message?: string;
-}
-
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authToken = inject(AuthToken);
   const currentUser = inject(CurrentUser);
@@ -38,13 +34,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-function resolveValidateError(err: HttpErrorResponse): string {
-  const body = err.error as ApiResponse<{ errors: [] }>;
-
-  return body.data?.errors.join(', ') ?? body.message;
-}
-
-function resolveMessage(err: HttpErrorResponse): string {
+export function resolveMessage(err: HttpErrorResponse): string {
   if (err.status === 0) {
     return 'Unable to reach the server. Please check your connection.';
   }
@@ -62,7 +52,7 @@ function resolveMessage(err: HttpErrorResponse): string {
 
   const body = err.error as ApiResponse<{ errors: [] }>;
   if (body) {
-    return body.data?.errors.join(', ') ?? body.message;
+    return body.data?.errors.join('\n') ?? body.message;
   }
 
   return err.message;

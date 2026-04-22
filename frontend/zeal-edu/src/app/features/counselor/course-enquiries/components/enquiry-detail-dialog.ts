@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
-import { lucideSend, lucideUserCheck } from '@ng-icons/lucide';
+import { lucideCheckCheck, lucideCopy, lucideSend, lucideUserCheck } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
@@ -38,7 +38,7 @@ export interface EnquiryNoteSubmit {
     HlmTextareaImports,
     HlmFieldImports,
   ],
-  providers: [provideIcons({ lucideSend, lucideUserCheck })],
+  providers: [provideIcons({ lucideCheckCheck, lucideCopy, lucideSend, lucideUserCheck })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'enquiry-detail-dialog.html',
 })
@@ -59,9 +59,11 @@ export class EnquiryDetailDialog {
   });
 
   readonly isOpen = signal(false);
+  readonly copyState = signal<'idle' | 'copied'>('idle');
 
   open(): void {
     this.noteForm.reset({ content: '' });
+    this.copyState.set('idle');
     this.dlg()?.open();
     this.isOpen.set(true);
   }
@@ -98,5 +100,32 @@ export class EnquiryDetailDialog {
     const d = this.detail();
     if (!d) return;
     this.convertClicked.emit(d);
+  }
+
+  protected async copyDetails(): Promise<void> {
+    const d = this.detail();
+    if (!d) return;
+
+    const lines = [
+      `Full Name: ${d.fullName}`,
+      `Status: ${this.statusLabel(d.status)}`,
+      `Phone: ${d.phone}`,
+      `Email: ${d.email ?? '—'}`,
+      `Course: ${d.courseInterested}`,
+      `Source: ${this.sourceLabel(d.source)}`,
+      `Next Follow-Up: ${d.nextFollowUpDate ? new Date(d.nextFollowUpDate).toLocaleDateString() : '—'}`,
+      `Assigned Counselor: ${d.assignedCounselorName}`,
+    ];
+    if (d.convertedCandidateCode) {
+      lines.push(`Candidate Code: ${d.convertedCandidateCode}`);
+    }
+
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      this.copyState.set('copied');
+      setTimeout(() => this.copyState.set('idle'), 2000);
+    } catch {
+      this.copyState.set('idle');
+    }
   }
 }
