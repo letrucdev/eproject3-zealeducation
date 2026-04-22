@@ -16,6 +16,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { DigitsOnlyDirective } from '../../../../shared/directives/digits-only.directive';
 import { Gender } from '../../../../core/models/gender';
 import { StaffDetail } from '../../../../core/models/staff-detail';
 import { UserRole } from '../../../../core/models/user-role';
@@ -66,6 +67,7 @@ export type StaffFormSubmit =
     HlmInputImports,
     HlmSelectImports,
     HlmButtonImports,
+    DigitsOnlyDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'staff-form-dialog.html',
@@ -110,7 +112,15 @@ export class StaffFormDialog {
     password: ['', [Validators.required, Validators.minLength(8)]],
     fullName: ['', [Validators.required, Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-    phone: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
+    phone: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(10),
+        Validators.pattern(/^\d+$/),
+      ],
+    ],
     dob: ['', [Validators.required]],
     gender: [Gender.Male, [Validators.required]],
     role: [UserRole.Incharge, [Validators.required]],

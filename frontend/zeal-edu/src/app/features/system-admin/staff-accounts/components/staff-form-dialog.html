@@ -16,11 +16,7 @@
         }}
       </p>
     </div>
-    <form
-      [formGroup]="form"
-      (ngSubmit)="submit()"
-      class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
-    >
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
       <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
         <div class="grid gap-4 sm:grid-cols-2">
           <hlm-field>
@@ -89,6 +85,7 @@
           <label hlmFieldLabel for="staff-phone">Phone</label>
           <input
             hlmInput
+            appDigitsOnly
             id="staff-phone"
             type="tel"
             formControlName="phone"
@@ -96,12 +93,9 @@
             class="w-full"
           />
           <hlm-field-error validator="required">Phone is required.</hlm-field-error>
-          <hlm-field-error validator="minlength"
-            >Phone number must be 10 numbers</hlm-field-error
-          >
-          <hlm-field-error validator="maxlength"
-            >Phone number must be 10 numbers</hlm-field-error
-          >
+          <hlm-field-error validator="minlength">Phone number must be 10 digits</hlm-field-error>
+          <hlm-field-error validator="maxlength">Phone number must be 10 digits</hlm-field-error>
+          <hlm-field-error validator="pattern">Only digits are allowed</hlm-field-error>
         </hlm-field>
 
         <div class="grid gap-4 sm:grid-cols-2">
@@ -140,9 +134,7 @@
                 @if (canSelectNonFaculty()) {
                   <hlm-select-item [value]="roles.Incharge">Incharge</hlm-select-item>
                   <hlm-select-item [value]="roles.Counselor">Counselor</hlm-select-item>
-                  <hlm-select-item [value]="roles.AccountsStaff"
-                    >Accounts Staff</hlm-select-item
-                  >
+                  <hlm-select-item [value]="roles.AccountsStaff">Accounts Staff</hlm-select-item>
                 }
               </hlm-select-content>
             </hlm-select>
@@ -199,9 +191,7 @@
                 formControlName="experienceYears"
                 class="w-full"
               />
-              <hlm-field-error validator="required"
-                >Experience years is required.</hlm-field-error
-              >
+              <hlm-field-error validator="required">Experience years is required.</hlm-field-error>
               <hlm-field-error validator="min">Cannot be negative.</hlm-field-error>
               <hlm-field-error validator="max">Must be 80 or less.</hlm-field-error>
             </hlm-field>

@@ -15,6 +15,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { EnquirySource } from '../../../../core/models/enquiry-source';
 import { EnquiryStatus } from '../../../../core/models/enquiry-status';
@@ -35,6 +36,7 @@ export interface EnquiryFilterValue {
     HlmSelectImports,
     HlmButtonImports,
     HlmIconImports,
+    HlmCheckboxImports,
   ],
   providers: [provideIcons({ lucideSearch, lucidePlus, lucideCalendarClock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
