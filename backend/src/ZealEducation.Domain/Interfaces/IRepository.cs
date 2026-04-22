@@ -12,4 +12,5 @@ public interface IRepository<T> where T : BaseEntity
     void Update(T entity);
     void Delete(T entity);
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
+    IQueryable<T> Query();
 }

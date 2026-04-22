@@ -1,0 +1,69 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [trackBy]="trackById"
+  itemLabel="staff"
+  emptyMessage="No staff found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+>
+  <ng-template staffCell="username" let-row>
+    <span class="font-mono text-xs font-semibold">{{ row.username }}</span>
+  </ng-template>
+
+  <ng-template staffCell="fullName" let-row>
+    <div class="flex items-center gap-3">
+      <span
+        class="bg-muted flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+        aria-hidden="true"
+      >
+        {{ getUserInitials(row.fullName) }}
+      </span>
+      <span class="font-medium">{{ row.fullName }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template staffCell="gender" let-row>
+    {{ genderLabel(row.gender) }}
+  </ng-template>
+
+  <ng-template staffCell="dob" let-row>
+    {{ row.dob | date: 'dd MMM yyyy' }}
+  </ng-template>
+
+  <ng-template staffCell="role" let-row>
+    <span hlmBadge variant="secondary">{{ roleLabel(row.role) }}</span>
+  </ng-template>
+
+  <ng-template staffCell="status" let-row>
+    @if (row.isActive) {
+      <span hlmBadge class="bg-emerald-100 text-emerald-800">
+        <span class="me-1 size-1.5 rounded-full bg-emerald-600"></span>
+        Active
+      </span>
+    } @else {
+      <span hlmBadge variant="secondary">
+        <span class="me-1 size-1.5 rounded-full bg-slate-400"></span>
+        Inactive
+      </span>
+    }
+  </ng-template>
+
+  <ng-template staffCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="editClicked.emit(row)"
+        [attr.aria-label]="'Edit ' + row.fullName"
+      >
+        <ng-icon hlm name="lucidePencil" size="sm" />
+        Edit
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

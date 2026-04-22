@@ -1,0 +1,49 @@
+<form [formGroup]="form" class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-2">
+    <div class="relative w-full md:w-72">
+      <ng-icon
+        hlm
+        name="lucideSearch"
+        size="sm"
+        class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+      />
+      <input
+        hlmInput
+        type="search"
+        class="w-full ps-9"
+        placeholder="Search by name, email, or username..."
+        formControlName="search"
+        aria-label="Search staff"
+      />
+    </div>
+
+    <hlm-select formControlName="role" [itemToString]="roleLabel" class="w-full md:w-44">
+      <hlm-select-trigger>
+        <hlm-select-value placeholder="Role: All" />
+      </hlm-select-trigger>
+      <hlm-select-content *hlmSelectPortal>
+        <hlm-select-item value="">All Roles</hlm-select-item>
+        <hlm-select-item [value]="roles.Faculty">Faculty</hlm-select-item>
+        <hlm-select-item [value]="roles.Incharge">Incharge</hlm-select-item>
+        <hlm-select-item [value]="roles.Counselor">Counselor</hlm-select-item>
+        <hlm-select-item [value]="roles.AccountsStaff">Accounts Staff</hlm-select-item>
+      </hlm-select-content>
+    </hlm-select>
+
+    <hlm-select formControlName="status" [itemToString]="statusLabel" class="w-full md:w-44">
+      <hlm-select-trigger>
+        <hlm-select-value placeholder="Status: All" />
+      </hlm-select-trigger>
+      <hlm-select-content *hlmSelectPortal>
+        <hlm-select-item value="all">All Status</hlm-select-item>
+        <hlm-select-item value="active">Active</hlm-select-item>
+        <hlm-select-item value="inactive">Inactive</hlm-select-item>
+      </hlm-select-content>
+    </hlm-select>
+  </div>
+
+  <button hlmBtn type="button" (click)="createClicked.emit()">
+    <ng-icon hlm name="lucidePlus" size="sm" />
+    Add User
+  </button>
+</form>

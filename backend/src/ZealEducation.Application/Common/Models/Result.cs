@@ -3,7 +3,7 @@ namespace ZealEducation.Application.Common.Models;
 public class Result
 {
     public bool Succeeded { get; init; }
-    public string[] Errors { get; init; } = Array.Empty<string>();
+    public string[] Errors { get; init; } = [];
 
     protected Result(bool succeeded, IEnumerable<string> errors)
     {
@@ -11,7 +11,7 @@ public class Result
         Errors = [.. errors];
     }
 
-    public static Result Success() => new(true, Array.Empty<string>());
+    public static Result Success() => new(true, []);
     public static Result Failure(IEnumerable<string> errors) => new(false, errors);
     public static Result Failure(string error) => new(false, [error]);
 }
