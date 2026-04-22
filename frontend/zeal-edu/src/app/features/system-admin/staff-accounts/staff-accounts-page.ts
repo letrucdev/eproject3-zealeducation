@@ -64,6 +64,7 @@ import { StaffAccountsService } from './staff-accounts.service';
         [pageSize]="pageSize()"
         (editClicked)="onEditClicked($event)"
         (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
       />
 
       <app-staff-form-dialog
@@ -109,9 +110,15 @@ export default class StaffAccountsPage {
   protected readonly detailQuery = this._service.detailQuery(this.editingStaffId);
   protected readonly createMutation = this._service.createMutation();
   protected readonly updateMutation = this._service.updateMutation();
+  protected readonly createFacultyMutation = this._service.createFacultyMutation();
+  protected readonly updateFacultyMutation = this._service.updateFacultyMutation();
 
   protected readonly isSubmittingForm = computed(
-    () => this.createMutation.isPending() || this.updateMutation.isPending(),
+    () =>
+      this.createMutation.isPending() ||
+      this.updateMutation.isPending() ||
+      this.createFacultyMutation.isPending() ||
+      this.updateFacultyMutation.isPending(),
   );
 
   constructor() {
@@ -148,6 +155,11 @@ export default class StaffAccountsPage {
     this.page.set(page);
   }
 
+  onPageSizeChanged(size: number): void {
+    this.pageSize.set(size);
+    this.page.set(1);
+  }
+
   onCreateClicked(): void {
     this.formDialog().openCreate();
   }
@@ -157,6 +169,31 @@ export default class StaffAccountsPage {
   }
 
   onFormSubmitted(event: StaffFormSubmit): void {
+    if (event.kind === 'faculty' && event.mode === 'create') {
+      this.createFacultyMutation.mutate(event.payload, {
+        onSuccess: () => {
+          toast.success('Faculty account created successfully.');
+          this.formDialog().close();
+        },
+        onError: (err) => toast.error(this._extractError(err) ?? 'Failed to create faculty.'),
+      });
+      return;
+    }
+
+    if (event.kind === 'faculty' && event.mode === 'edit') {
+      this.updateFacultyMutation.mutate(
+        { staffId: event.staffId, payload: event.payload },
+        {
+          onSuccess: () => {
+            toast.success('Faculty account updated successfully.');
+            this.formDialog().close();
+          },
+          onError: (err) => toast.error(this._extractError(err) ?? 'Failed to update faculty.'),
+        },
+      );
+      return;
+    }
+
     if (event.mode === 'create') {
       this.createMutation.mutate(event.payload, {
         onSuccess: () => {

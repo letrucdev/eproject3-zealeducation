@@ -1,0 +1,124 @@
+<div class="overflow-hidden rounded-md border w-full">
+  <div hlmTableContainer>
+    <table hlmTable class="w-full">
+      <thead hlmTHead>
+        <tr hlmTr>
+          @for (col of columns(); track col.key) {
+            <th
+              hlmTh
+              scope="col"
+              [class]="headerClasses(col)"
+              [style.width]="widthStyle(col)"
+              [style.min-width]="minWidthStyle(col)"
+            >
+              {{ col.header }}
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody hlmTBody>
+        @if (isLoading()) {
+          @for (row of skeletonRows; track row) {
+            <tr hlmTr>
+              <td hlmTd [attr.colspan]="columns().length">
+                <hlm-skeleton class="h-10 w-full" />
+              </td>
+            </tr>
+          }
+        } @else if (displayRows().length === 0) {
+          <tr hlmTr>
+            <td hlmTd [attr.colspan]="columns().length" class="h-14 text-center">
+              {{ emptyMessage() }}
+            </td>
+          </tr>
+        } @else {
+          @for (row of displayRows(); track trackFn()(row, $index); let i = $index) {
+            <tr hlmTr [style.height]="rowHeight() || null">
+              @for (col of columns(); track col.key) {
+                <td hlmTd [class]="cellClasses(col)">
+                  @if (cellTemplateFor(col.key); as tpl) {
+                    <ng-container
+                      *ngTemplateOutlet="
+                        tpl;
+                        context: { $implicit: row, row: row, index: i }
+                      "
+                    />
+                  } @else {
+                    {{ renderValue(row, col) }}
+                  }
+                </td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (page(); as pg) {
+  <div class="flex flex-col justify-between py-4 sm:flex-row sm:items-center flex-wrap gap-y-4">
+    <div class="text-muted-foreground text-sm">
+      Showing {{ showingFrom() }} to {{ showingTo() }} of {{ pg.totalCount }}
+      {{ itemLabel() }}
+    </div>
+    <div class="mt-2 flex flex-wrap items-center gap-2 gap-y-4 sm:mt-0">
+      <div class="flex items-center gap-2 text-sm">
+        <span class="text-muted-foreground">Rows per page</span>
+        <hlm-select [formControl]="pageSizeControl" class="w-20">
+          <hlm-select-trigger class="h-9">
+            <hlm-select-value />
+          </hlm-select-trigger>
+          <hlm-select-content *hlmSelectPortal>
+            @for (opt of pageSizeOptions(); track opt) {
+              <hlm-select-item [value]="opt">{{ opt }}</hlm-select-item>
+            }
+          </hlm-select-content>
+        </hlm-select>
+      </div>
+
+      <div class="flex gap-2 items-center">
+        <button
+          size="sm"
+          variant="outline"
+          hlmBtn
+          type="button"
+          [disabled]="!pg.hasPreviousPage || isLoading()"
+          (click)="prev()"
+        >
+          <ng-icon hlm name="lucideChevronLeft" size="sm" class="mr-1" />
+          Previous
+        </button>
+
+        <div class="flex items-center gap-1.5 text-sm">
+          <span class="text-muted-foreground">Page</span>
+          <input
+            hlmInput
+            type="text"
+            inputmode="numeric"
+            class="h-9 w-14 text-center"
+            aria-label="Go to page"
+            [value]="pageInputValue()"
+            [disabled]="isLoading() || pg.totalPages <= 1"
+            (keydown)="onPageInputKeyDown($event)"
+            (input)="onPageInput($event)"
+            (blur)="commitPageInput()"
+          />
+          <span class="text-muted-foreground">of {{ pg.totalPages }}</span>
+        </div>
+
+        <button
+          size="sm"
+          variant="outline"
+          hlmBtn
+          type="button"
+          [disabled]="!pg.hasNextPage || isLoading()"
+          (click)="next()"
+        >
+          Next
+          <ng-icon hlm name="lucideChevronRight" size="sm" class="ml-1" />
+        </button>
+      </div>
+    </div>
+  </div>
+}

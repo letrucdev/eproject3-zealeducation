@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
@@ -18,21 +19,43 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { Gender } from '../../../../core/models/gender';
 import { StaffDetail } from '../../../../core/models/staff-detail';
 import { UserRole } from '../../../../core/models/user-role';
-import { CreateStaffPayload, UpdateStaffPayload } from '../models/staff-form-payload';
+import {
+  CreateFacultyPayload,
+  CreateStaffPayload,
+  UpdateFacultyPayload,
+  UpdateStaffPayload,
+} from '../models/staff-form-payload';
 import { ROLE_LABELS } from '../../../../core/layout/nav-items';
 
 export type StaffFormMode = 'create' | 'edit';
 
-export interface StaffFormSubmitCreate {
+export interface StaffFormSubmitCreateStaff {
+  kind: 'staff';
   mode: 'create';
   payload: CreateStaffPayload;
 }
-export interface StaffFormSubmitUpdate {
+export interface StaffFormSubmitUpdateStaff {
+  kind: 'staff';
   mode: 'edit';
   staffId: string;
   payload: UpdateStaffPayload;
 }
-export type StaffFormSubmit = StaffFormSubmitCreate | StaffFormSubmitUpdate;
+export interface StaffFormSubmitCreateFaculty {
+  kind: 'faculty';
+  mode: 'create';
+  payload: CreateFacultyPayload;
+}
+export interface StaffFormSubmitUpdateFaculty {
+  kind: 'faculty';
+  mode: 'edit';
+  staffId: string;
+  payload: UpdateFacultyPayload;
+}
+export type StaffFormSubmit =
+  | StaffFormSubmitCreateStaff
+  | StaffFormSubmitUpdateStaff
+  | StaffFormSubmitCreateFaculty
+  | StaffFormSubmitUpdateFaculty;
 
 @Component({
   selector: 'app-staff-form-dialog',
@@ -45,212 +68,7 @@ export type StaffFormSubmit = StaffFormSubmitCreate | StaffFormSubmitUpdate;
     HlmButtonImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <hlm-dialog #dlg>
-      <hlm-dialog-content
-        *hlmDialogPortal
-        class="sm:max-w-4xl w-3xl flex max-h-[90dvh] flex-col"
-        [showCloseButton]="true"
-      >
-        <div hlmDialogHeader>
-          <h2 hlmDialogTitle>
-            {{ isEdit() ? 'Edit Staff Account' : 'Add Staff Account' }}
-          </h2>
-          <p class="text-muted-foreground text-sm">
-            {{
-              isEdit()
-                ? 'Update staff details. Username cannot be changed.'
-                : 'Create a new staff account with a temporary password.'
-            }}
-          </p>
-        </div>
-        <form
-          [formGroup]="form"
-          (ngSubmit)="submit()"
-          class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
-        >
-          <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <hlm-field>
-                <label hlmFieldLabel for="staff-username">Username</label>
-                <input
-                  hlmInput
-                  id="staff-username"
-                  type="text"
-                  formControlName="username"
-                  autocomplete="off"
-                  class="w-full"
-                />
-                <hlm-field-error validator="required">Username is required.</hlm-field-error>
-                <hlm-field-error validator="minlength">
-                  Username must be at least 3 characters.
-                </hlm-field-error>
-                <hlm-field-error validator="pattern">
-                  Only letters, digits, dot and underscore are allowed.
-                </hlm-field-error>
-              </hlm-field>
-
-              <hlm-field>
-                <label hlmFieldLabel for="staff-fullname">Full Name</label>
-                <input
-                  hlmInput
-                  id="staff-fullname"
-                  type="text"
-                  formControlName="fullName"
-                  class="w-full"
-                />
-                <hlm-field-error validator="required">Full name is required.</hlm-field-error>
-              </hlm-field>
-            </div>
-
-            @if (!isEdit()) {
-              <hlm-field>
-                <label hlmFieldLabel for="staff-password">Temporary password</label>
-                <input
-                  hlmInput
-                  id="staff-password"
-                  type="password"
-                  formControlName="password"
-                  autocomplete="new-password"
-                  class="w-full"
-                />
-                <hlm-field-error validator="required">Password is required.</hlm-field-error>
-                <hlm-field-error validator="minlength"> Minimum 8 characters. </hlm-field-error>
-              </hlm-field>
-            }
-
-            <hlm-field>
-              <label hlmFieldLabel for="staff-email">Email</label>
-              <input
-                hlmInput
-                id="staff-email"
-                type="email"
-                formControlName="email"
-                autocomplete="email"
-                class="w-full"
-              />
-              <hlm-field-error validator="required">Email is required.</hlm-field-error>
-              <hlm-field-error validator="email">Invalid email format.</hlm-field-error>
-            </hlm-field>
-
-            <hlm-field>
-              <label hlmFieldLabel for="staff-phone">Phone</label>
-              <input
-                hlmInput
-                id="staff-phone"
-                type="tel"
-                formControlName="phone"
-                autocomplete="tel"
-                class="w-full"
-              />
-              <hlm-field-error validator="required">Phone is required.</hlm-field-error>
-              <hlm-field-error validator="minLength"
-                >Phone number must be 10 numbers</hlm-field-error
-              >
-              <hlm-field-error validator="maxLength"
-                >Phone number must be 10 numbers</hlm-field-error
-              >
-            </hlm-field>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-              <hlm-field>
-                <label hlmFieldLabel for="staff-dob">Date of birth</label>
-                <input hlmInput id="staff-dob" type="date" formControlName="dob" class="w-full" />
-                <hlm-field-error validator="required">Date of birth is required.</hlm-field-error>
-              </hlm-field>
-
-              <hlm-field>
-                <label hlmFieldLabel for="staff-gender">Gender</label>
-                <hlm-select formControlName="gender" [itemToString]="genderLabel" class="w-full">
-                  <hlm-select-trigger class="w-full">
-                    <hlm-select-value placeholder="Select gender" />
-                  </hlm-select-trigger>
-                  <hlm-select-content *hlmSelectPortal>
-                    <hlm-select-item [value]="genders.Male">Male</hlm-select-item>
-                    <hlm-select-item [value]="genders.Female">Female</hlm-select-item>
-                    <hlm-select-item [value]="genders.Other">Other</hlm-select-item>
-                  </hlm-select-content>
-                </hlm-select>
-              </hlm-field>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-3">
-              <hlm-field>
-                <label hlmFieldLabel for="staff-role">Role</label>
-                <hlm-select formControlName="role" [itemToString]="roleLabel" class="w-full">
-                  <hlm-select-trigger class="w-full">
-                    <hlm-select-value placeholder="Select role" />
-                  </hlm-select-trigger>
-                  <hlm-select-content *hlmSelectPortal>
-                    <hlm-select-item [value]="roles.Incharge">Incharge</hlm-select-item>
-                    <hlm-select-item [value]="roles.Counselor">Counselor</hlm-select-item>
-                    <hlm-select-item [value]="roles.AccountsStaff">Accounts Staff</hlm-select-item>
-                  </hlm-select-content>
-                </hlm-select>
-              </hlm-field>
-
-              <hlm-field>
-                <label hlmFieldLabel for="staff-position">Position</label>
-                <input
-                  hlmInput
-                  id="staff-position"
-                  type="text"
-                  formControlName="position"
-                  class="w-full"
-                />
-                <hlm-field-error validator="required">Position is required.</hlm-field-error>
-              </hlm-field>
-
-              <hlm-field>
-                <label hlmFieldLabel for="staff-department">Department</label>
-                <input
-                  hlmInput
-                  id="staff-department"
-                  type="text"
-                  formControlName="department"
-                  class="w-full"
-                />
-                <hlm-field-error validator="required">Department is required.</hlm-field-error>
-              </hlm-field>
-            </div>
-
-            <hlm-field>
-              <label hlmFieldLabel for="staff-joined">Joined date</label>
-              <input
-                hlmInput
-                id="staff-joined"
-                type="date"
-                formControlName="joinedDate"
-                class="w-full"
-              />
-            </hlm-field>
-
-            @if (isEdit()) {
-              <hlm-field>
-                <label hlmFieldLabel for="staff-status">Status</label>
-                <hlm-select formControlName="isActive" [itemToString]="statusLabel" class="w-full">
-                  <hlm-select-trigger class="w-full">
-                    <hlm-select-value placeholder="Select status" />
-                  </hlm-select-trigger>
-                  <hlm-select-content *hlmSelectPortal>
-                    <hlm-select-item [value]="true">Active</hlm-select-item>
-                    <hlm-select-item [value]="false">Inactive</hlm-select-item>
-                  </hlm-select-content>
-                </hlm-select>
-              </hlm-field>
-            }
-          </hlm-field-group>
-
-          <div hlmDialogFooter class="shrink-0">
-            <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
-            <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
-              {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create staff' }}
-            </button>
-          </div>
-        </form>
-      </hlm-dialog-content>
-    </hlm-dialog>
-  `,
+  templateUrl: 'staff-form-dialog.html',
 })
 export class StaffFormDialog {
   private readonly _fb = inject(FormBuilder);
@@ -300,6 +118,26 @@ export class StaffFormDialog {
     department: ['', [Validators.required, Validators.maxLength(60)]],
     joinedDate: [this._today()],
     isActive: [true],
+    facultyCode: [''],
+    qualification: [''],
+    specialization: [''],
+    experienceYears: [0],
+  });
+
+  private readonly _roleValue = toSignal(this.form.controls.role.valueChanges, {
+    initialValue: this.form.controls.role.value,
+  });
+
+  protected readonly isFacultyRole = computed(() => this._roleValue() === UserRole.Faculty);
+
+  protected readonly canSelectFaculty = computed(() => {
+    if (!this.isEdit()) return true;
+    return this.initial()?.role === UserRole.Faculty;
+  });
+
+  protected readonly canSelectNonFaculty = computed(() => {
+    if (!this.isEdit()) return true;
+    return this.initial()?.role !== UserRole.Faculty;
   });
 
   constructor() {
@@ -313,6 +151,27 @@ export class StaffFormDialog {
         this.form.controls.password.enable({ emitEvent: false });
         this.form.controls.joinedDate.enable({ emitEvent: false });
       }
+    });
+
+    effect(() => {
+      const facultyValidators = [Validators.required, Validators.maxLength(100)];
+      const codeValidators = [Validators.required, Validators.maxLength(20)];
+      const expValidators = [Validators.required, Validators.min(0), Validators.max(80)];
+      if (this.isFacultyRole()) {
+        this.form.controls.facultyCode.setValidators(codeValidators);
+        this.form.controls.qualification.setValidators(facultyValidators);
+        this.form.controls.specialization.setValidators(facultyValidators);
+        this.form.controls.experienceYears.setValidators(expValidators);
+      } else {
+        this.form.controls.facultyCode.clearValidators();
+        this.form.controls.qualification.clearValidators();
+        this.form.controls.specialization.clearValidators();
+        this.form.controls.experienceYears.clearValidators();
+      }
+      this.form.controls.facultyCode.updateValueAndValidity({ emitEvent: false });
+      this.form.controls.qualification.updateValueAndValidity({ emitEvent: false });
+      this.form.controls.specialization.updateValueAndValidity({ emitEvent: false });
+      this.form.controls.experienceYears.updateValueAndValidity({ emitEvent: false });
     });
   }
 
@@ -332,6 +191,10 @@ export class StaffFormDialog {
       department: '',
       joinedDate: this._today(),
       isActive: true,
+      facultyCode: '',
+      qualification: '',
+      specialization: '',
+      experienceYears: 0,
     });
     this.dlg()?.open();
   }
@@ -352,6 +215,10 @@ export class StaffFormDialog {
       department: detail.department,
       joinedDate: detail.joinedDate,
       isActive: detail.isActive,
+      facultyCode: detail.facultyCode ?? '',
+      qualification: detail.qualification ?? '',
+      specialization: detail.specialization ?? '',
+      experienceYears: detail.experienceYears ?? 0,
     });
     this.dlg()?.open();
   }
@@ -363,43 +230,92 @@ export class StaffFormDialog {
   submit(): void {
     if (this.form.invalid) return;
     const v = this.form.getRawValue();
+    const isFaculty = v.role === UserRole.Faculty;
 
     if (this.isEdit()) {
       const detail = this.initial();
       if (!detail) return;
-      this.submitted.emit({
-        mode: 'edit',
-        staffId: detail.staffId,
-        payload: {
-          fullName: v.fullName,
-          email: v.email,
-          phone: v.phone,
-          dob: v.dob,
-          gender: v.gender,
-          role: v.role,
-          position: v.position,
-          department: v.department,
-          joinedDate: v.joinedDate,
-          isActive: v.isActive,
-        },
-      });
+      if (isFaculty) {
+        this.submitted.emit({
+          kind: 'faculty',
+          mode: 'edit',
+          staffId: detail.staffId,
+          payload: {
+            fullName: v.fullName,
+            email: v.email,
+            phone: v.phone,
+            dob: v.dob,
+            gender: v.gender,
+            position: v.position,
+            department: v.department,
+            joinedDate: v.joinedDate,
+            isActive: v.isActive,
+            facultyCode: v.facultyCode,
+            qualification: v.qualification,
+            specialization: v.specialization,
+            experienceYears: Number(v.experienceYears),
+          },
+        });
+      } else {
+        this.submitted.emit({
+          kind: 'staff',
+          mode: 'edit',
+          staffId: detail.staffId,
+          payload: {
+            fullName: v.fullName,
+            email: v.email,
+            phone: v.phone,
+            dob: v.dob,
+            gender: v.gender,
+            role: v.role,
+            position: v.position,
+            department: v.department,
+            joinedDate: v.joinedDate,
+            isActive: v.isActive,
+          },
+        });
+      }
     } else {
-      this.submitted.emit({
-        mode: 'create',
-        payload: {
-          username: v.username,
-          password: v.password,
-          fullName: v.fullName,
-          email: v.email,
-          phone: v.phone,
-          dob: v.dob,
-          gender: v.gender,
-          role: v.role,
-          position: v.position,
-          department: v.department,
-          joinedDate: v.joinedDate || null,
-        },
-      });
+      if (isFaculty) {
+        this.submitted.emit({
+          kind: 'faculty',
+          mode: 'create',
+          payload: {
+            username: v.username,
+            password: v.password,
+            fullName: v.fullName,
+            email: v.email,
+            phone: v.phone,
+            dob: v.dob,
+            gender: v.gender,
+            position: v.position,
+            department: v.department,
+            joinedDate: v.joinedDate || null,
+            facultyCode: v.facultyCode,
+            qualification: v.qualification,
+            specialization: v.specialization,
+            experienceYears: Number(v.experienceYears),
+          },
+        });
+      } else {
+        this.submitted.emit({
+          kind: 'staff',
+          mode: 'create',
+          payload: {
+            username: v.username,
+            password: v.password,
+            fullName: v.fullName,
+            email: v.email,
+            phone: v.phone,
+            dob: v.dob,
+            gender: v.gender,
+            role: v.role,
+            position: v.position,
+            department: v.department,
+            joinedDate: v.joinedDate || null,
+          },
+        });
+      }
     }
   }
 
