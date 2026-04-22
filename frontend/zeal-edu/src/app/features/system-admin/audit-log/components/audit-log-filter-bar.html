@@ -1,0 +1,56 @@
+<form [formGroup]="form" class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+  <div class="relative w-full md:w-72">
+    <ng-icon
+      hlm
+      name="lucideSearch"
+      size="sm"
+      class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+    />
+    <input
+      hlmInput
+      type="search"
+      class="w-full ps-9"
+      placeholder="Search table, record, or user..."
+      formControlName="search"
+      aria-label="Search audit logs"
+    />
+  </div>
+
+  <hlm-select formControlName="action" [itemToString]="actionLabel" class="w-full md:w-44">
+    <hlm-select-trigger>
+      <hlm-select-value placeholder="Action: All" />
+    </hlm-select-trigger>
+    <hlm-select-content *hlmSelectPortal>
+      <hlm-select-item value="">All Actions</hlm-select-item>
+      <hlm-select-item [value]="actions.INSERT">Insert</hlm-select-item>
+      <hlm-select-item [value]="actions.UPDATE">Update</hlm-select-item>
+      <hlm-select-item [value]="actions.DELETE">Delete</hlm-select-item>
+      <hlm-select-item [value]="actions.OVERRIDE">Override</hlm-select-item>
+    </hlm-select-content>
+  </hlm-select>
+
+  <input
+    hlmInput
+    type="text"
+    class="w-full md:w-48"
+    placeholder="Table name"
+    formControlName="tableName"
+    aria-label="Filter by table name"
+  />
+
+  <input
+    hlmInput
+    type="date"
+    class="w-full md:w-44"
+    formControlName="fromDate"
+    aria-label="From date"
+  />
+
+  <input
+    hlmInput
+    type="date"
+    class="w-full md:w-44"
+    formControlName="toDate"
+    aria-label="To date"
+  />
+</form>

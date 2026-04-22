@@ -1,0 +1,72 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="flex max-h-[90dvh] w-3xl flex-col sm:max-w-4xl"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Audit Log Entry</h2>
+      <p class="text-muted-foreground text-sm">
+        Full record for a tracked change — old and new values are preserved as JSON.
+      </p>
+    </div>
+
+    <div class="mt-2 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+      @if (isLoading()) {
+        <hlm-skeleton class="h-24 w-full" />
+        <hlm-skeleton class="h-48 w-full" />
+      } @else if (detail(); as d) {
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div>
+            <div class="text-muted-foreground text-xs">Changed at</div>
+            <div class="font-mono text-sm">{{ d.changedAt | date: 'dd MMM yyyy HH:mm:ss' }}</div>
+          </div>
+          <div>
+            <div class="text-muted-foreground text-xs">Action</div>
+            <span hlmBadge [class]="actionBadgeClass(d.action)">{{ d.action }}</span>
+          </div>
+          <div>
+            <div class="text-muted-foreground text-xs">User</div>
+            <div class="text-sm">
+              {{ d.userFullName }}
+              <span class="text-muted-foreground font-mono text-xs">({{ d.username }})</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-muted-foreground text-xs">IP Address</div>
+            <div class="font-mono text-sm">{{ d.ipAddress ?? '—' }}</div>
+          </div>
+          <div>
+            <div class="text-muted-foreground text-xs">Table</div>
+            <div class="font-mono text-sm">{{ d.tableName }}</div>
+          </div>
+          <div>
+            <div class="text-muted-foreground text-xs">Record ID</div>
+            <div class="font-mono text-sm break-all">{{ d.recordId }}</div>
+          </div>
+        </div>
+
+        <div class="grid gap-3 lg:grid-cols-2">
+          <section class="flex flex-col gap-2">
+            <h3 class="text-sm font-semibold">Old Value</h3>
+            <pre
+              class="bg-muted max-h-80 overflow-auto rounded-md p-3 font-mono text-xs"
+              >{{ formattedOld() || '—' }}</pre>
+          </section>
+          <section class="flex flex-col gap-2">
+            <h3 class="text-sm font-semibold">New Value</h3>
+            <pre
+              class="bg-muted max-h-80 overflow-auto rounded-md p-3 font-mono text-xs"
+              >{{ formattedNew() || '—' }}</pre>
+          </section>
+        </div>
+      } @else {
+        <p class="text-muted-foreground text-sm">No details to display.</p>
+      }
+    </div>
+
+    <div class="mt-4 flex justify-end">
+      <button hlmBtn type="button" variant="outline" (click)="close()">Close</button>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

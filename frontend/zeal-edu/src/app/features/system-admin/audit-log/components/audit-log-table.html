@@ -1,0 +1,74 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [trackBy]="trackById"
+  itemLabel="logs"
+  emptyMessage="No audit log entries found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+>
+  <ng-template auditLogCell="changedAt" let-row>
+    <span class="text-sm">{{ row.changedAt | date: 'dd MMM yyyy HH:mm' }}</span>
+  </ng-template>
+
+  <ng-template auditLogCell="user" let-row>
+    <div class="flex items-center gap-3">
+      <span
+        class="bg-muted flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+        aria-hidden="true"
+      >
+        {{ getUserInitials(row.userFullName) }}
+      </span>
+      <span class="font-medium">{{ row.userFullName }}</span>
+    </div>
+    <!--  <div class="flex flex-col">
+      <span class="font-medium">{{ row.userFullName }}</span>
+      <span class="text-muted-foreground font-mono text-xs">{{ row.username }}</span>
+    </div> -->
+  </ng-template>
+
+  <ng-template auditLogCell="action" let-row>
+    <span hlmBadge [class]="actionBadgeClass(row.action)">{{ row.action }}</span>
+  </ng-template>
+
+  <ng-template auditLogCell="tableName" let-row>
+    <span class="font-mono text-xs">{{ row.tableName }}</span>
+  </ng-template>
+
+  <ng-template auditLogCell="recordId" let-row>
+    <span class="block truncate font-mono text-xs" [attr.title]="row.recordId">
+      {{ row.recordId }}
+    </span>
+  </ng-template>
+
+  <ng-template auditLogCell="ipAddress" let-row>
+    <span class="font-mono text-xs">{{ row.ipAddress ?? '—' }}</span>
+  </ng-template>
+
+  <ng-template auditLogCell="valuePreview" let-row>
+    <span
+      class="text-muted-foreground block truncate font-mono text-xs"
+      [attr.title]="valuePreview(row)"
+    >
+      {{ valuePreview(row) || '—' }}
+    </span>
+  </ng-template>
+
+  <ng-template auditLogCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="viewClicked.emit(row)"
+        [attr.aria-label]="'View audit log ' + row.id"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+        Details
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

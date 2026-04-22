@@ -4,6 +4,7 @@ import { provideIcons } from '@ng-icons/core';
 import {
   lucideGraduationCap,
   lucidePanelLeft,
+  lucideScrollText,
   lucideUserPlus,
   lucideWrench,
 } from '@ng-icons/lucide';
@@ -36,6 +37,7 @@ import { SidebarUserCard } from './sidebar-user-card';
       lucideUserPlus,
       lucidePanelLeft,
       lucideGraduationCap,
+      lucideScrollText,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
