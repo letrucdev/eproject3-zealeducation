@@ -108,6 +108,14 @@
 
       <div hlmDialogFooter class="shrink-0">
         <button hlmBtn variant="outline" type="button" hlmDialogClose>Close</button>
+        <button hlmBtn variant="outline" type="button" (click)="copyDetails()">
+          <ng-icon
+            hlm
+            [name]="copyState() === 'copied' ? 'lucideCheckCheck' : 'lucideCopy'"
+            size="sm"
+          />
+          {{ copyState() === 'copied' ? 'Copied!' : 'Copy Details' }}
+        </button>
         <button
           hlmBtn
           type="button"
