@@ -1,0 +1,79 @@
+<form
+  [formGroup]="form"
+  class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between"
+>
+  <div class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-2">
+    <div class="relative w-full md:w-96">
+      <ng-icon
+        hlm
+        name="lucideSearch"
+        size="sm"
+        class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+      />
+      <input
+        hlmInput
+        type="search"
+        class="w-full ps-9"
+        placeholder="Search by name, phone, email, or course..."
+        formControlName="search"
+        aria-label="Search enquiries"
+      />
+    </div>
+
+    <hlm-select
+      formControlName="status"
+      [itemToString]="statusLabel"
+      class="w-full md:w-44"
+    >
+      <hlm-select-trigger>
+        <hlm-select-value placeholder="Status: All" />
+      </hlm-select-trigger>
+      <hlm-select-content *hlmSelectPortal>
+        <hlm-select-item value="">All Status</hlm-select-item>
+        <hlm-select-item [value]="statuses.New">New</hlm-select-item>
+        <hlm-select-item [value]="statuses.Contacted">Contacted</hlm-select-item>
+        <hlm-select-item [value]="statuses.InFollowUp">In Follow-Up</hlm-select-item>
+        <hlm-select-item [value]="statuses.Interested">Interested</hlm-select-item>
+        <hlm-select-item [value]="statuses.Converted">Converted</hlm-select-item>
+        <hlm-select-item [value]="statuses.Closed">Closed</hlm-select-item>
+      </hlm-select-content>
+    </hlm-select>
+
+    <hlm-select
+      formControlName="source"
+      [itemToString]="sourceLabel"
+      class="w-full md:w-44"
+    >
+      <hlm-select-trigger>
+        <hlm-select-value placeholder="Source: All" />
+      </hlm-select-trigger>
+      <hlm-select-content *hlmSelectPortal>
+        <hlm-select-item value="">All Sources</hlm-select-item>
+        <hlm-select-item [value]="sources.WalkIn">Walk-in</hlm-select-item>
+        <hlm-select-item [value]="sources.Phone">Phone</hlm-select-item>
+        <hlm-select-item [value]="sources.Website">Website</hlm-select-item>
+        <hlm-select-item [value]="sources.Referral">Referral</hlm-select-item>
+        <hlm-select-item [value]="sources.SocialMedia">Social Media</hlm-select-item>
+        <hlm-select-item [value]="sources.Other">Other</hlm-select-item>
+      </hlm-select-content>
+    </hlm-select>
+
+    <label
+      class="border-input hover:bg-accent flex h-9 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm"
+    >
+      <input
+        type="checkbox"
+        formControlName="dueFollowUpOnly"
+        class="size-4"
+        aria-label="Overdue only"
+      />
+      <ng-icon hlm name="lucideCalendarClock" size="sm" class="text-amber-600" />
+      Overdue only
+    </label>
+  </div>
+
+  <button hlmBtn type="button" (click)="createClicked.emit()">
+    <ng-icon hlm name="lucidePlus" size="sm" />
+    New Enquiry
+  </button>
+</form>

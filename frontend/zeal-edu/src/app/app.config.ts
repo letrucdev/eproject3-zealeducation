@@ -1,4 +1,5 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
@@ -22,5 +23,6 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideTanStackQuery(new QueryClient()),
+    { provide: OVERLAY_DEFAULT_CONFIG, useValue: { usePopover: false } },
   ],
 };

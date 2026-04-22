@@ -6,6 +6,7 @@ import {
   lucidePanelLeft,
   lucideScrollText,
   lucideUserPlus,
+  lucideUserSearch,
   lucideWrench,
 } from '@ng-icons/lucide';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -38,6 +39,7 @@ import { SidebarUserCard } from './sidebar-user-card';
       lucidePanelLeft,
       lucideGraduationCap,
       lucideScrollText,
+      lucideUserSearch,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,7 +56,9 @@ import { SidebarUserCard } from './sidebar-user-card';
             </div>
             <div class="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
               <span class="truncate text-sm font-semibold">Zeal Education</span>
-              <span class="text-muted-foreground truncate text-xs">Admin Console</span>
+              <span class="text-muted-foreground truncate text-xs"
+                >{{ this.currentUser.role() }} Console</span
+              >
             </div>
           </div>
         </hlm-sidebar-header>
@@ -124,7 +128,7 @@ import { SidebarUserCard } from './sidebar-user-card';
   `,
 })
 export class AppShell {
-  private readonly currentUser = inject(CurrentUser);
+  readonly currentUser = inject(CurrentUser);
   private readonly router = inject(Router);
 
   private readonly navigationEnd = toSignal(

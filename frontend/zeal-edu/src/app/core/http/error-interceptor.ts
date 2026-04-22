@@ -5,6 +5,7 @@ import { catchError, throwError } from 'rxjs';
 import { AuthToken } from '../auth/auth-token';
 import { CurrentUser } from '../auth/current-user';
 import { Router } from '@angular/router';
+import { ApiResponse } from './api-response';
 
 interface ApiErrorBody {
   message?: string;
@@ -24,10 +25,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         inject(Router).navigateByUrl('/login');
       }
 
-      if (
-        (err.status !== HttpStatusCode.Unauthorized && err.status !== HttpStatusCode.BadRequest) ||
-        !isLoginRequest
-      ) {
+      /*      if (err.status === HttpStatusCode.BadRequest) {
+        toast.error(resolveValidateError(err));
+      } */
+
+      if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {
         toast.error(resolveMessage(err));
       }
 
@@ -36,12 +38,18 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
+function resolveValidateError(err: HttpErrorResponse): string {
+  const body = err.error as ApiResponse<{ errors: [] }>;
+
+  return body.data?.errors.join(', ') ?? body.message;
+}
+
 function resolveMessage(err: HttpErrorResponse): string {
   if (err.status === 0) {
     return 'Unable to reach the server. Please check your connection.';
   }
 
-  const body = err.error as ApiErrorBody | string | null;
+  /* const body = err.error as ApiErrorBody | string | null;
 
   if (typeof body === 'string' && body.trim().length > 0) {
     return body;
@@ -50,6 +58,11 @@ function resolveMessage(err: HttpErrorResponse): string {
   const message = (body as ApiErrorBody | null)?.message?.trim();
   if (message) {
     return message;
+  } */
+
+  const body = err.error as ApiResponse<{ errors: [] }>;
+  if (body) {
+    return body.data?.errors.join(', ') ?? body.message;
   }
 
   return err.message;

@@ -1,0 +1,125 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-3xl w-2xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Enquiry Details</h2>
+    </div>
+
+    @if (detail(); as d) {
+      <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pe-1">
+        <section class="grid gap-3 sm:grid-cols-2">
+          <div>
+            <p class="text-muted-foreground text-xs">Full Name</p>
+            <p class="font-medium">{{ d.fullName }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Status</p>
+            <p>
+              <span hlmBadge>{{ statusLabel(d.status) }}</span>
+            </p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Phone</p>
+            <p>{{ d.phone }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Email</p>
+            <p>{{ d.email ?? '—' }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Course</p>
+            <p>{{ d.courseInterested }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Source</p>
+            <p>{{ sourceLabel(d.source) }}</p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Next Follow-Up</p>
+            <p>
+              {{ d.nextFollowUpDate ? (d.nextFollowUpDate | date: 'dd MMM yyyy') : '—' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-muted-foreground text-xs">Assigned Counselor</p>
+            <p>{{ d.assignedCounselorName }}</p>
+          </div>
+          @if (d.convertedCandidateCode) {
+            <div class="sm:col-span-2">
+              <p class="text-muted-foreground text-xs">Candidate Code</p>
+              <p class="font-mono font-medium">{{ d.convertedCandidateCode }}</p>
+            </div>
+          }
+        </section>
+
+        <section class="border-t pt-4">
+          <h3 class="mb-3 text-sm font-semibold">Notes &amp; follow-up</h3>
+
+          @if (d.status !== statuses.Converted) {
+            <form [formGroup]="noteForm" (ngSubmit)="submitNote()" class="mb-4 flex flex-col gap-2">
+              <hlm-field>
+                <label hlmFieldLabel for="enquiry-note">Add a note</label>
+                <textarea
+                  hlmTextarea
+                  id="enquiry-note"
+                  rows="3"
+                  placeholder="Record what was discussed, next actions, etc."
+                  formControlName="content"
+                  class="w-full"
+                ></textarea>
+                <hlm-field-error validator="required">Note cannot be empty.</hlm-field-error>
+              </hlm-field>
+              <div class="flex justify-end">
+                <button
+                  hlmBtn
+                  type="submit"
+                  size="sm"
+                  [disabled]="noteForm.invalid || isAddingNote()"
+                >
+                  <ng-icon hlm name="lucideSend" size="sm" />
+                  {{ isAddingNote() ? 'Saving...' : 'Add note' }}
+                </button>
+              </div>
+            </form>
+          }
+
+          @if (d.notes.length === 0) {
+            <p class="text-muted-foreground text-sm">No notes yet.</p>
+          } @else {
+            <ol class="flex flex-col gap-3">
+              @for (note of d.notes; track note.noteId) {
+                <li class="bg-muted/40 rounded-md border p-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ note.authorFullName }}</span>
+                    <span class="text-muted-foreground text-xs">
+                      {{ note.createdAt | date: 'dd MMM yyyy, HH:mm' }}
+                    </span>
+                  </div>
+                  <p class="mt-1 text-sm whitespace-pre-wrap">{{ note.content }}</p>
+                </li>
+              }
+            </ol>
+          }
+        </section>
+      </div>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Close</button>
+        <button
+          hlmBtn
+          type="button"
+          (click)="onConvert()"
+          [disabled]="d.status === statuses.Converted || d.status === statuses.Closed"
+        >
+          <ng-icon hlm name="lucideUserCheck" size="sm" />
+          Convert to Candidate
+        </button>
+      </div>
+    } @else {
+      <p class="text-muted-foreground py-6 text-center text-sm">Loading...</p>
+    }
+  </hlm-dialog-content>
+</hlm-dialog>
