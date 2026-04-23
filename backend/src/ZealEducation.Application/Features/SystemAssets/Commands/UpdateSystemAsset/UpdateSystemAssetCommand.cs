@@ -8,6 +8,6 @@ public record UpdateSystemAssetCommand(
     Guid Id,
     string AssetName,
     string AssetType,
+    string SerialNumber,
     string Location,
-    Guid ManagedBy,
     string? Notes = null) : IRequest<Result>;

@@ -16,10 +16,10 @@ public class UpdateSystemAssetCommandValidator : AbstractValidator<UpdateSystemA
         RuleFor(x => x.AssetType)
             .NotEmpty().WithMessage("Asset Type is required.");
             
+        RuleFor(x => x.SerialNumber)
+            .NotEmpty().WithMessage("Serial Number is required.");
+            
         RuleFor(x => x.Location)
             .NotEmpty().WithMessage("Location is required.");
-            
-        RuleFor(x => x.ManagedBy)
-            .NotEmpty().WithMessage("Managed By (Staff Id) is required.");
     }
 }

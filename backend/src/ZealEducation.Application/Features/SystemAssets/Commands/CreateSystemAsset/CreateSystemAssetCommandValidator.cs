@@ -21,8 +21,5 @@ public class CreateSystemAssetCommandValidator : AbstractValidator<CreateSystemA
             
         RuleFor(x => x.Location)
             .NotEmpty().WithMessage("Location is required.");
-            
-        RuleFor(x => x.ManagedBy)
-            .NotEmpty().WithMessage("Managed By (Staff Id) is required.");
     }
 }

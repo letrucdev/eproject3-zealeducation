@@ -49,14 +49,9 @@ public class SystemAssetsController(ISender sender) : ControllerBase
         return Ok(ApiResponse<SystemAssetDto>.Success(result.Data));
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> Update(Guid id, [FromBody] UpdateSystemAssetCommand command)
+    [HttpPut]
+    public async Task<ActionResult<ApiResponse<object>>> Update([FromBody] UpdateSystemAssetCommand command)
     {
-        if (id != command.Id)
-        {
-            return BadRequest(ApiResponse<object>.Error("Id mismatch"));
-        }
-
         var result = await sender.Send(command);
 
         if (!result.Succeeded)

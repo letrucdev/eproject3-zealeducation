@@ -10,5 +10,4 @@ public record CreateSystemAssetCommand(
     string SerialNumber,
     string Location,
     DateTime PurchaseDate,
-    Guid ManagedBy,
     string? Notes = null) : IRequest<Result<Guid>>;
