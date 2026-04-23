@@ -32,6 +32,6 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },
-  { path: '', pathMatch: 'full', redirectTo: 'login' },
-  { path: '**', redirectTo: 'login' },
+  { path: '', pathMatch: 'full', redirectTo: 'app' },
+  { path: '**', redirectTo: 'app' },
 ];

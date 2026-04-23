@@ -52,9 +52,7 @@ export class CourseEnquiriesService {
   createMutation() {
     return injectMutation<unknown, HttpErrorResponse, CreateEnquiryPayload>(() => ({
       mutationFn: (payload) =>
-        firstValueFrom(
-          this._http.post<ApiResponse<unknown>>('/course-enquiries', payload),
-        ),
+        firstValueFrom(this._http.post<ApiResponse<unknown>>('/course-enquiries', payload)),
       onSuccess: () => this._invalidateAll(),
     }));
   }
@@ -137,9 +135,7 @@ export class CourseEnquiriesService {
     const response = await firstValueFrom(
       this._http.get<ApiResponse<EnquiryStatistics>>('/course-enquiries/statistics'),
     );
-    return (
-      response.data ?? { total: 0, new: 0, inFollowUp: 0, converted: 0, overdue: 0 }
-    );
+    return response.data ?? { total: 0, new: 0, inFollowUp: 0, converted: 0, overdue: 0 };
   }
 
   private async _fetchDetail(enquiryId: string): Promise<CourseEnquiryDetail> {
@@ -162,8 +158,8 @@ export class CourseEnquiriesService {
   }
 
   private _invalidateAll(): void {
-    void this._queryClient.refetchQueries({ queryKey: ENQUIRY_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: ENQUIRY_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: ENQUIRY_DETAIL_QUERY_KEY });
     void this._queryClient.refetchQueries({ queryKey: ENQUIRY_STATS_QUERY_KEY });
-    void this._queryClient.refetchQueries({ queryKey: ENQUIRY_DETAIL_QUERY_KEY });
   }
 }
