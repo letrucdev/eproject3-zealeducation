@@ -21,6 +21,7 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
 import { PaginatedList } from '../../../core/models/paginated-list';
+import { DigitsOnlyDirective } from '../../directives/digits-only.directive';
 import { DataTableCellContext, DataTableCellDef } from './data-table-cell.directive';
 import { DataTableAlign, DataTableColumn } from './data-table-column';
 
@@ -35,6 +36,7 @@ import { DataTableAlign, DataTableColumn } from './data-table-column';
     HlmInputImports,
     HlmSelectImports,
     HlmSkeletonImports,
+    DigitsOnlyDirective,
   ],
   providers: [
     provideIcons({
@@ -148,41 +150,6 @@ export class DataTable<T = unknown> {
   protected next(): void {
     const pg = this.page();
     if (pg?.hasNextPage) this.pageChanged.emit(pg.pageNumber + 1);
-  }
-
-  protected onPageInputKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      this.commitPageInput();
-      return;
-    }
-
-    const navigationKeys = [
-      'Backspace',
-      'Delete',
-      'ArrowLeft',
-      'ArrowRight',
-      'ArrowUp',
-      'ArrowDown',
-      'Tab',
-      'Home',
-      'End',
-    ];
-    if (navigationKeys.includes(event.key)) return;
-    if (event.ctrlKey || event.metaKey) return;
-
-    if (!/^[0-9]$/.test(event.key)) {
-      event.preventDefault();
-    }
-  }
-
-  protected onPageInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const stripped = target.value.replace(/\D/g, '');
-    if (stripped !== target.value) {
-      target.value = stripped;
-    }
-    this.pageInputValue.set(stripped);
   }
 
   protected commitPageInput(): void {

@@ -1,0 +1,124 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-3xl w-2xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isEdit() ? 'Edit Enquiry' : 'New Enquiry' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isEdit()
+            ? 'Update the lead details and follow-up schedule.'
+            : 'Capture a new potential candidate who has expressed interest.'
+        }}
+      </p>
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
+    >
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="enquiry-name">Full Name</label>
+            <input hlmInput id="enquiry-name" type="text" formControlName="fullName" class="w-full" />
+            <hlm-field-error validator="required">Full name is required.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="enquiry-phone">Phone</label>
+            <input hlmInput appDigitsOnly id="enquiry-phone" type="tel" formControlName="phone" class="w-full" />
+            <hlm-field-error validator="required">Phone is required.</hlm-field-error>
+            <hlm-field-error validator="minlength">Phone number must be 10 digits</hlm-field-error>
+            <hlm-field-error validator="maxlength">Phone number must be 10 digits</hlm-field-error>
+            <hlm-field-error validator="pattern">Only digits are allowed</hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label hlmFieldLabel for="enquiry-email">Email (optional)</label>
+          <input
+            hlmInput
+            id="enquiry-email"
+            type="email"
+            formControlName="email"
+            class="w-full"
+          />
+          <hlm-field-error validator="email">Invalid email format.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="enquiry-course">Course Interested</label>
+          <input
+            hlmInput
+            id="enquiry-course"
+            type="text"
+            formControlName="courseInterested"
+            class="w-full"
+          />
+          <hlm-field-error validator="required">Course is required.</hlm-field-error>
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <hlm-field>
+            <label hlmFieldLabel for="enquiry-source">Source</label>
+            <hlm-select formControlName="source" [itemToString]="sourceLabel" class="w-full">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select source" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                <hlm-select-item [value]="sources.WalkIn">Walk-in</hlm-select-item>
+                <hlm-select-item [value]="sources.Phone">Phone</hlm-select-item>
+                <hlm-select-item [value]="sources.Website">Website</hlm-select-item>
+                <hlm-select-item [value]="sources.Referral">Referral</hlm-select-item>
+                <hlm-select-item [value]="sources.SocialMedia">Social Media</hlm-select-item>
+                <hlm-select-item [value]="sources.Other">Other</hlm-select-item>
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="enquiry-status">Status</label>
+            <hlm-select formControlName="status" [itemToString]="statusLabel" class="w-full">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select status" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                <hlm-select-item [value]="statuses.New">New</hlm-select-item>
+                <hlm-select-item [value]="statuses.Contacted">Contacted</hlm-select-item>
+                <hlm-select-item [value]="statuses.InFollowUp">In Follow-Up</hlm-select-item>
+                <hlm-select-item [value]="statuses.Interested">Interested</hlm-select-item>
+                <hlm-select-item [value]="statuses.Closed">Closed</hlm-select-item>
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="enquiry-followup">Next Follow-Up</label>
+            <input
+              hlmInput
+              id="enquiry-followup"
+              type="date"
+              formControlName="nextFollowUpDate"
+              class="w-full"
+            />
+          </hlm-field>
+        </div>
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          {{
+            submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create enquiry'
+          }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

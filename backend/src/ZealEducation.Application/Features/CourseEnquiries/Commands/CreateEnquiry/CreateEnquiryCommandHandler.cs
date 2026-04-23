@@ -1,0 +1,48 @@
+using MediatR;
+using ZealEducation.Application.Common.Exceptions;
+using ZealEducation.Application.Common.Interfaces;
+using ZealEducation.Domain.Entities;
+using ZealEducation.Domain.Interfaces;
+
+namespace ZealEducation.Application.Features.CourseEnquiries.Commands.CreateEnquiry;
+
+public class CreateEnquiryCommandHandler(
+    IRepository<CourseEnquiry> enquiryRepository,
+    IRepository<Staff> staffRepository,
+    IUnitOfWork unitOfWork,
+    ICurrentUser currentUser) : IRequestHandler<CreateEnquiryCommand, CreateEnquiryResponse>
+{
+    public async Task<CreateEnquiryResponse> Handle(CreateEnquiryCommand request, CancellationToken cancellationToken)
+    {
+        var userId = currentUser.UserId
+            ?? throw new UnauthorizedException("User is not authenticated.");
+
+        var staffs = await staffRepository.FindAsync(s => s.UserAccountId == userId, cancellationToken);
+        var staff = staffs[0]
+            ?? throw new UnauthorizedException("Current user is not linked to a staff profile.");
+
+        var enquiry = new CourseEnquiry
+        {
+            Id = Guid.NewGuid(),
+            FullName = request.FullName.Trim(),
+            Phone = request.Phone.Trim(),
+            Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
+            CourseInterested = request.CourseInterested.Trim(),
+            Source = request.Source,
+            Status = request.Status,
+            NextFollowUpDate = request.NextFollowUpDate,
+            AssignedCounselorId = staff.Id
+        };
+
+        await enquiryRepository.AddAsync(enquiry, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new CreateEnquiryResponse
+        {
+            EnquiryId = enquiry.Id,
+            FullName = enquiry.FullName,
+            Phone = enquiry.Phone,
+            CourseInterested = enquiry.CourseInterested
+        };
+    }
+}

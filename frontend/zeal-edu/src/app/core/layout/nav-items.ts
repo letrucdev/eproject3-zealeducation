@@ -39,6 +39,18 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
       },
     ],
   },
+  {
+    title: 'Counselor',
+    roles: [UserRole.Counselor],
+    items: [
+      {
+        label: 'Course Enquiries',
+        route: '/app/counselor/course-enquiries',
+        icon: 'lucideUserSearch',
+        roles: [UserRole.Counselor],
+      },
+    ],
+  },
 ];
 
 function filterNavItemsForRole(items: readonly NavItem[], role: UserRole): NavItem[] {

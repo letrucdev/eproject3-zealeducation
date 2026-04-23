@@ -1,0 +1,103 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [trackBy]="trackById"
+  itemLabel="enquiries"
+  emptyMessage="No enquiries found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+>
+  <ng-template enquiryCell="fullName" let-row>
+    <div class="flex flex-col">
+      <span class="font-medium">{{ row.fullName }}</span>
+      <!--  @if (row.convertedCandidateId) {
+        <span class="text-muted-foreground text-xs">Candidate created</span>
+      } -->
+    </div>
+  </ng-template>
+
+  <ng-template enquiryCell="email" let-row>
+    @if (row.email) {
+      <span class="truncate">{{ row.email }}</span>
+    } @else {
+      <span class="text-muted-foreground">—</span>
+    }
+  </ng-template>
+
+  <ng-template enquiryCell="source" let-row>
+    {{ sourceLabel(row.source) }}
+  </ng-template>
+
+  <ng-template enquiryCell="status" let-row>
+    @switch (row.status) {
+      @case (statuses.New) {
+        <span hlmBadge class="bg-sky-100 text-sky-800">New</span>
+      }
+      @case (statuses.Contacted) {
+        <span hlmBadge class="bg-indigo-100 text-indigo-800">Contacted</span>
+      }
+      @case (statuses.InFollowUp) {
+        <span hlmBadge class="bg-amber-100 text-amber-800">In Follow-Up</span>
+      }
+      @case (statuses.Interested) {
+        <span hlmBadge class="bg-purple-100 text-purple-800">Interested</span>
+      }
+      @case (statuses.Converted) {
+        <span hlmBadge class="bg-emerald-100 text-emerald-800">Converted</span>
+      }
+      @case (statuses.Closed) {
+        <span hlmBadge variant="secondary">Closed</span>
+      }
+    }
+  </ng-template>
+
+  <ng-template enquiryCell="nextFollowUpDate" let-row>
+    @if (row.nextFollowUpDate) {
+      <span [class]="isOverdue(row) ? 'text-amber-700 font-medium' : ''">
+        {{ row.nextFollowUpDate | date: 'dd MMM yyyy' }}
+      </span>
+    } @else {
+      <span class="text-muted-foreground">—</span>
+    }
+  </ng-template>
+
+  <ng-template enquiryCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="viewClicked.emit(row)"
+        [attr.aria-label]="'View ' + row.fullName"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="editClicked.emit(row)"
+        [disabled]="row.status === statuses.Converted || row.status === statuses.Closed"
+        [attr.aria-label]="'Edit ' + row.fullName"
+      >
+        <ng-icon hlm name="lucidePencil" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="convertClicked.emit(row)"
+        [disabled]="row.status === statuses.Converted || row.status === statuses.Closed"
+        [attr.aria-label]="'Convert ' + row.fullName"
+      >
+        <ng-icon hlm name="lucideUserCheck" size="sm" />
+        Convert
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>
