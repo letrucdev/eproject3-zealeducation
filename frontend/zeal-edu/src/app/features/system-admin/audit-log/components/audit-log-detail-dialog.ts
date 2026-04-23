@@ -11,8 +11,8 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
-import { AuditAction } from '../../../../core/models/audit-action';
-import { AuditLogDetail } from '../../../../core/models/audit-log-detail';
+import { AuditAction } from '@core/models/audit-action';
+import { AuditLogDetail } from '@core/models/audit-log-detail';
 
 @Component({
   selector: 'app-audit-log-detail-dialog',

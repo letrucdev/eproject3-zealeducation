@@ -1,4 +1,4 @@
-import { UserAccount } from '../../../core/models/user-account';
+import { UserAccount } from '@core/models/user-account';
 
 export interface LoginResponse {
   token: string;

@@ -1,0 +1,49 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Course Enquiries</h1>
+      <p class="text-muted-foreground mt-1 max-w-2xl text-sm">
+        Capture leads, record follow-ups, and convert interested candidates into enrolled students.
+      </p>
+    </div>
+  </header>
+
+  <app-enquiry-stats-cards [stats]="statsQuery.data()" [isLoading]="statsQuery.isPending()" />
+
+  <app-enquiry-filter-bar
+    [initial]="initialFilter"
+    (filterChanged)="onFilterChanged($event)"
+    (createClicked)="onCreateClicked()"
+  />
+
+  <app-enquiry-table
+    [page]="listQuery.data()"
+    [isLoading]="listQuery.isPending()"
+    [pageSize]="pageSize()"
+    (viewClicked)="onViewClicked($event)"
+    (editClicked)="onEditClicked($event)"
+    (convertClicked)="onConvertClicked($event)"
+    (pageChanged)="onPageChanged($event)"
+    (pageSizeChanged)="onPageSizeChanged($event)"
+  />
+
+  <app-enquiry-form-dialog
+    #formDialog
+    [submitting]="isSubmittingForm()"
+    (submitted)="onFormSubmitted($event)"
+  />
+
+  <app-enquiry-detail-dialog
+    #detailDialog
+    [detail]="detailQuery.data() ?? null"
+    [isAddingNote]="addNoteMutation.isPending()"
+    (noteSubmitted)="onNoteSubmitted($event)"
+    (convertClicked)="onConvertFromDetail($event)"
+  />
+
+  <app-enquiry-convert-dialog
+    #convertDialog
+    [submitting]="convertMutation.isPending()"
+    (submitted)="onConvertSubmitted($event)"
+  />
+</section>

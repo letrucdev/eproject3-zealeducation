@@ -3,13 +3,13 @@ import { Injectable, Signal, inject } from '@angular/core';
 import { QueryClient } from '@tanstack/query-core';
 import { injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../../../core/http/api-response';
-import { ConvertEnquiryResult } from '../../../core/models/convert-enquiry-result';
-import { CourseEnquiryDetail } from '../../../core/models/course-enquiry-detail';
-import { CourseEnquiryListItem } from '../../../core/models/course-enquiry-list-item';
-import { EnquiryNote } from '../../../core/models/enquiry-note';
-import { EnquiryStatistics } from '../../../core/models/enquiry-statistics';
-import { PaginatedList } from '../../../core/models/paginated-list';
+import { ApiResponse } from '@core/http/api-response';
+import { ConvertEnquiryResult } from '@core/models/convert-enquiry-result';
+import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
+import { CourseEnquiryListItem } from '@core/models/course-enquiry-list-item';
+import { EnquiryNote } from '@core/models/enquiry-note';
+import { EnquiryStatistics } from '@core/models/enquiry-statistics';
+import { PaginatedList } from '@core/models/paginated-list';
 import {
   AddEnquiryNotePayload,
   ConvertEnquiryPayload,

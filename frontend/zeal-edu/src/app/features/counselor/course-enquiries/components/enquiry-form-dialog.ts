@@ -14,14 +14,14 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
-import { DigitsOnlyDirective } from '../../../../shared/directives/digits-only.directive';
-import { CourseEnquiryDetail } from '../../../../core/models/course-enquiry-detail';
-import { EnquirySource } from '../../../../core/models/enquiry-source';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { DigitsOnlyDirective } from '@shared/directives/digits-only.directive';
+import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
+import { EnquirySource } from '@core/models/enquiry-source';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import {
   CreateEnquiryPayload,
   UpdateEnquiryPayload,
-} from '../models/course-enquiry-payload';
+} from '@features/counselor/course-enquiries/models/course-enquiry-payload';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
 
 export type EnquiryFormMode = 'create' | 'edit';

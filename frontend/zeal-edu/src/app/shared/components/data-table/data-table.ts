@@ -20,8 +20,8 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTableImports } from '@spartan-ng/helm/table';
-import { PaginatedList } from '../../../core/models/paginated-list';
-import { DigitsOnlyDirective } from '../../directives/digits-only.directive';
+import { PaginatedList } from '@core/models/paginated-list';
+import { DigitsOnlyDirective } from '@shared/directives/digits-only.directive';
 import { DataTableCellContext, DataTableCellDef } from './data-table-cell.directive';
 import { DataTableAlign, DataTableColumn } from './data-table-column';
 

@@ -5,18 +5,18 @@ import { lucidePencil } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { ROLE_LABELS } from '../../../../core/layout/nav-items';
-import { Gender } from '../../../../core/models/gender';
-import { PaginatedList } from '../../../../core/models/paginated-list';
-import { StaffListItem } from '../../../../core/models/staff-list-item';
-import { UserRole } from '../../../../core/models/user-role';
-import { getUserInitials } from '../../../../core/utils/user-initials';
+import { ROLE_LABELS } from '@core/layout/nav-items';
+import { Gender } from '@core/models/gender';
+import { PaginatedList } from '@core/models/paginated-list';
+import { StaffListItem } from '@core/models/staff-list-item';
+import { UserRole } from '@core/models/user-role';
+import { getUserInitials } from '@core/utils/user-initials';
 import {
   DataTable,
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
-} from '../../../../shared/components/data-table';
+} from '@shared/components/data-table';
 
 @Directive({
   selector: '[staffCell]',

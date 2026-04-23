@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
-import { UserRole } from '../models/user-role';
+import { UserRole } from '@core/models/user-role';
 import { CurrentUser } from './current-user';
 
 export function hasRole(...roles: readonly UserRole[]): CanMatchFn {

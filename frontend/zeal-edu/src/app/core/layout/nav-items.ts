@@ -1,4 +1,4 @@
-import { UserRole } from '../models/user-role';
+import { UserRole } from '@core/models/user-role';
 
 export interface NavigationMenu {
   title: string;

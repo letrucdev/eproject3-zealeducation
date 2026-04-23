@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
-import { StaffListItem } from '../../../core/models/staff-list-item';
-import { UserRole } from '../../../core/models/user-role';
+import { StaffListItem } from '@core/models/staff-list-item';
+import { UserRole } from '@core/models/user-role';
 import {
   StaffFilterBar,
   StaffFilterValue,

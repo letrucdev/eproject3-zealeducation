@@ -5,11 +5,11 @@ import { provideRouter, TitleStrategy } from '@angular/router';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 
 import { routes } from './app.routes';
-import { authInterceptor } from './core/http/auth-interceptor';
-import { authPersistenceInterceptor } from './core/http/auth-persistence-interceptor';
-import { baseUrlInterceptor } from './core/http/base-url-interceptor';
-import { errorInterceptor } from './core/http/error-interceptor';
-import { AppTitleStrategy } from './core/layout/title-strategy';
+import { authInterceptor } from '@core/http/auth-interceptor';
+import { authPersistenceInterceptor } from '@core/http/auth-persistence-interceptor';
+import { baseUrlInterceptor } from '@core/http/base-url-interceptor';
+import { errorInterceptor } from '@core/http/error-interceptor';
+import { AppTitleStrategy } from '@core/layout/title-strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [

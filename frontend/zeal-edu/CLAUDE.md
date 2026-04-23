@@ -7,6 +7,23 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
 
+## Import Path Aliases
+
+Use path aliases instead of relative `../` paths. Aliases are configured in `tsconfig.json`:
+
+- `@app/*` → `src/app/*`
+- `@core/*` → `src/app/core/*`
+- `@features/*` → `src/app/features/*`
+- `@shared/*` → `src/app/shared/*`
+- `@environments/*` → `src/environments/*`
+- `@/*` → `src/*` (fallback for paths outside the above)
+
+Rules:
+- Prefer the most specific alias (e.g. use `@core/auth/auth-service`, not `@app/core/auth/auth-service`).
+- Use aliases for any cross-folder import (anything that would otherwise need `../`).
+- Keep `./` for sibling files in the same folder or local subfolders within the same feature module (e.g. `./login/login` inside `auth.routes.ts`).
+- Aliases also work in dynamic imports: `import('@features/auth/auth.routes')`.
+
 ## Angular Best Practices
 
 - Always use standalone components over NgModules
