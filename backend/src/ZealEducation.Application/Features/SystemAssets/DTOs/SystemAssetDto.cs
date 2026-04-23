@@ -15,4 +15,5 @@ public class SystemAssetDto
     public DateTime? LastMaintenance { get; init; }
     public string? Notes { get; init; }
     public Guid ManagedBy { get; init; }
+    public string? ManagedByName { get; init; }
 }

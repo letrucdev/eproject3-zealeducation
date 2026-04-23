@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -12,35 +14,49 @@ namespace ZealEducation.Application.Features.SystemAssets.Queries.GetSystemAsset
 public class GetSystemAssetByIdQueryHandler : IRequestHandler<GetSystemAssetByIdQuery, Result<SystemAssetDto>>
 {
     private readonly IRepository<SystemAsset> _repository;
+    private readonly IRepository<Staff> _staffRepository;
+    private readonly IRepository<UserAccount> _userAccountRepository;
 
-    public GetSystemAssetByIdQueryHandler(IRepository<SystemAsset> repository)
+    public GetSystemAssetByIdQueryHandler(
+        IRepository<SystemAsset> repository,
+        IRepository<Staff> staffRepository,
+        IRepository<UserAccount> userAccountRepository)
     {
         _repository = repository;
+        _staffRepository = staffRepository;
+        _userAccountRepository = userAccountRepository;
     }
 
     public async Task<Result<SystemAssetDto>> Handle(GetSystemAssetByIdQuery request, CancellationToken cancellationToken)
     {
-        var asset = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var query = from a in _repository.Query()
+                    where a.Id == request.Id
+                    join s in _staffRepository.Query() on a.ManagedBy equals s.Id into sj
+                    from s in sj.DefaultIfEmpty()
+                    join u in _userAccountRepository.Query() on (s != null ? s.UserAccountId : Guid.Empty) equals u.Id into uj
+                    from u in uj.DefaultIfEmpty()
+                    select new SystemAssetDto
+                    {
+                        Id = a.Id,
+                        AssetName = a.AssetName,
+                        AssetType = a.AssetType,
+                        SerialNumber = a.SerialNumber,
+                        Location = a.Location,
+                        ConditionStatus = a.ConditionStatus,
+                        PurchaseDate = a.PurchaseDate,
+                        LastMaintenance = a.LastMaintenance,
+                        Notes = a.Notes,
+                        ManagedBy = a.ManagedBy,
+                        ManagedByName = u != null ? u.FullName : null
+                    };
 
-        if (asset == null)
+        var dto = query.FirstOrDefault();
+
+        if (dto == null)
         {
             throw new NotFoundException(nameof(SystemAsset), request.Id);
         }
 
-        var dto = new SystemAssetDto
-        {
-            Id = asset.Id,
-            AssetName = asset.AssetName,
-            AssetType = asset.AssetType,
-            SerialNumber = asset.SerialNumber,
-            Location = asset.Location,
-            ConditionStatus = asset.ConditionStatus,
-            PurchaseDate = asset.PurchaseDate,
-            LastMaintenance = asset.LastMaintenance,
-            Notes = asset.Notes,
-            ManagedBy = asset.ManagedBy
-        };
-
-        return Result<SystemAssetDto>.Success(dto);
+        return await Task.FromResult(Result<SystemAssetDto>.Success(dto));
     }
 }
