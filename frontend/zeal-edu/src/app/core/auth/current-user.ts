@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { UserAccount } from '../models/user-account';
+import { UserAccount } from '@core/models/user-account';
 
 const USER_STORAGE_KEY = 'zeal-edu.current-user';
 

@@ -1,6 +1,6 @@
-import { Gender } from '../../../../core/models/gender';
-import { EnquirySource } from '../../../../core/models/enquiry-source';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { Gender } from '@core/models/gender';
+import { EnquirySource } from '@core/models/enquiry-source';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 
 export interface CreateEnquiryPayload {
   fullName: string;

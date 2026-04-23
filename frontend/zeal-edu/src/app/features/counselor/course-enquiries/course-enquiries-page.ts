@@ -8,17 +8,16 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
-import { CourseEnquiryListItem } from '../../../core/models/course-enquiry-list-item';
+import { CourseEnquiryListItem } from '@core/models/course-enquiry-list-item';
 import { EnquiryFilterBar, EnquiryFilterValue } from './components/enquiry-filter-bar';
 import { EnquiryFormDialog, EnquiryFormSubmit } from './components/enquiry-form-dialog';
 import { EnquiryStatsCards } from './components/enquiry-stats-cards';
 import { EnquiryTable } from './components/enquiry-table';
 import { EnquiryDetailDialog, EnquiryNoteSubmit } from './components/enquiry-detail-dialog';
 import { EnquiryConvertDialog, EnquiryConvertSubmit } from './components/enquiry-convert-dialog';
-import { EnquirySource } from '../../../core/models/enquiry-source';
-import { EnquiryStatus } from '../../../core/models/enquiry-status';
+import { EnquirySource } from '@core/models/enquiry-source';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import { CourseEnquiriesService } from './course-enquiries.service';
 import { EnquiryListQuery } from './models/course-enquiry-payload';
 
@@ -35,58 +34,7 @@ type DialogIntent = 'none' | 'edit' | 'view' | 'convert';
     EnquiryConvertDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="flex flex-col gap-6">
-      <header class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Course Enquiries</h1>
-          <p class="text-muted-foreground mt-1 max-w-2xl text-sm">
-            Capture leads, record follow-ups, and convert interested candidates into enrolled
-            students.
-          </p>
-        </div>
-      </header>
-
-      <app-enquiry-stats-cards [stats]="statsQuery.data()" [isLoading]="statsQuery.isPending()" />
-
-      <app-enquiry-filter-bar
-        [initial]="initialFilter"
-        (filterChanged)="onFilterChanged($event)"
-        (createClicked)="onCreateClicked()"
-      />
-
-      <app-enquiry-table
-        [page]="listQuery.data()"
-        [isLoading]="listQuery.isPending()"
-        [pageSize]="pageSize()"
-        (viewClicked)="onViewClicked($event)"
-        (editClicked)="onEditClicked($event)"
-        (convertClicked)="onConvertClicked($event)"
-        (pageChanged)="onPageChanged($event)"
-        (pageSizeChanged)="onPageSizeChanged($event)"
-      />
-
-      <app-enquiry-form-dialog
-        #formDialog
-        [submitting]="isSubmittingForm()"
-        (submitted)="onFormSubmitted($event)"
-      />
-
-      <app-enquiry-detail-dialog
-        #detailDialog
-        [detail]="detailQuery.data() ?? null"
-        [isAddingNote]="addNoteMutation.isPending()"
-        (noteSubmitted)="onNoteSubmitted($event)"
-        (convertClicked)="onConvertFromDetail($event)"
-      />
-
-      <app-enquiry-convert-dialog
-        #convertDialog
-        [submitting]="convertMutation.isPending()"
-        (submitted)="onConvertSubmitted($event)"
-      />
-    </section>
-  `,
+  templateUrl: 'course-enquiries-page.html',
 })
 export default class CourseEnquiriesPage {
   private readonly _service = inject(CourseEnquiriesService);

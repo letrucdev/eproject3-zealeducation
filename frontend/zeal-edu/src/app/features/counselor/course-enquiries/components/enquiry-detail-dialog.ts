@@ -16,8 +16,8 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
-import { CourseEnquiryDetail } from '../../../../core/models/course-enquiry-detail';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
 import { DatePipe } from '@angular/common';
 

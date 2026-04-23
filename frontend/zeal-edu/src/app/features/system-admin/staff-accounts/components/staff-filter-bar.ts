@@ -16,8 +16,8 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { UserRole } from '../../../../core/models/user-role';
-import { ROLE_LABELS } from '../../../../core/layout/nav-items';
+import { UserRole } from '@core/models/user-role';
+import { ROLE_LABELS } from '@core/layout/nav-items';
 
 export interface StaffFilterValue {
   search: string;
