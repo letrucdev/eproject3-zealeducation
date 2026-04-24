@@ -15,6 +15,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<CourseEnquiry> CourseEnquiries => Set<CourseEnquiry>();
     public DbSet<EnquiryNote> EnquiryNotes => Set<EnquiryNote>();
+    public DbSet<SystemAsset> SystemAssets => Set<SystemAsset>();
     public DbSet<Batch> Batches => Set<Batch>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<FeeStructure> FeeStructures => Set<FeeStructure>();
