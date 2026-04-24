@@ -1122,37 +1122,39 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .HasForeignKey("ManagedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-            modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
-                {
-                    b.Navigation("Enrollments");
-                });
+                    modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
+                        {
+                            b.Navigation("Enrollments");
+                        });
 
-            modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
-                {
-                    b.Navigation("Batches");
+                    modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
+                        {
+                            b.Navigation("Batches");
 
-                    b.Navigation("Enquiries");
-                });
+                            b.Navigation("Enquiries");
+                        });
 
-            modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
-                {
-                    b.Navigation("Notes");
-                });
+                    modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
+                        {
+                            b.Navigation("Notes");
+                        });
 
-            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
-                {
-                    b.Navigation("Fine");
+                    modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                        {
+                            b.Navigation("Fine");
 
-                    b.Navigation("InstallmentPlans");
+                            b.Navigation("InstallmentPlans");
 
-                    b.Navigation("PaymentTransactions");
-                });
+                            b.Navigation("PaymentTransactions");
+                        });
 
-            modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
-                {
-                    b.Navigation("Faculty");
-                });
+                    modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
+                        {
+                            b.Navigation("Faculty");
+                        });
 #pragma warning restore 612, 618
+
+                });
         }
     }
 }
