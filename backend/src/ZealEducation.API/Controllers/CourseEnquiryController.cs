@@ -64,7 +64,7 @@ public class CourseEnquiryController(ISender sender) : ControllerBase
             body.FullName,
             body.Phone,
             body.Email,
-            body.CourseInterested,
+            body.CourseInterestedId,
             body.Source,
             body.Status,
             body.NextFollowUpDate);
@@ -99,7 +99,7 @@ public class CourseEnquiryController(ISender sender) : ControllerBase
         string FullName,
         string Phone,
         string? Email,
-        string CourseInterested,
+        Guid CourseInterestedId,
         EnquirySource Source,
         EnquiryStatus Status,
         DateOnly? NextFollowUpDate);

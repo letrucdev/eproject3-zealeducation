@@ -16,8 +16,8 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
-import { CourseEnquiryDetail } from '../../../../core/models/course-enquiry-detail';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
 import { DatePipe } from '@angular/common';
 
@@ -111,7 +111,7 @@ export class EnquiryDetailDialog {
       `Status: ${this.statusLabel(d.status)}`,
       `Phone: ${d.phone}`,
       `Email: ${d.email ?? '—'}`,
-      `Course: ${d.courseInterested}`,
+      `Course: ${d.courseInterestedName}`,
       `Source: ${this.sourceLabel(d.source)}`,
       `Next Follow-Up: ${d.nextFollowUpDate ? new Date(d.nextFollowUpDate).toLocaleDateString() : '—'}`,
       `Assigned Counselor: ${d.assignedCounselorName}`,

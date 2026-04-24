@@ -2,10 +2,10 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, Signal, inject } from '@angular/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../../../core/http/api-response';
-import { AuditLogDetail } from '../../../core/models/audit-log-detail';
-import { AuditLogListItem } from '../../../core/models/audit-log-list-item';
-import { PaginatedList } from '../../../core/models/paginated-list';
+import { ApiResponse } from '@core/http/api-response';
+import { AuditLogDetail } from '@core/models/audit-log-detail';
+import { AuditLogListItem } from '@core/models/audit-log-list-item';
+import { PaginatedList } from '@core/models/paginated-list';
 import { AuditLogListQuery } from './models/audit-log-list-query';
 
 export const AUDIT_LOG_QUERY_KEY = ['audit-logs'] as const;

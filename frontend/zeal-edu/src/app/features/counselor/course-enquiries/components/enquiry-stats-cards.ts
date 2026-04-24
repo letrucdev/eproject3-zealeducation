@@ -10,7 +10,7 @@ import {
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
-import { EnquiryStatistics } from '../../../../core/models/enquiry-statistics';
+import { EnquiryStatistics } from '@core/models/enquiry-statistics';
 
 @Component({
   selector: 'app-enquiry-stats-cards',

@@ -12,6 +12,9 @@ public class ConvertEnquiryCommandHandler(
     IRepository<CourseEnquiry> enquiryRepository,
     IRepository<UserAccount> userRepository,
     IRepository<Candidate> candidateRepository,
+    IRepository<Course> courseRepository,
+    IRepository<Enrollment> enrollmentRepository,
+    IRepository<FeeStructure> feeStructureRepository,
     IUnitOfWork unitOfWork,
     IPasswordHasher passwordHasher) : IRequestHandler<ConvertEnquiryCommand, ConvertEnquiryResponse>
 {
@@ -28,6 +31,9 @@ public class ConvertEnquiryCommandHandler(
 
         if (enquiry.Status == EnquiryStatus.Closed)
             throw new ConflictException("This enquiry is closed.");
+
+        var course = await courseRepository.GetByIdAsync(enquiry.CourseInterestedId, cancellationToken)
+            ?? throw new NotFoundException(nameof(Course), enquiry.CourseInterestedId);
 
         var email = request.Email.Trim();
         var phone = enquiry.Phone.Trim();
@@ -71,6 +77,28 @@ public class ConvertEnquiryCommandHandler(
             RegisteredByStaffId = enquiry.AssignedCounselorId
         };
 
+        var enrollment = new Enrollment
+        {
+            Id = Guid.NewGuid(),
+            CandidateId = candidate.Id,
+            CourseId = course.Id,
+            EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            Status = EnrollmentStatus.PendingAssignment,
+            Notes = "New student registration"
+        };
+
+        var feeStructure = new FeeStructure
+        {
+            Id = Guid.NewGuid(),
+            CandidateId = candidate.Id,
+            FeeType = FeeType.Tuition,
+            TotalFee = course.BaseFee,
+            AmountPaid = 0,
+            OutstandingBalance = course.BaseFee,
+            PaymentStatus = PaymentStatus.Unpaid,
+            PaymentType = PaymentType.NotSet
+        };
+
         enquiry.Email = email;
         enquiry.Status = EnquiryStatus.Converted;
         enquiry.ConvertedCandidateId = candidate.Id;
@@ -78,6 +106,8 @@ public class ConvertEnquiryCommandHandler(
 
         await userRepository.AddAsync(userAccount, cancellationToken);
         await candidateRepository.AddAsync(candidate, cancellationToken);
+        await enrollmentRepository.AddAsync(enrollment, cancellationToken);
+        await feeStructureRepository.AddAsync(feeStructure, cancellationToken);
         enquiryRepository.Update(enquiry);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

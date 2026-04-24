@@ -1,0 +1,91 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Assign Faculty</h2>
+      <p class="text-muted-foreground text-sm">
+        Select a faculty member to teach this batch, or clear the selection to mark it as needing
+        an instructor.
+      </p>
+    </div>
+
+    @let current = batch();
+    @if (current) {
+      <div class="bg-muted/50 rounded-md border p-3 text-sm">
+        <div class="flex flex-col gap-1">
+          <div>
+            <span class="text-muted-foreground">Batch:</span>
+            <span class="ml-2 font-mono font-medium">{{ current.batchCode }}</span>
+          </div>
+          <div>
+            <span class="text-muted-foreground">Course:</span>
+            <span class="ml-2 font-medium">{{ current.courseName }}</span>
+          </div>
+          <div>
+            <span class="text-muted-foreground">Current faculty:</span>
+            @if (current.facultyName) {
+              <span class="ml-2">{{ current.facultyName }} ({{ current.facultyCode }})</span>
+            } @else {
+              <span class="ml-2 italic">Not assigned</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field>
+        <label hlmFieldLabel>Faculty</label>
+        <hlm-combobox
+          formControlName="faculty"
+          [(search)]="facultySearch"
+          [itemToString]="facultyItemToString"
+          class="w-full"
+        >
+          <hlm-combobox-input
+            placeholder="Search faculty by name, code, or specialization..."
+            showClear
+          />
+          <hlm-combobox-content *hlmComboboxPortal>
+            @if (faculties.isError()) {
+              <hlm-combobox-status>Failed to load faculty.</hlm-combobox-status>
+            } @else if (faculties.isPending()) {
+              <hlm-combobox-status>
+                <hlm-spinner />
+                Loading...
+              </hlm-combobox-status>
+            } @else {
+              @let items = faculties.data()?.items ?? [];
+              @if (items.length === 0) {
+                <hlm-combobox-empty>No faculty found.</hlm-combobox-empty>
+              }
+              <div hlmComboboxList>
+                @for (faculty of items; track faculty.facultyId) {
+                  <hlm-combobox-item [value]="faculty">
+                    <div class="flex flex-col">
+                      <span>{{ faculty.fullName }} ({{ faculty.facultyCode }})</span>
+                      <span class="text-muted-foreground text-xs">
+                        {{ faculty.specialization }}
+                      </span>
+                    </div>
+                  </hlm-combobox-item>
+                }
+              </div>
+            }
+          </hlm-combobox-content>
+        </hlm-combobox>
+        <p class="text-muted-foreground text-xs">Clear the selection to unassign current faculty.</p>
+      </hlm-field>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Saving...' : 'Save assignment' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

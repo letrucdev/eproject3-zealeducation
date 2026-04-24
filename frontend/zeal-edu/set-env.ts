@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 
 config();
 
-const requiredKeys = ['API_URL'] as const;
+const requiredKeys = ['API_URL', 'APP_NAME'] as const;
 const missing = requiredKeys.filter((k) => !process.env[k]);
 if (missing.length) {
   console.error(
@@ -14,6 +14,7 @@ if (missing.length) {
 
 const content = `export const environment = {
   apiUrl: '${process.env['API_URL']}',
+  appName: '${process.env['APP_NAME']}'
 };
 `;
 

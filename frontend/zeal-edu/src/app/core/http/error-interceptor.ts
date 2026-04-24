@@ -2,8 +2,8 @@ import { HttpErrorResponse, HttpInterceptorFn, HttpStatusCode } from '@angular/c
 import { inject } from '@angular/core';
 import { toast } from '@spartan-ng/brain/sonner';
 import { catchError, throwError } from 'rxjs';
-import { AuthToken } from '../auth/auth-token';
-import { CurrentUser } from '../auth/current-user';
+import { AuthToken } from '@core/auth/auth-token';
+import { CurrentUser } from '@core/auth/current-user';
 import { Router } from '@angular/router';
 import { ApiResponse } from './api-response';
 

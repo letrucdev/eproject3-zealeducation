@@ -1,0 +1,59 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [trackBy]="trackById"
+  itemLabel="courses"
+  emptyMessage="No courses found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+>
+  <ng-template courseCell="courseName" let-row>
+    <div class="flex flex-col">
+      <span class="font-medium">{{ row.courseName }}</span>
+      @if (row.description) {
+        <span class="text-muted-foreground truncate text-xs">{{ row.description }}</span>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template courseCell="durationWeeks" let-row>
+    {{ row.durationWeeks }} {{ row.durationWeeks === 1 ? 'week' : 'weeks' }}
+  </ng-template>
+
+  <ng-template courseCell="baseFee" let-row>
+    {{ row.baseFee | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN' }}
+  </ng-template>
+
+  <ng-template courseCell="isActive" let-row>
+    @if (row.isActive) {
+      <span hlmBadge class="bg-emerald-100 text-emerald-800">Active</span>
+    } @else {
+      <span hlmBadge variant="secondary">Inactive</span>
+    }
+  </ng-template>
+
+  <ng-template courseCell="updatedAt" let-row>
+    @if (row.updatedAt) {
+      {{ row.updatedAt | date: 'dd MMM yyyy' }}
+    } @else {
+      {{ row.createdAt | date: 'dd MMM yyyy' }}
+    }
+  </ng-template>
+
+  <ng-template courseCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="editClicked.emit(row)"
+        [attr.aria-label]="'Edit ' + row.courseName"
+      >
+        <ng-icon hlm name="lucidePencil" size="sm" />
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

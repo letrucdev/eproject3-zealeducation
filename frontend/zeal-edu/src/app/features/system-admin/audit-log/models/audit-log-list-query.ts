@@ -1,4 +1,4 @@
-import { AuditAction } from '../../../../core/models/audit-action';
+import { AuditAction } from '@core/models/audit-action';
 
 export interface AuditLogListQuery {
   page: number;

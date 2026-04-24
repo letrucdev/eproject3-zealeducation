@@ -7,7 +7,8 @@ export interface CourseEnquiryDetail {
   fullName: string;
   phone: string;
   email: string | null;
-  courseInterested: string;
+  courseInterestedId: string;
+  courseInterestedName: string;
   source: EnquirySource;
   status: EnquiryStatus;
   nextFollowUpDate: string | null;

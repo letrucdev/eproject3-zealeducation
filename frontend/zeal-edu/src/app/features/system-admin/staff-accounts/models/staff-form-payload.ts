@@ -1,5 +1,5 @@
-import { Gender } from '../../../../core/models/gender';
-import { UserRole } from '../../../../core/models/user-role';
+import { Gender } from '@core/models/gender';
+import { UserRole } from '@core/models/user-role';
 
 export interface CreateStaffPayload {
   username: string;

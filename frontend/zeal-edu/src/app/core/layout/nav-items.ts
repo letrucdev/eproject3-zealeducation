@@ -1,4 +1,4 @@
-import { UserRole } from '../models/user-role';
+import { UserRole } from '@core/models/user-role';
 
 export interface NavigationMenu {
   title: string;
@@ -48,6 +48,24 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         route: '/app/counselor/course-enquiries',
         icon: 'lucideUserSearch',
         roles: [UserRole.Counselor],
+      },
+    ],
+  },
+  {
+    title: 'Manages',
+    roles: [UserRole.Incharge],
+    items: [
+      {
+        label: 'Courses',
+        route: '/app/incharge/courses',
+        icon: 'lucideBookOpen',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Batches',
+        route: '/app/incharge/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Incharge],
       },
     ],
   },

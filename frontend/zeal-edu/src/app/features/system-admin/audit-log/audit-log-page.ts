@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
-import { AuditLogListItem } from '../../../core/models/audit-log-list-item';
+import { AuditLogListItem } from '@core/models/audit-log-list-item';
 import { AuditLogService } from './audit-log.service';
 import { AuditLogDetailDialog } from './components/audit-log-detail-dialog';
 import {
