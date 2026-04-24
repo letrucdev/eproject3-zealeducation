@@ -8,7 +8,8 @@ public class CourseEnquiryListItemDto
     public string FullName { get; set; } = default!;
     public string Phone { get; set; } = default!;
     public string? Email { get; set; }
-    public string CourseInterested { get; set; } = default!;
+    public Guid CourseInterestedId { get; set; }
+    public string CourseInterestedName { get; set; } = default!;
     public EnquirySource Source { get; set; }
     public EnquiryStatus Status { get; set; }
     public DateOnly? NextFollowUpDate { get; set; }

@@ -136,6 +136,51 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("candidate", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("BaseFee")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("CourseName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DurationWeeks")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseName")
+                        .IsUnique();
+
+                    b.ToTable("course", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -151,10 +196,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<Guid?>("ConvertedCandidateId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CourseInterested")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                    b.Property<Guid>("CourseInterestedId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -202,6 +245,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.HasIndex("AssignedCounselorId");
 
                     b.HasIndex("ConvertedCandidateId");
+
+                    b.HasIndex("CourseInterestedId");
 
                     b.HasIndex("NextFollowUpDate");
 
@@ -475,9 +520,17 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .HasForeignKey("ConvertedCandidateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("ZealEducation.Domain.Entities.Course", "CourseInterested")
+                        .WithMany("Enquiries")
+                        .HasForeignKey("CourseInterestedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("AssignedCounselor");
 
                     b.Navigation("ConvertedCandidate");
+
+                    b.Navigation("CourseInterested");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.EnquiryNote", b =>
@@ -519,6 +572,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("UserAccount");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
+                {
+                    b.Navigation("Enquiries");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>

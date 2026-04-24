@@ -22,7 +22,7 @@
       (ngSubmit)="submit()"
       class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
     >
-      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <div class="grid gap-4 sm:grid-cols-2">
           <hlm-field>
             <label hlmFieldLabel for="enquiry-name">Full Name</label>
@@ -53,14 +53,37 @@
         </hlm-field>
 
         <hlm-field>
-          <label hlmFieldLabel for="enquiry-course">Course Interested</label>
-          <input
-            hlmInput
-            id="enquiry-course"
-            type="text"
+          <label hlmFieldLabel>Course Interested</label>
+          <hlm-combobox
             formControlName="courseInterested"
+            [(search)]="courseSearch"
+            [itemToString]="courseItemToString"
             class="w-full"
-          />
+          >
+            <hlm-combobox-input placeholder="Search for a course..." showClear />
+            <hlm-combobox-content *hlmComboboxPortal>
+              @if (courses.isError()) {
+                <hlm-combobox-status>Failed to load courses.</hlm-combobox-status>
+              } @else if (courses.isPending()) {
+                <hlm-combobox-status>
+                  <hlm-spinner />
+                  Loading...
+                </hlm-combobox-status>
+              } @else {
+                @let items = courses.data()?.items ?? [];
+                @if (items.length === 0) {
+                  <hlm-combobox-empty>No courses found.</hlm-combobox-empty>
+                }
+                <div hlmComboboxList>
+                  @for (course of items; track course.courseId) {
+                    <hlm-combobox-item [value]="course">
+                      {{ course.courseName }}
+                    </hlm-combobox-item>
+                  }
+                </div>
+              }
+            </hlm-combobox-content>
+          </hlm-combobox>
           <hlm-field-error validator="required">Course is required.</hlm-field-error>
         </hlm-field>
 

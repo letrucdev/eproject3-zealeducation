@@ -8,7 +8,7 @@ public class CourseEnquiry : BaseAuditableEntity
     public string FullName { get; set; } = default!;
     public string Phone { get; set; } = default!;
     public string? Email { get; set; }
-    public string CourseInterested { get; set; } = default!;
+    public Guid CourseInterestedId { get; set; }
     public EnquirySource Source { get; set; }
     public EnquiryStatus Status { get; set; } = EnquiryStatus.New;
     public DateOnly? NextFollowUpDate { get; set; }
@@ -16,6 +16,7 @@ public class CourseEnquiry : BaseAuditableEntity
     public Guid? ConvertedCandidateId { get; set; }
     public DateTime? ConvertedAt { get; set; }
 
+    public Course CourseInterested { get; set; } = default!;
     public Staff AssignedCounselor { get; set; } = default!;
     public Candidate? ConvertedCandidate { get; set; }
     public ICollection<EnquiryNote> Notes { get; set; } = new List<EnquiryNote>();

@@ -12,6 +12,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Faculty> Faculties => Set<Faculty>();
     public DbSet<Candidate> Candidates => Set<Candidate>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Course> Courses => Set<Course>();
     public DbSet<CourseEnquiry> CourseEnquiries => Set<CourseEnquiry>();
     public DbSet<EnquiryNote> EnquiryNotes => Set<EnquiryNote>();
 

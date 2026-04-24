@@ -56,7 +56,7 @@ export class EnquiryTable {
     { key: 'fullName', header: 'Name', width: 'w-56' },
     { key: 'phone', header: 'Phone', width: 'w-36' },
     { key: 'email', header: 'Email', width: 'w-56' },
-    { key: 'courseInterested', header: 'Course', width: 'w-48' },
+    { key: 'courseInterestedName', header: 'Course', width: 'w-48' },
     { key: 'source', header: 'Source', width: 'w-32' },
     { key: 'status', header: 'Status', width: 'w-36', align: 'center' },
     { key: 'nextFollowUpDate', header: 'Next Follow-Up', width: 'w-40' },
