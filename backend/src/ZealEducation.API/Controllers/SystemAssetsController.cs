@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZealEducation.API.Common.Models;
 using ZealEducation.Application.Features.SystemAssets.Commands.CreateSystemAsset;
@@ -16,80 +17,80 @@ using ZealEducation.Domain.Enums;
 namespace ZealEducation.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class SystemAssetsController(ISender sender) : ControllerBase
+[Route("api/system-assets")]
+[Authorize(Roles = nameof(UserRole.SystemAdmin))]
+public class SystemAssetsController : ControllerBase
 {
-    [HttpPost]
-    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromBody] CreateSystemAssetCommand command)
-    {
-        var result = await sender.Send(command);
-        
-        if (!result.Succeeded)
-        {
-            return BadRequest(ApiResponse<Guid>.Error(string.Join(", ", result.Errors)));
-        }
+    private readonly ISender _sender;
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = result.Data },
-            ApiResponse<Guid>.Success(result.Data, "System asset created successfully"));
+    public SystemAssetsController(ISender sender)
+    {
+        _sender = sender;
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<SystemAssetDto>>>> GetAll([FromQuery] ConditionStatus? conditionStatus, [FromQuery] string? assetType)
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<SystemAssetDto>>>> GetAll(
+        [FromQuery] ConditionStatus? conditionStatus = null,
+        [FromQuery] string? assetType = null)
     {
-        var result = await sender.Send(new GetSystemAssetsQuery(conditionStatus, assetType));
+        var result = await _sender.Send(new GetSystemAssetsQuery(conditionStatus, assetType));
         return Ok(ApiResponse<IReadOnlyList<SystemAssetDto>>.Success(result.Data));
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ApiResponse<SystemAssetDto>>> GetById(Guid id)
     {
-        var result = await sender.Send(new GetSystemAssetByIdQuery(id));
+        var result = await _sender.Send(new GetSystemAssetByIdQuery(id));
         return Ok(ApiResponse<SystemAssetDto>.Success(result.Data));
     }
 
-    [HttpPut]
-    public async Task<ActionResult<ApiResponse<object>>> Update([FromBody] UpdateSystemAssetCommand command)
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromBody] CreateSystemAssetCommand command)
     {
-        var result = await sender.Send(command);
+        var result = await _sender.Send(command);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = result },
+            ApiResponse<Guid>.Success(result, "System asset created successfully"));
+    }
 
-        if (!result.Succeeded)
-        {
-            return BadRequest(ApiResponse<object>.Error(string.Join(", ", result.Errors)));
-        }
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> Update(Guid id, [FromBody] UpdateSystemAssetRequest body)
+    {
+        var command = new UpdateSystemAssetCommand(
+            id,
+            body.AssetName,
+            body.AssetType,
+            body.SerialNumber,
+            body.Location,
+            body.PurchaseDate,
+            body.Notes);
 
+        await _sender.Send(command);
         return Ok(ApiResponse<object>.Success(null, "System asset updated successfully"));
     }
 
     [HttpPatch("{id:guid}/condition")]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateCondition(Guid id, [FromBody] UpdateConditionCommand command)
+    public async Task<ActionResult<ApiResponse<object>>> UpdateCondition(Guid id, [FromBody] UpdateConditionRequest body)
     {
-        if (id != command.Id)
-        {
-            return BadRequest(ApiResponse<object>.Error("Id mismatch"));
-        }
-
-        var result = await sender.Send(command);
-
-        if (!result.Succeeded)
-        {
-            return BadRequest(ApiResponse<object>.Error(string.Join(", ", result.Errors)));
-        }
-
-        return Ok(ApiResponse<object>.Success(null, "System asset condition updated successfully"));
+        await _sender.Send(new UpdateConditionCommand(id, body.ConditionStatus));
+        return Ok(ApiResponse<object>.Success(null, "Condition updated successfully"));
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id)
+    public async Task<ActionResult<ApiResponse<object>>> Decommission(Guid id)
     {
-        var result = await sender.Send(new DecommissionAssetCommand(id));
-
-        if (!result.Succeeded)
-        {
-            return BadRequest(ApiResponse<object>.Error(string.Join(", ", result.Errors)));
-        }
-
-        return Ok(ApiResponse<object>.Success(null, "System asset decommissioned successfully"));
+        await _sender.Send(new DecommissionAssetCommand(id));
+        return Ok(ApiResponse<object>.Success(null, "Asset decommissioned successfully"));
     }
+
+    public record UpdateSystemAssetRequest(
+        string AssetName,
+        string AssetType,
+        string SerialNumber,
+        string Location,
+        DateTime PurchaseDate,
+        string? Notes);
+
+    public record UpdateConditionRequest(ConditionStatus ConditionStatus);
 }

@@ -10,7 +10,7 @@ public class UpdateConditionCommandValidator : AbstractValidator<UpdateCondition
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("Id is required.");
 
-        RuleFor(x => x.NewStatus)
+        RuleFor(x => x.ConditionStatus)
             .IsInEnum().WithMessage("Condition Status is invalid.");
     }
 }

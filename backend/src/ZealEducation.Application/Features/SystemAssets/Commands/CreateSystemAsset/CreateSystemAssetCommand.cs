@@ -1,6 +1,5 @@
 using System;
 using MediatR;
-using ZealEducation.Application.Common.Models;
 
 namespace ZealEducation.Application.Features.SystemAssets.Commands.CreateSystemAsset;
 
@@ -10,4 +9,6 @@ public record CreateSystemAssetCommand(
     string SerialNumber,
     string Location,
     DateTime PurchaseDate,
-    string? Notes = null) : IRequest<Result<Guid>>;
+    string? Notes = null) : IRequest<Guid>;
+    
+// No ManagedBy — automatically retrieved from JWT token

@@ -1,15 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using ZealEducation.Application.Common.Models;
-using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Interfaces;
 
 namespace ZealEducation.Application.Features.SystemAssets.Commands.UpdateCondition;
 
-public class UpdateConditionCommandHandler : IRequestHandler<UpdateConditionCommand, Result>
+public class UpdateConditionCommandHandler : IRequestHandler<UpdateConditionCommand>
 {
     private readonly IRepository<SystemAsset> _repository;
     private readonly IUnitOfWork _unitOfWork;
@@ -20,27 +19,14 @@ public class UpdateConditionCommandHandler : IRequestHandler<UpdateConditionComm
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result> Handle(UpdateConditionCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateConditionCommand request, CancellationToken cancellationToken)
     {
-        var asset = await _repository.GetByIdAsync(request.Id, cancellationToken);
-        
-        if (asset == null)
-        {
-            throw new NotFoundException(nameof(SystemAsset), request.Id);
-        }
+        var asset = await _repository.GetByIdAsync(request.Id, cancellationToken)
+            ?? throw new KeyNotFoundException($"Asset with Id '{request.Id}' not found.");
 
-        try
-        {
-            asset.UpdateCondition(request.NewStatus);
+        asset.UpdateCondition(request.ConditionStatus); // call domain method
 
-            _repository.Update(asset);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.Message);
-        }
+        _repository.Update(asset);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

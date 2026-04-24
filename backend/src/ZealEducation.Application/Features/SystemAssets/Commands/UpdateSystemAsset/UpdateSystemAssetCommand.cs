@@ -1,6 +1,5 @@
 using System;
 using MediatR;
-using ZealEducation.Application.Common.Models;
 
 namespace ZealEducation.Application.Features.SystemAssets.Commands.UpdateSystemAsset;
 
@@ -10,4 +9,5 @@ public record UpdateSystemAssetCommand(
     string AssetType,
     string SerialNumber,
     string Location,
-    string? Notes = null) : IRequest<Result>;
+    DateTime PurchaseDate,
+    string? Notes) : IRequest;
