@@ -10,5 +10,6 @@ public class Course : BaseAuditableEntity
     public decimal BaseFee { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public ICollection<CourseEnquiry> Enquiries { get; set; } = new List<CourseEnquiry>();
+    public ICollection<CourseEnquiry> Enquiries { get; set; } = [];
+    public ICollection<Batch> Batches { get; set; } = [];
 }
