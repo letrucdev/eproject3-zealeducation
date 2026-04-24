@@ -1,8 +1,12 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
+import { registerLocaleData } from '@angular/common';
+import localeVi from '@angular/common/locales/vi';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, TitleStrategy } from '@angular/router';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
+
+registerLocaleData(localeVi);
 
 import { routes } from './app.routes';
 import { authInterceptor } from '@core/http/auth-interceptor';

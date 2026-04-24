@@ -7,6 +7,7 @@ using ZealEducation.Application.Features.Courses.Commands.CreateCourse;
 using ZealEducation.Application.Features.Courses.Commands.UpdateCourse;
 using ZealEducation.Application.Features.Courses.Queries.GetCourseById;
 using ZealEducation.Application.Features.Courses.Queries.GetCourses;
+using ZealEducation.Application.Features.Courses.Queries.GetCourseStatistics;
 using ZealEducation.Domain.Enums;
 
 namespace ZealEducation.API.Controllers;
@@ -29,6 +30,14 @@ public class CourseController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(new GetCoursesQuery(page, pageSize, search, isActive));
         return Ok(ApiResponse<PaginatedList<CourseListItemDto>>.Success(result));
+    }
+
+    [HttpGet("statistics")]
+    [Authorize(Roles = ReadRoles)]
+    public async Task<ActionResult<ApiResponse<CourseStatisticsDto>>> GetStatistics()
+    {
+        var result = await sender.Send(new GetCourseStatisticsQuery());
+        return Ok(ApiResponse<CourseStatisticsDto>.Success(result));
     }
 
     [HttpGet("{id:guid}")]

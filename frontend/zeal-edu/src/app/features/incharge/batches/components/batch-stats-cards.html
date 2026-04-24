@@ -1,0 +1,73 @@
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideGraduationCap" size="sm" />
+        Total
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl">{{ stats()?.total ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideUserRoundX" size="sm" class="text-amber-600" />
+        Needs Instructor
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl text-amber-700">
+          {{ stats()?.needsInstructor ?? 0 }}
+        </h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideCircleCheck" size="sm" class="text-emerald-600" />
+        Active
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl text-emerald-700">{{ stats()?.active ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideFlag" size="sm" class="text-slate-600" />
+        Completed
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl text-slate-700">{{ stats()?.completed ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideCircleOff" size="sm" class="text-rose-600" />
+        Cancelled
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl text-rose-700">{{ stats()?.cancelled ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+</div>

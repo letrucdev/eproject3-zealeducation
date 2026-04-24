@@ -5,6 +5,7 @@ import { QueryClient, keepPreviousData } from '@tanstack/query-core';
 import { firstValueFrom } from 'rxjs';
 import { ApiResponse } from '@core/http/api-response';
 import { CourseListItem } from '@core/models/course-list-item';
+import { CourseStatistics } from '@core/models/course-statistics';
 import { PaginatedList } from '@core/models/paginated-list';
 
 export interface CourseListQuery {
@@ -32,6 +33,7 @@ export interface UpdateCoursePayload {
 
 export const COURSE_QUERY_KEY = ['courses'] as const;
 export const COURSE_DETAIL_QUERY_KEY = ['course-detail'] as const;
+export const COURSE_STATS_QUERY_KEY = ['course-statistics'] as const;
 
 @Injectable({ providedIn: 'root' })
 export class CoursesService {
@@ -44,6 +46,13 @@ export class CoursesService {
       queryFn: () => this._fetchList(params()),
       staleTime: 60_000,
       placeholderData: keepPreviousData,
+    }));
+  }
+
+  statisticsQuery() {
+    return injectQuery(() => ({
+      queryKey: COURSE_STATS_QUERY_KEY,
+      queryFn: () => this._fetchStatistics(),
     }));
   }
 
@@ -110,6 +119,13 @@ export class CoursesService {
     );
   }
 
+  private async _fetchStatistics(): Promise<CourseStatistics> {
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<CourseStatistics>>('/courses/statistics'),
+    );
+    return response.data ?? { total: 0, active: 0, inactive: 0 };
+  }
+
   private async _fetchById(courseId: string): Promise<CourseListItem> {
     const response = await firstValueFrom(
       this._http.get<ApiResponse<CourseListItem>>(`/courses/${courseId}`),
@@ -120,6 +136,7 @@ export class CoursesService {
 
   private _invalidateAll(): void {
     void this._queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEY });
-    void this._queryClient.invalidateQueries({ queryKey: COURSE_DETAIL_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: COURSE_STATS_QUERY_KEY });
+    void this._queryClient.removeQueries({ queryKey: COURSE_DETAIL_QUERY_KEY });
   }
 }

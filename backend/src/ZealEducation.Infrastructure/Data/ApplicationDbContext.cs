@@ -17,6 +17,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EnquiryNote> EnquiryNotes => Set<EnquiryNote>();
     public DbSet<Batch> Batches => Set<Batch>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+    public DbSet<FeeStructure> FeeStructures => Set<FeeStructure>();
+    public DbSet<InstallmentPlan> InstallmentPlans => Set<InstallmentPlan>();
+    public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
+    public DbSet<Fine> Fines => Set<Fine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

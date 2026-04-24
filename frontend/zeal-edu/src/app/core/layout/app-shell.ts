@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
 import {
+  lucideBookOpen,
   lucideGraduationCap,
   lucidePanelLeft,
   lucideScrollText,
@@ -41,6 +42,7 @@ import { environment } from '@/environments/environment';
       lucideGraduationCap,
       lucideScrollText,
       lucideUserSearch,
+      lucideBookOpen,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

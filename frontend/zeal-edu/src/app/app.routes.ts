@@ -29,6 +29,13 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@features/counselor/counselor.routes').then((m) => m.COUNSELOR_ROUTES),
       },
+      {
+        path: 'incharge',
+        canMatch: [hasRole(UserRole.Incharge)],
+        data: { breadcrumb: 'InCharge' },
+        loadChildren: () =>
+          import('@features/incharge/incharge.routes').then((m) => m.INCHARGE_ROUTES),
+      },
       { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },

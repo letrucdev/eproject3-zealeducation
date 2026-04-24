@@ -21,12 +21,13 @@ import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
 import { CourseListItem } from '@core/models/course-list-item';
 import { EnquirySource } from '@core/models/enquiry-source';
 import { EnquiryStatus } from '@core/models/enquiry-status';
-import { CoursesService } from '@features/counselor/courses/courses.service';
+import { CoursesService } from '@core/services/courses.service';
 import {
   CreateEnquiryPayload,
   UpdateEnquiryPayload,
 } from '@features/counselor/course-enquiries/models/course-enquiry-payload';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
+import { CurrencyPipe } from '@angular/common';
 
 export type EnquiryFormMode = 'create' | 'edit';
 
@@ -53,6 +54,7 @@ export type EnquiryFormSubmit = EnquiryFormSubmitCreate | EnquiryFormSubmitUpdat
     HlmSpinnerImports,
     HlmButtonImports,
     DigitsOnlyDirective,
+    CurrencyPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'enquiry-form-dialog.html',

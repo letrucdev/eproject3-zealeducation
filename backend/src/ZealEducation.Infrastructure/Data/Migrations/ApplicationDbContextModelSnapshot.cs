@@ -465,6 +465,240 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("faculty", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeeType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Tuition");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("OutstandingBalance")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("decimal(12,2)")
+                        .HasComputedColumnSql("[TotalFee] - [AmountPaid]", true);
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Unpaid");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("NotSet");
+
+                    b.Property<decimal>("TotalFee")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.ToTable("fee_structure", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Fine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid>("IssuedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("IssuedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("PaidDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ViolationReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("FeeId")
+                        .IsUnique();
+
+                    b.HasIndex("IssuedByStaffId");
+
+                    b.ToTable("fine", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("AmountPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("DueDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("InstallmentNo")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("PaidDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeeId", "InstallmentNo")
+                        .IsUnique();
+
+                    b.ToTable("installment_plan", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid>("ProcessedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiptNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeeId");
+
+                    b.HasIndex("ProcessedByStaffId");
+
+                    b.HasIndex("ReceiptNumber")
+                        .IsUnique();
+
+                    b.ToTable("payment_transaction", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
                 {
                     b.Property<Guid>("Id")
@@ -611,7 +845,7 @@ namespace ZealEducation.Infrastructure.Data.Migrations
             modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.Course", "Course")
-                        .WithMany()
+                        .WithMany("Batches")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -733,6 +967,74 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Fine", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
+                        .WithOne("Fine")
+                        .HasForeignKey("ZealEducation.Domain.Entities.Fine", "FeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "IssuedByStaff")
+                        .WithMany()
+                        .HasForeignKey("IssuedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("FeeStructure");
+
+                    b.Navigation("IssuedByStaff");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentPlan", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
+                        .WithMany("InstallmentPlans")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FeeStructure");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "ProcessedByStaff")
+                        .WithMany()
+                        .HasForeignKey("ProcessedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FeeStructure");
+
+                    b.Navigation("ProcessedByStaff");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.UserAccount", "UserAccount")
@@ -751,12 +1053,23 @@ namespace ZealEducation.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
                 {
+                    b.Navigation("Batches");
+
                     b.Navigation("Enquiries");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
                 {
                     b.Navigation("Notes");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.Navigation("Fine");
+
+                    b.Navigation("InstallmentPlans");
+
+                    b.Navigation("PaymentTransactions");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>

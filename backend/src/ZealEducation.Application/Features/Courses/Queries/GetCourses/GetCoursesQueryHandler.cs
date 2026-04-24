@@ -28,7 +28,7 @@ public class GetCoursesQueryHandler(
         }
 
         var projected = query
-            .OrderByDescending(c => c.IsActive)
+            .OrderByDescending(c => c.CreatedAt)
             .ThenBy(c => c.CourseName)
             .Select(c => new CourseListItemDto
             {
