@@ -8,6 +8,7 @@ public class Enrollment : BaseAuditableEntity
     public Guid CandidateId { get; set; }
     public Guid? BatchId { get; set; }
     public Guid? InchargeId { get; set; }
+    public Guid? FeeId { get; set; }
     public DateOnly EnrollmentDate { get; set; }
     public Guid CourseId { get; set; }
     public EnrollmentStatus Status { get; set; } = EnrollmentStatus.PendingAssignment;
@@ -17,4 +18,5 @@ public class Enrollment : BaseAuditableEntity
     public Course Course { get; set; } = default!;
     public Batch? Batch { get; set; }
     public Staff? Incharge { get; set; }
+    public FeeStructure? Fee { get; set; }
 }

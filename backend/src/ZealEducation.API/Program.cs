@@ -1,9 +1,12 @@
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
 using ZealEducation.Application;
 using ZealEducation.Infrastructure;
 using ZealEducation.Infrastructure.Data;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 

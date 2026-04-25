@@ -44,6 +44,11 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .HasForeignKey(e => e.InchargeId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(e => e.Fee)
+            .WithOne(f => f.Enrollment)
+            .HasForeignKey<Enrollment>(e => e.FeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Ignore(e => e.DomainEvents);
     }
 }

@@ -69,6 +69,18 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
       },
     ],
   },
+  {
+    title: 'Finance',
+    roles: [UserRole.AccountsStaff],
+    items: [
+      {
+        label: 'Payments',
+        route: '/app/accounts/payments',
+        icon: 'lucideWallet',
+        roles: [UserRole.AccountsStaff],
+      },
+    ],
+  },
 ];
 
 function filterNavItemsForRole(items: readonly NavItem[], role: UserRole): NavItem[] {

@@ -1,4 +1,5 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
+import { VndPipe } from '@shared/pipes/vnd-pipe';
 import { ChangeDetectionStrategy, Component, Directive, input, output } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
 import { lucidePencil } from '@ng-icons/lucide';
@@ -34,7 +35,7 @@ export class CourseCellDef extends DataTableCellDef<CourseListItem> {
   imports: [
     DataTable,
     CourseCellDef,
-    CurrencyPipe,
+    VndPipe,
     DatePipe,
     HlmBadgeImports,
     HlmButtonImports,

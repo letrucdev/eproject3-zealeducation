@@ -1,0 +1,126 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <h1 class="text-2xl font-semibold tracking-tight">Payments</h1>
+    <p class="text-muted-foreground max-w-2xl text-sm">
+      Manage fee collection: set payment plans, record transactions, print receipts.
+    </p>
+  </header>
+
+  <form [formGroup]="form" class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+    <div class="relative w-full md:w-96">
+      <ng-icon
+        hlm
+        name="lucideSearch"
+        size="sm"
+        class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+      />
+      <input
+        hlmInput
+        type="search"
+        class="w-full ps-9"
+        placeholder="Search by candidate code, name, course..."
+        formControlName="search"
+        aria-label="Search fee structures"
+      />
+    </div>
+
+    <hlm-select formControlName="status" [itemToString]="statusLabel" class="w-full md:w-52">
+      <hlm-select-trigger>
+        <hlm-select-value placeholder="Status: All" />
+      </hlm-select-trigger>
+      <hlm-select-content *hlmSelectPortal>
+        <hlm-select-item value="all">All Status</hlm-select-item>
+        <hlm-select-item [value]="paymentStatuses.Unpaid">Unpaid</hlm-select-item>
+        <hlm-select-item [value]="paymentStatuses.Partial">Partial</hlm-select-item>
+        <hlm-select-item [value]="paymentStatuses.Paid">Paid</hlm-select-item>
+        <hlm-select-item [value]="paymentStatuses.Overdue">Overdue</hlm-select-item>
+      </hlm-select-content>
+    </hlm-select>
+
+    <hlm-select formControlName="type" [itemToString]="typeLabel" class="w-full md:w-44">
+      <hlm-select-trigger>
+        <hlm-select-value placeholder="Type: All" />
+      </hlm-select-trigger>
+      <hlm-select-content *hlmSelectPortal>
+        <hlm-select-item value="all">All Types</hlm-select-item>
+        <hlm-select-item [value]="feeTypes.Tuition">Tuition</hlm-select-item>
+        <hlm-select-item [value]="feeTypes.Fine">Fine</hlm-select-item>
+      </hlm-select-content>
+    </hlm-select>
+  </form>
+
+  <app-data-table
+    [columns]="columns"
+    [page]="listQuery.data()"
+    [isLoading]="listQuery.isPending()"
+    [pageSize]="pageSize()"
+    [trackBy]="trackById"
+    itemLabel="fee records"
+    emptyMessage="No fee structures found."
+    (pageChanged)="onPageChanged($event)"
+    (pageSizeChanged)="onPageSizeChanged($event)"
+  >
+    <ng-template paymentCell="candidateCode" let-row>
+      <span class="font-mono text-sm">{{ row.candidateCode }}</span>
+    </ng-template>
+
+    <ng-template paymentCell="candidateFullName" let-row>
+      <span class="font-medium">{{ row.candidateFullName }}</span>
+    </ng-template>
+
+    <ng-template paymentCell="courseTitle" let-row>
+      @if (row.courseTitle) {
+        <span>{{ row.courseTitle }}</span>
+      } @else {
+        <span class="text-muted-foreground italic text-xs">No course</span>
+      }
+    </ng-template>
+
+    <ng-template paymentCell="feeType" let-row>
+      <span hlmBadge variant="secondary">{{ row.feeType }}</span>
+    </ng-template>
+
+    <ng-template paymentCell="totalFee" let-row>
+      {{ row.totalFee | vnd }}
+    </ng-template>
+
+    <ng-template paymentCell="amountPaid" let-row>
+      {{ row.amountPaid | vnd }}
+    </ng-template>
+
+    <ng-template paymentCell="outstandingBalance" let-row>
+      <span [class.text-rose-600]="row.outstandingBalance > 0">
+        {{ row.outstandingBalance | vnd }}
+      </span>
+    </ng-template>
+
+    <ng-template paymentCell="paymentStatus" let-row>
+      @switch (row.paymentStatus) {
+        @case (paymentStatuses.Unpaid) {
+          <span hlmBadge class="bg-slate-100 text-slate-800">Unpaid</span>
+        }
+        @case (paymentStatuses.Partial) {
+          <span hlmBadge class="bg-amber-100 text-amber-800">Partial</span>
+        }
+        @case (paymentStatuses.Paid) {
+          <span hlmBadge class="bg-emerald-100 text-emerald-800">Paid</span>
+        }
+        @case (paymentStatuses.Overdue) {
+          <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+        }
+      }
+    </ng-template>
+
+    <ng-template paymentCell="actions" let-row>
+      <a
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        [routerLink]="['/app/accounts/payments', row.feeId]"
+        [attr.aria-label]="'View payment detail for ' + row.candidateCode"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+      </a>
+    </ng-template>
+  </app-data-table>
+</section>

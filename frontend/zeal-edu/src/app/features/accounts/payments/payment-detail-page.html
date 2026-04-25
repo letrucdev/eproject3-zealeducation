@@ -1,0 +1,344 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <a hlmBtn variant="ghost" size="sm" routerLink="/app/accounts/payments" class="self-start">
+      <ng-icon hlm name="lucideArrowLeft" size="sm" />
+      Back to Payments
+    </a>
+    <h1 class="text-2xl font-semibold tracking-tight">Payment Detail</h1>
+  </header>
+
+  @if (detailQuery.isPending()) {
+    <div class="grid gap-4 md:grid-cols-2">
+      <hlm-skeleton class="h-40" />
+      <hlm-skeleton class="h-40" />
+    </div>
+  } @else if (detailQuery.isError()) {
+    <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      Failed to load fee structure.
+    </div>
+  } @else if (detailQuery.data(); as detail) {
+    <!-- Card 1: Info -->
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>{{ detail.candidateFullName }}</h2>
+        <p hlmCardDescription>
+          {{ detail.candidateCode }} ·
+          @if (detail.courseName) {
+            {{ detail.courseName }}
+          } @else {
+            No course
+          }
+          @if (detail.durationWeeks) {
+            · {{ detail.durationWeeks }} weeks
+          }
+        </p>
+      </div>
+      <div hlmCardContent class="grid gap-4 md:grid-cols-3">
+        <div class="flex flex-col">
+          <span class="text-xs uppercase text-muted-foreground">Total Fee</span>
+          <span class="text-xl font-semibold">{{ detail.totalFee | vnd }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs uppercase text-muted-foreground">Paid</span>
+          <span class="text-xl font-semibold text-emerald-700">{{ detail.amountPaid | vnd }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs uppercase text-muted-foreground">Outstanding</span>
+          <span class="text-xl font-semibold" [class.text-rose-600]="detail.outstandingBalance > 0">
+            {{ detail.outstandingBalance | vnd }}
+          </span>
+        </div>
+        <div class="flex items-center gap-2 md:col-span-3">
+          <span class="text-xs text-muted-foreground">Status:</span>
+          @switch (detail.paymentStatus) {
+            @case (paymentStatuses.Unpaid) {
+              <span hlmBadge class="bg-slate-100 text-slate-800">Unpaid</span>
+            }
+            @case (paymentStatuses.Partial) {
+              <span hlmBadge class="bg-amber-100 text-amber-800">Partial</span>
+            }
+            @case (paymentStatuses.Paid) {
+              <span hlmBadge class="bg-emerald-100 text-emerald-800">Paid</span>
+            }
+            @case (paymentStatuses.Overdue) {
+              <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+            }
+          }
+          <span hlmBadge variant="secondary">{{ detail.feeType }}</span>
+          @if (detail.paymentType !== paymentTypes.NotSet) {
+            <span hlmBadge variant="outline">{{ paymentTypeLabels[detail.paymentType] }}</span>
+          }
+          @if (!detail.candidateIsActive) {
+            <span hlmBadge class="bg-amber-100 text-amber-800">Account Locked</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 2: Payment Type -->
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h3 hlmCardTitle>Payment Type</h3>
+        <p hlmCardDescription>
+          @if (detail.paymentType === paymentTypes.NotSet) {
+            Choose how this candidate will pay the tuition.
+          } @else if (canChangePaymentType()) {
+            Type can be changed until the first payment is recorded.
+          } @else {
+            Locked. Cannot be changed after a transaction.
+          }
+        </p>
+      </div>
+      <div hlmCardContent class="flex flex-col gap-3">
+        <hlm-select
+          [formControl]="paymentTypeControl"
+          [itemToString]="paymentTypeOptionLabel"
+          class="w-full md:w-72"
+          aria-label="Payment type"
+        >
+          <hlm-select-trigger>
+            <hlm-select-value placeholder="Choose payment type" />
+          </hlm-select-trigger>
+          <hlm-select-content *hlmSelectPortal>
+            @for (option of paymentTypeOptions; track option.value) {
+              <hlm-select-item [value]="option.value">{{ option.label }}</hlm-select-item>
+            }
+          </hlm-select-content>
+        </hlm-select>
+      </div>
+    </section>
+
+    <!-- Card 3: Installment Schedule (Installment only) -->
+    @if (detail.paymentType === paymentTypes.Installment) {
+      <section hlmCard>
+        <div hlmCardHeader>
+          <h3 hlmCardTitle>Installment Schedule</h3>
+          <p hlmCardDescription>
+            Each installment must be paid in full. Late payments incur a 5% penalty.
+          </p>
+        </div>
+        <div hlmCardContent class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+              <tr>
+                <th class="px-3 py-2">No.</th>
+                <th class="px-3 py-2 text-right w-44">Amount Due</th>
+                <th class="px-3 py-2 text-right">Due Date</th>
+                <th class="px-3 py-2 text-right">Paid</th>
+                <th class="px-3 py-2 text-right">Penalty</th>
+                <th class="px-3 py-2 text-center">Status</th>
+                <th class="px-3 py-2 text-right w-44">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (installment of detail.installmentPlans; track installment.id) {
+                <tr class="border-b">
+                  <td class="px-3 py-2 font-medium">{{ installment.installmentNo }}</td>
+                  <td class="px-3 py-2 text-right">
+                    {{ installment.amountDue | vnd }}
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    <span
+                      [class.text-rose-600]="isInstallmentOverdue(installment)"
+                      [class.font-medium]="isInstallmentOverdue(installment)"
+                    >
+                      {{ installment.dueDate | date: 'yyyy-MM-dd' }}
+                    </span>
+                    @if (isInstallmentOverdue(installment)) {
+                      <ng-icon
+                        hlm
+                        name="lucideTriangleAlert"
+                        size="xs"
+                        class="text-rose-600 ml-1"
+                      />
+                    }
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    {{ installment.amountPaid | vnd }}
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    {{ installment.penaltyAmount | vnd }}
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    @switch (installment.status) {
+                      @case (installmentStatuses.Pending) {
+                        @if (isInstallmentOverdue(installment)) {
+                          <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+                        } @else {
+                          <span hlmBadge class="bg-slate-100 text-slate-800">Pending</span>
+                        }
+                      }
+                      @case (installmentStatuses.Paid) {
+                        <span hlmBadge class="bg-emerald-100 text-emerald-800">Paid</span>
+                      }
+                      @case (installmentStatuses.Overdue) {
+                        <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+                      }
+                      @case (installmentStatuses.PartiallyPaid) {
+                        <span hlmBadge class="bg-amber-100 text-amber-800">Partial</span>
+                      }
+                    }
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    @if (installment.status !== installmentStatuses.Paid) {
+                      <button
+                        hlmBtn
+                        size="sm"
+                        type="button"
+                        (click)="onPayInstallmentClicked(installment)"
+                        [disabled]="confirmPaymentMutation.isPending() || !canPayInstallment(installment)"
+                        [attr.title]="
+                          !canPayInstallment(installment)
+                            ? 'Pay previous installments first'
+                            : null
+                        "
+                      >
+                        Pay
+                      </button>
+                    } @else {
+                      <ng-icon hlm name="lucideCircleCheck" size="sm" class="text-emerald-600" />
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="px-3 py-6 text-center text-muted-foreground">
+                    No installments recorded.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    <!-- Card 4 (FullPayment only): action -->
+    @if (detail.paymentType === paymentTypes.FullPayment && detail.outstandingBalance > 0) {
+      <section hlmCard>
+        <div hlmCardHeader>
+          <h3 hlmCardTitle>Full Payment</h3>
+          <p hlmCardDescription>
+            Collect the remaining outstanding balance in a single transaction.
+          </p>
+        </div>
+        <div hlmCardContent>
+          <button
+            hlmBtn
+            type="button"
+            (click)="onPayFullClicked()"
+            [disabled]="confirmPaymentMutation.isPending()"
+          >
+            Confirm Payment ({{ detail.outstandingBalance | vnd }})
+          </button>
+        </div>
+      </section>
+    }
+
+    <!-- Card 5: Transactions -->
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h3 hlmCardTitle>Transaction History</h3>
+        <p hlmCardDescription>All payments recorded for this fee.</p>
+      </div>
+      <div hlmCardContent class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+            <tr>
+              <th class="px-3 py-2 w-72">Receipt</th>
+              <th class="px-3 py-2 w-50">Date</th>
+              <th class="px-3 py-2 text-right">Amount</th>
+              <th class="px-3 py-2 text-center">Method</th>
+              <th class="px-3 py-2">Inst. No.</th>
+              <th class="px-3 py-2">Processed By</th>
+              <th class="px-3 py-2 text-center">Proof</th>
+              <th class="px-3 py-2 text-right">Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tx of detail.paymentTransactions; track tx.id) {
+              <tr class="border-b">
+                <td class="px-3 py-2 font-mono">{{ tx.receiptNumber }}</td>
+                <td class="px-3 py-2">{{ tx.paymentDate | date: 'yyyy-MM-dd HH:mm' }}</td>
+                <td class="px-3 py-2 text-right font-medium">
+                  {{ tx.amount | vnd }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                  @switch (tx.paymentMethod) {
+                    @case (paymentMethods.Cash) {
+                      <span hlmBadge class="bg-emerald-100 text-emerald-800">
+                        {{ paymentMethodLabels[paymentMethods.Cash] }}
+                      </span>
+                    }
+                    @case (paymentMethods.BankTransfer) {
+                      <span hlmBadge class="bg-sky-100 text-sky-800">
+                        {{ paymentMethodLabels[paymentMethods.BankTransfer] }}
+                      </span>
+                    }
+                  }
+                </td>
+                <td class="px-3 py-2">
+                  @if (tx.installmentNo != null) {
+                    #{{ tx.installmentNo }}
+                  } @else {
+                    <span class="text-muted-foreground">Full</span>
+                  }
+                </td>
+                <td class="px-3 py-2">{{ tx.processedByStaffName ?? '-' }}</td>
+                <td class="px-3 py-2 text-center">
+                  @if (tx.hasBankTransferProof) {
+                    <button
+                      hlmBtn
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      (click)="onViewBankTransferProofClicked(tx)"
+                      [attr.aria-label]="'View bank transfer proof for ' + tx.receiptNumber"
+                    >
+                      <ng-icon hlm name="lucideEye" size="sm" />
+                    </button>
+                  } @else {
+                    <span class="text-muted-foreground">-</span>
+                  }
+                </td>
+                <td class="px-3 py-2 text-right">
+                  <button
+                    hlmBtn
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    (click)="onDownloadReceiptClicked(tx)"
+                    [disabled]="downloadingReceiptId() === tx.id"
+                    [attr.aria-label]="'Download receipt ' + tx.receiptNumber"
+                  >
+                    <ng-icon hlm name="lucideDownload" size="sm" />
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="px-3 py-6 text-center text-muted-foreground">
+                  No transactions yet.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</section>
+
+<app-installment-plan-dialog #installmentDialog (submitted)="onInstallmentPlanSubmitted($event)" />
+
+<app-confirm-payment-dialog #confirmPaymentDialog (submitted)="onConfirmPaymentSubmitted($event)" />
+
+<app-confirm-dialog #fullPaymentTypeConfirm (confirmed)="onFullPaymentConfirmed()" />
+
+<app-confirm-dialog
+  #confirmPaymentSubmitConfirm
+  (confirmed)="onConfirmPaymentReallyConfirmed()"
+  (cancelled)="onConfirmPaymentCancelled()"
+/>
+
+<app-bank-transfer-proof-dialog #bankTransferProofDialog />

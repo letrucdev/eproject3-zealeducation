@@ -29,6 +29,12 @@ public class PaymentTransactionConfiguration : IEntityTypeConfiguration<PaymentT
             .IsRequired()
             .HasDefaultValueSql("GETUTCDATE()");
 
+        builder.Property(t => t.ReceiptFilePath)
+            .HasMaxLength(500);
+
+        builder.Property(t => t.BankTransferProofPath)
+            .HasMaxLength(500);
+
         builder.HasOne(t => t.FeeStructure)
             .WithMany(f => f.PaymentTransactions)
             .HasForeignKey(t => t.FeeId)
@@ -39,7 +45,13 @@ public class PaymentTransactionConfiguration : IEntityTypeConfiguration<PaymentT
             .HasForeignKey(t => t.ProcessedByStaffId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(t => t.InstallmentPlan)
+            .WithMany()
+            .HasForeignKey(t => t.InstallmentPlanId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(t => t.ReceiptNumber).IsUnique();
+        builder.HasIndex(t => t.InstallmentPlanId);
 
         builder.Ignore(t => t.DomainEvents);
     }

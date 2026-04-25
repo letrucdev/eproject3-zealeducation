@@ -1,0 +1,98 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-md w-[92vw] flex flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h3 hlmDialogTitle>Confirm Payment</h3>
+      <p class="text-muted-foreground text-sm">
+        @if (context()?.mode === 'installment') {
+          Collect installment #{{ context()?.installment?.installmentNo }}.
+        } @else {
+          Collect the remaining outstanding balance.
+        }
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 py-4">
+      <div class="rounded-md border bg-muted/30 px-4 py-3 text-sm flex flex-col gap-1">
+        <div class="flex justify-between">
+          <span class="text-muted-foreground">Base amount</span>
+          <span class="font-medium">{{ baseAmount() | vnd }}</span>
+        </div>
+        @if (isLate()) {
+          <div class="flex justify-between text-rose-600">
+            <span>Late penalty (5%)</span>
+            <span class="font-medium">{{ penaltyAmount() | vnd }}</span>
+          </div>
+        }
+        <div class="flex justify-between border-t pt-2 mt-1">
+          <span class="font-semibold">Total</span>
+          <span class="font-semibold">{{ totalAmount() | vnd }}</span>
+        </div>
+      </div>
+
+      <fieldset hlmRadioGroup formControlName="paymentMethod" class="grid gap-2">
+        <legend class="text-sm font-medium mb-1">Payment Method</legend>
+        @for (method of methods; track method) {
+          <label
+            class="flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer hover:bg-accent/50"
+            [class.border-primary]="selectedMethod() === method"
+          >
+            <hlm-radio [value]="method">
+              <hlm-radio-indicator indicator />
+            </hlm-radio>
+            <span class="font-medium text-sm">{{ methodLabel(method) }}</span>
+          </label>
+        }
+      </fieldset>
+
+      @if (selectedMethod() === PaymentMethod.BankTransfer) {
+        <div class="grid gap-2">
+          <label for="bank-transfer-proof" class="text-sm font-medium">
+            Bank Transfer Proof <span class="text-rose-600">*</span>
+          </label>
+          <input
+            id="bank-transfer-proof"
+            type="file"
+            [accept]="proofAccept"
+            (change)="onProofFileSelected($event)"
+            class="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-primary-foreground file:cursor-pointer hover:file:bg-primary/90"
+          />
+          <p class="text-xs text-muted-foreground">JPG, PNG, or WebP. Max 5 MB.</p>
+          @if (proofError()) {
+            <p class="text-xs text-rose-600">{{ proofError() }}</p>
+          }
+          @if (proofPreviewUrl(); as url) {
+            <div class="mt-1 flex items-start gap-3">
+              <img
+                [src]="url"
+                alt="Proof preview"
+                class="h-24 w-24 rounded-md border object-cover"
+              />
+              <div class="flex flex-col gap-1 text-xs">
+                <span class="text-muted-foreground break-all">{{ proofFile()?.name }}</span>
+                <button
+                  hlmBtn
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  class="self-start text-rose-600"
+                  (click)="onClearProof()"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <div hlmDialogFooter class="mt-2">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="!canSubmit()">Confirm</button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>
