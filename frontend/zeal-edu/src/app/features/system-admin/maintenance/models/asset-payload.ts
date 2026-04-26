@@ -12,9 +12,7 @@ export interface CreateAssetPayload {
 export interface UpdateAssetPayload {
   assetName: string;
   assetType: string;
-  serialNumber: string;
   location: string;
-  purchaseDate: string;   // ISO 8601
   notes: string;
 }
 

@@ -205,20 +205,17 @@ export default class MaintenancePage {
   }
 
   onFormSubmitted(event: AssetFormSubmit): void {
-    const sn = event.payload.serialNumber.trim().toLowerCase();
-    const isDuplicate = this.listQuery
-      .data()
-      ?.some(
-        (a) =>
-          a.serialNumber.toLowerCase() === sn && (event.mode === 'create' || a.id !== event.id),
-      );
-
-    if (isDuplicate) {
-      toast.error(`Serial Number "${event.payload.serialNumber}" already exists.`);
-      return;
-    }
-
     if (event.mode === 'create') {
+      const sn = event.payload.serialNumber.trim().toLowerCase();
+      const isDuplicate = this.listQuery
+        .data()
+        ?.some((a) => a.serialNumber.toLowerCase() === sn);
+
+      if (isDuplicate) {
+        toast.error(`Serial Number "${event.payload.serialNumber}" already exists.`);
+        return;
+      }
+
       this.createMutation.mutate(event.payload, {
         onSuccess: () => {
           toast.success('Asset created successfully.');
