@@ -1,0 +1,48 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <a hlmBtn variant="ghost" size="sm" routerLink="/app/incharge/candidates" class="self-start">
+      <ng-icon hlm name="lucideArrowLeft" size="sm" />
+      Back to Candidates
+    </a>
+    <h1 class="text-2xl font-semibold tracking-tight">Candidate Detail</h1>
+  </header>
+
+  @if (detailQuery.isPending()) {
+    <div class="grid gap-4">
+      <hlm-skeleton class="h-40" />
+      <hlm-skeleton class="h-32" />
+      <hlm-skeleton class="h-40" />
+    </div>
+  } @else if (detailQuery.isError()) {
+    <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      Failed to load candidate.
+    </div>
+  } @else if (detailQuery.data(); as detail) {
+    <app-candidate-info-card
+      [detail]="detail"
+      (editClicked)="onEditClicked()"
+      (fineClicked)="onFineClicked()"
+    />
+
+    <app-candidate-enrollments-card [enrollments]="detail.enrollments" />
+
+    <app-fee-history-table
+      [feeStructures]="detail.feeStructures"
+      (viewClicked)="onViewFeeClicked($event)"
+    />
+  }
+</section>
+
+<app-candidate-update-dialog
+  #updateDialog
+  [submitting]="updateMutation.isPending()"
+  (submitted)="onUpdateSubmitted($event)"
+/>
+
+<app-apply-fine-dialog
+  #fineDialog
+  [submitting]="applyFineMutation.isPending()"
+  (submitted)="onApplyFineSubmitted($event)"
+/>
+
+<app-fee-detail-dialog #feeDetailDialog />

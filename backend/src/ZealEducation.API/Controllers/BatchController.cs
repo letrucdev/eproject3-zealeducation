@@ -3,13 +3,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZealEducation.API.Common.Models;
 using ZealEducation.Application.Common.Models;
+using ZealEducation.Application.Features.Batches.Commands.AssignCandidatesToBatch;
 using ZealEducation.Application.Features.Batches.Commands.AssignFaculty;
 using ZealEducation.Application.Features.Batches.Commands.CreateBatch;
 using ZealEducation.Application.Features.Batches.Commands.DeleteBatch;
 using ZealEducation.Application.Features.Batches.Commands.UpdateBatch;
+using ZealEducation.Application.Features.Batches.Queries.GetAssignableCandidates;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchById;
+using ZealEducation.Application.Features.Batches.Queries.GetBatchEnrollments;
 using ZealEducation.Application.Features.Batches.Queries.GetBatches;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchStatistics;
+using ZealEducation.Application.Features.ClassSessions.Commands.CreateClassSession;
+using ZealEducation.Application.Features.ClassSessions.Queries.GetBatchSessions;
 using ZealEducation.Domain.Enums;
 
 namespace ZealEducation.API.Controllers;
@@ -96,6 +101,61 @@ public class BatchController(ISender sender) : ControllerBase
         return Ok(ApiResponse<object>.Success(null, "Batch deleted successfully"));
     }
 
+    [HttpGet("{id:guid}/enrollments")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<PaginatedList<BatchEnrollmentItemDto>>>> GetEnrollments(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
+    {
+        var result = await sender.Send(new GetBatchEnrollmentsQuery(id, page, pageSize, search));
+        return Ok(ApiResponse<PaginatedList<BatchEnrollmentItemDto>>.Success(result));
+    }
+
+    [HttpGet("{id:guid}/assignable-candidates")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<PaginatedList<AssignableCandidateDto>>>> GetAssignableCandidates(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
+    {
+        var result = await sender.Send(new GetAssignableCandidatesQuery(id, page, pageSize, search));
+        return Ok(ApiResponse<PaginatedList<AssignableCandidateDto>>.Success(result));
+    }
+
+    [HttpPost("{id:guid}/candidates")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<object>>> AssignCandidates(Guid id, [FromBody] AssignCandidatesRequest body)
+    {
+        await sender.Send(new AssignCandidatesToBatchCommand(id, body.EnrollmentIds));
+        return Ok(ApiResponse<object>.Success(null, "Candidates assigned to batch successfully"));
+    }
+
+    [HttpGet("{id:guid}/sessions")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<List<ClassSessionDto>>>> GetSessions(Guid id)
+    {
+        var result = await sender.Send(new GetBatchSessionsQuery(id));
+        return Ok(ApiResponse<List<ClassSessionDto>>.Success(result));
+    }
+
+    [HttpPost("{id:guid}/sessions")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<Guid>>> CreateSession(Guid id, [FromBody] CreateClassSessionRequest body)
+    {
+        var sessionId = await sender.Send(new CreateClassSessionCommand(
+            id,
+            body.SessionDate,
+            body.StartTime,
+            body.EndTime,
+            body.Topic,
+            body.Location));
+
+        return Ok(ApiResponse<Guid>.Success(sessionId, "Class session created successfully"));
+    }
+
     public record UpdateBatchRequest(
         string BatchCode,
         Guid CourseId,
@@ -106,4 +166,13 @@ public class BatchController(ISender sender) : ControllerBase
         BatchStatus Status);
 
     public record AssignFacultyRequest(Guid? FacultyId);
+
+    public record AssignCandidatesRequest(List<Guid> EnrollmentIds);
+
+    public record CreateClassSessionRequest(
+        DateOnly SessionDate,
+        TimeOnly StartTime,
+        TimeOnly EndTime,
+        string? Topic,
+        string? Location);
 }

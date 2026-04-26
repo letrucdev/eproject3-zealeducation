@@ -67,6 +67,12 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideGraduationCap',
         roles: [UserRole.Incharge],
       },
+      {
+        label: 'Candidates',
+        route: '/app/incharge/candidates',
+        icon: 'lucideUsers',
+        roles: [UserRole.Incharge],
+      },
     ],
   },
   {

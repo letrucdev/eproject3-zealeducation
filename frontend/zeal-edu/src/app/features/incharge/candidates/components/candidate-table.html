@@ -1,0 +1,99 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [trackBy]="trackById"
+  itemLabel="candidates"
+  emptyMessage="No candidates found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+>
+  <ng-template candidateCell="candidateCode" let-row>
+    <span class="font-mono font-medium">{{ row.candidateCode }}</span>
+  </ng-template>
+
+  <ng-template candidateCell="fullName" let-row>
+    <div class="flex flex-col">
+      <span class="font-medium">{{ row.fullName }}</span>
+      @if (!row.isActive) {
+        <span class="text-amber-700 text-xs">Account Locked</span>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template candidateCell="contact" let-row>
+    <div class="flex flex-col text-xs">
+      <span>{{ row.email }}</span>
+      <span class="text-muted-foreground">{{ row.phone }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template candidateCell="currentCourse" let-row>
+    @if (row.currentCourseName) {
+      <span>{{ row.currentCourseName }}</span>
+    } @else {
+      <span class="text-muted-foreground italic text-sm">No active enrollment</span>
+    }
+  </ng-template>
+
+  <ng-template candidateCell="currentBatch" let-row>
+    @if (row.currentBatchCode) {
+      <span class="font-mono">{{ row.currentBatchCode }}</span>
+    } @else {
+      <span class="text-muted-foreground">-</span>
+    }
+  </ng-template>
+
+  <ng-template candidateCell="status" let-row>
+    @switch (row.status) {
+      @case (statuses.Active) {
+        <span hlmBadge class="bg-emerald-100 text-emerald-800">Active</span>
+      }
+      @case (statuses.OnBreak) {
+        <span hlmBadge class="bg-amber-100 text-amber-800">On Break</span>
+      }
+      @case (statuses.Graduated) {
+        <span hlmBadge class="bg-sky-100 text-sky-800">Graduated</span>
+      }
+      @case (statuses.Dropped) {
+        <span hlmBadge class="bg-rose-100 text-rose-800">Dropped</span>
+      }
+    }
+  </ng-template>
+
+  <ng-template candidateCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="viewClicked.emit(row)"
+        [attr.aria-label]="'View ' + row.candidateCode"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="editClicked.emit(row)"
+        [attr.aria-label]="'Edit ' + row.candidateCode"
+      >
+        <ng-icon hlm name="lucidePencil" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="fineClicked.emit(row)"
+        [attr.aria-label]="'Apply fine to ' + row.candidateCode"
+      >
+        <ng-icon hlm name="lucideScale" size="sm" />
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

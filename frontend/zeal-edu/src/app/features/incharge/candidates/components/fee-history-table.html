@@ -1,0 +1,97 @@
+<section hlmCard>
+  <div hlmCardHeader>
+    <h3 hlmCardTitle>Fee Structure History</h3>
+    <p hlmCardDescription>
+      All tuition and fine fee structures linked to this candidate. Click "View" to inspect
+      installment plan and payment transactions.
+    </p>
+  </div>
+  <div hlmCardContent class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+        <tr>
+          <th class="px-3 py-2">Type</th>
+          <th class="px-3 py-2">Course</th>
+          <th class="px-3 py-2 text-right">Total</th>
+          <th class="px-3 py-2 text-right">Paid</th>
+          <th class="px-3 py-2 text-right">Outstanding</th>
+          <th class="px-3 py-2 text-center">Status</th>
+          <th class="px-3 py-2">Created</th>
+          <th class="px-3 py-2 text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fee of feeStructures(); track fee.feeId) {
+          <tr class="border-b">
+            <td class="px-3 py-2">
+              @switch (fee.feeType) {
+                @case (feeTypes.Tuition) {
+                  <span hlmBadge class="bg-sky-100 text-sky-800">Tuition</span>
+                }
+                @case (feeTypes.Fine) {
+                  <span hlmBadge class="bg-rose-100 text-rose-800">Fine</span>
+                }
+              }
+              @if (fee.paymentType !== paymentTypes.NotSet) {
+                <span hlmBadge variant="outline" class="ml-1">
+                  {{ paymentTypeLabels[fee.paymentType] }}
+                </span>
+              }
+            </td>
+            <td class="px-3 py-2">
+              @if (fee.courseTitle) {
+                {{ fee.courseTitle }}
+              } @else {
+                <span class="text-muted-foreground italic">-</span>
+              }
+            </td>
+            <td class="px-3 py-2 text-right font-medium">{{ fee.totalFee | vnd }}</td>
+            <td class="px-3 py-2 text-right text-emerald-700">{{ fee.amountPaid | vnd }}</td>
+            <td
+              class="px-3 py-2 text-right"
+              [class.text-rose-600]="fee.outstandingBalance > 0"
+              [class.font-medium]="fee.outstandingBalance > 0"
+            >
+              {{ fee.outstandingBalance | vnd }}
+            </td>
+            <td class="px-3 py-2 text-center">
+              @switch (fee.paymentStatus) {
+                @case (paymentStatuses.Unpaid) {
+                  <span hlmBadge class="bg-slate-100 text-slate-800">Unpaid</span>
+                }
+                @case (paymentStatuses.Partial) {
+                  <span hlmBadge class="bg-amber-100 text-amber-800">Partial</span>
+                }
+                @case (paymentStatuses.Paid) {
+                  <span hlmBadge class="bg-emerald-100 text-emerald-800">Paid</span>
+                }
+                @case (paymentStatuses.Overdue) {
+                  <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+                }
+              }
+            </td>
+            <td class="px-3 py-2 text-xs">{{ fee.createdAt | date: 'dd MMM yyyy' }}</td>
+            <td class="px-3 py-2 text-right">
+              <button
+                hlmBtn
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="viewClicked.emit(fee)"
+                aria-label="View fee detail"
+              >
+                <ng-icon hlm name="lucideEye" size="sm" />
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="px-3 py-6 text-center text-muted-foreground">
+              No fee structures yet.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Directive, input, output } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
-import { lucidePencil, lucideTrash2, lucideUserPlus } from '@ng-icons/lucide';
+import { lucideEye, lucidePencil, lucideTrash2, lucideUserPlus } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
@@ -33,7 +33,7 @@ export class BatchCellDef extends DataTableCellDef<BatchListItem> {
 @Component({
   selector: 'app-batch-table',
   imports: [DataTable, BatchCellDef, DatePipe, HlmBadgeImports, HlmButtonImports, HlmIconImports],
-  providers: [provideIcons({ lucidePencil, lucideTrash2, lucideUserPlus })],
+  providers: [provideIcons({ lucideEye, lucidePencil, lucideTrash2, lucideUserPlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'batch-table.html',
 })
@@ -42,6 +42,7 @@ export class BatchTable {
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
 
+  readonly viewClicked = output<BatchListItem>();
   readonly editClicked = output<BatchListItem>();
   readonly assignFacultyClicked = output<BatchListItem>();
   readonly deleteClicked = output<BatchListItem>();
@@ -57,7 +58,7 @@ export class BatchTable {
     { key: 'schedule', header: 'Schedule', width: 'w-56' },
     { key: 'capacity', header: 'Capacity', width: 'w-32', align: 'center' },
     { key: 'status', header: 'Status', width: 'w-40', align: 'center' },
-    { key: 'actions', header: 'Actions', width: 'w-32', align: 'right' },
+    { key: 'actions', header: 'Actions', width: 'w-40', align: 'right' },
   ];
 
   protected readonly trackById = (row: BatchListItem): string => row.batchId;

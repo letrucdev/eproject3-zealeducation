@@ -15,10 +15,14 @@ namespace ZealEducation.API.Controllers;
 
 [ApiController]
 [Route("api/payments")]
-[Authorize(Roles = nameof(UserRole.AccountsStaff))]
+[Authorize]
 public class PaymentController(ISender sender) : ControllerBase
 {
+    private const string ReadRoles = nameof(UserRole.AccountsStaff) + "," + nameof(UserRole.Incharge);
+    private const string WriteRoles = nameof(UserRole.AccountsStaff);
+
     [HttpGet("fee-structures")]
+    [Authorize(Roles = ReadRoles)]
     public async Task<ActionResult<ApiResponse<PaginatedList<FeeStructureListItemDto>>>> GetFeeStructures(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -31,6 +35,7 @@ public class PaymentController(ISender sender) : ControllerBase
     }
 
     [HttpGet("fee-structures/{feeId:guid}")]
+    [Authorize(Roles = ReadRoles)]
     public async Task<ActionResult<ApiResponse<FeeStructureDetailDto>>> GetFeeStructureDetail(Guid feeId)
     {
         var result = await sender.Send(new GetFeeStructureDetailQuery(feeId));
@@ -38,6 +43,7 @@ public class PaymentController(ISender sender) : ControllerBase
     }
 
     [HttpPut("fee-structures/{feeId:guid}/payment-type")]
+    [Authorize(Roles = WriteRoles)]
     public async Task<ActionResult<ApiResponse<SetPaymentTypeResponse>>> SetPaymentType(
         Guid feeId,
         [FromBody] SetPaymentTypeRequest body)
@@ -48,6 +54,7 @@ public class PaymentController(ISender sender) : ControllerBase
     }
 
     [HttpPost("fee-structures/{feeId:guid}/confirm")]
+    [Authorize(Roles = WriteRoles)]
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(6 * 1024 * 1024)]
     public async Task<ActionResult<ApiResponse<ConfirmPaymentResponse>>> ConfirmPayment(
@@ -88,6 +95,7 @@ public class PaymentController(ISender sender) : ControllerBase
     }
 
     [HttpGet("transactions/{transactionId:guid}/receipt")]
+    [Authorize(Roles = ReadRoles)]
     public async Task<IActionResult> GetReceipt(Guid transactionId)
     {
         var result = await sender.Send(new GetPaymentReceiptQuery(transactionId));
@@ -95,6 +103,7 @@ public class PaymentController(ISender sender) : ControllerBase
     }
 
     [HttpGet("transactions/{transactionId:guid}/bank-transfer-proof")]
+    [Authorize(Roles = ReadRoles)]
     public async Task<IActionResult> GetBankTransferProof(Guid transactionId)
     {
         var result = await sender.Send(new GetBankTransferProofQuery(transactionId));

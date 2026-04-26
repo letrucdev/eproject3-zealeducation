@@ -1,0 +1,76 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <a hlmBtn variant="ghost" size="sm" routerLink="/app/incharge/batches" class="self-start">
+      <ng-icon hlm name="lucideArrowLeft" size="sm" />
+      Back to Batches
+    </a>
+    <h1 class="text-2xl font-semibold tracking-tight">Batch Detail</h1>
+  </header>
+
+  @if (detailQuery.isPending()) {
+    <div class="grid gap-4">
+      <hlm-skeleton class="h-40" />
+      <hlm-skeleton class="h-32" />
+      <hlm-skeleton class="h-40" />
+    </div>
+  } @else if (detailQuery.isError()) {
+    <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      Failed to load batch.
+    </div>
+  } @else if (detailQuery.data(); as detail) {
+    <app-batch-info-card
+      [detail]="detail"
+      (editClicked)="onEditBatch()"
+      (assignFacultyClicked)="onAssignFaculty()"
+      (deleteClicked)="onDeleteBatch()"
+    />
+
+    <app-batch-enrollments-card
+      [page]="enrollmentsQuery.data()"
+      [isLoading]="enrollmentsQuery.isPending()"
+      [canAddCandidate]="canAddCandidate()"
+      (addClicked)="onAddCandidate()"
+      (viewClicked)="onViewCandidate($event)"
+    />
+
+    <app-batch-sessions-card
+      [sessions]="sessionsQuery.data()"
+      [isLoading]="sessionsQuery.isPending()"
+      [canAddSession]="canMutate()"
+      (addClicked)="onAddSession()"
+      (editClicked)="onEditSession($event)"
+      (deleteClicked)="onDeleteSession($event)"
+      (attendanceClicked)="onTakeAttendance($event)"
+    />
+  }
+</section>
+
+<app-batch-form-dialog
+  #updateDialog
+  [submitting]="updateMutation.isPending()"
+  (submitted)="onUpdateSubmitted($event)"
+/>
+
+<app-assign-candidates-dialog
+  #assignDialog
+  [submitting]="assignCandidatesMutation.isPending()"
+  (submitted)="onAssignSubmitted($event)"
+/>
+
+<app-batch-assign-faculty-dialog
+  #assignFacultyDialog
+  [submitting]="assignFacultyMutation.isPending()"
+  (submitted)="onAssignFacultySubmitted($event)"
+/>
+
+<app-session-form-dialog
+  #sessionDialog
+  [submitting]="isSubmittingSession()"
+  (submitted)="onSessionSubmitted($event)"
+/>
+
+<app-confirm-dialog
+  #confirmDialog
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()"
+/>
