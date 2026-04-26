@@ -116,6 +116,6 @@ export class CandidatesService {
 
   private _invalidateAll(): void {
     void this._queryClient.invalidateQueries({ queryKey: CANDIDATE_QUERY_KEY });
-    void this._queryClient.refetchQueries({ queryKey: CANDIDATE_DETAIL_QUERY_KEY });
+    void this._queryClient.removeQueries({ queryKey: CANDIDATE_DETAIL_QUERY_KEY });
   }
 }
