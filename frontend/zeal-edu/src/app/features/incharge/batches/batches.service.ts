@@ -176,8 +176,6 @@ export class BatchesService {
         ),
       onSuccess: () => {
         this._invalidateAll();
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_ENROLLMENTS_QUERY_KEY });
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_ASSIGNABLE_QUERY_KEY });
       },
     }));
   }
@@ -210,8 +208,7 @@ export class BatchesService {
       mutationFn: ({ sessionId, payload }) =>
         firstValueFrom(this._http.put<ApiResponse<unknown>>(`/sessions/${sessionId}`, payload)),
       onSuccess: () => {
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
-        void this._queryClient.invalidateQueries({ queryKey: SESSION_ATTENDANCE_QUERY_KEY });
+        this._invalidateAll();
       },
     }));
   }
@@ -221,7 +218,7 @@ export class BatchesService {
       mutationFn: (sessionId) =>
         firstValueFrom(this._http.delete<ApiResponse<unknown>>(`/sessions/${sessionId}`)),
       onSuccess: () => {
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
+        this._invalidateAll();
       },
     }));
   }
@@ -237,8 +234,7 @@ export class BatchesService {
           this._http.post<ApiResponse<unknown>>(`/sessions/${sessionId}/attendance`, payload),
         ),
       onSuccess: () => {
-        void this._queryClient.invalidateQueries({ queryKey: SESSION_ATTENDANCE_QUERY_KEY });
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
+        this._invalidateAll();
       },
     }));
   }
@@ -343,5 +339,7 @@ export class BatchesService {
     void this._queryClient.invalidateQueries({ queryKey: BATCH_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_STATS_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_DETAIL_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_ENROLLMENTS_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_ASSIGNABLE_QUERY_KEY });
   }
 }
