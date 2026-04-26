@@ -27,7 +27,7 @@ import {
   UpdateEnquiryPayload,
 } from '@features/counselor/course-enquiries/models/course-enquiry-payload';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
-import { CurrencyPipe } from '@angular/common';
+import { VndPipe } from '@shared/pipes/vnd-pipe';
 
 export type EnquiryFormMode = 'create' | 'edit';
 
@@ -54,7 +54,7 @@ export type EnquiryFormSubmit = EnquiryFormSubmitCreate | EnquiryFormSubmitUpdat
     HlmSpinnerImports,
     HlmButtonImports,
     DigitsOnlyDirective,
-    CurrencyPipe,
+    VndPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'enquiry-form-dialog.html',

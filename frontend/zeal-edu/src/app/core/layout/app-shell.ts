@@ -8,6 +8,7 @@ import {
   lucideScrollText,
   lucideUserPlus,
   lucideUserSearch,
+  lucideWallet,
   lucideWrench,
 } from '@ng-icons/lucide';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -43,6 +44,7 @@ import { environment } from '@/environments/environment';
       lucideScrollText,
       lucideUserSearch,
       lucideBookOpen,
+      lucideWallet,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

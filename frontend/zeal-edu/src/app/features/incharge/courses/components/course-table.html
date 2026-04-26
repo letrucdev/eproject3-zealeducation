@@ -23,7 +23,7 @@
   </ng-template>
 
   <ng-template courseCell="baseFee" let-row>
-    {{ row.baseFee | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN' }}
+    {{ row.baseFee | vnd }}
   </ng-template>
 
   <ng-template courseCell="isActive" let-row>

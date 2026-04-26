@@ -77,16 +77,6 @@ public class ConvertEnquiryCommandHandler(
             RegisteredByStaffId = enquiry.AssignedCounselorId
         };
 
-        var enrollment = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            CandidateId = candidate.Id,
-            CourseId = course.Id,
-            EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow),
-            Status = EnrollmentStatus.PendingAssignment,
-            Notes = "New student registration"
-        };
-
         var feeStructure = new FeeStructure
         {
             Id = Guid.NewGuid(),
@@ -97,6 +87,17 @@ public class ConvertEnquiryCommandHandler(
             OutstandingBalance = course.BaseFee,
             PaymentStatus = PaymentStatus.Unpaid,
             PaymentType = PaymentType.NotSet
+        };
+
+        var enrollment = new Enrollment
+        {
+            Id = Guid.NewGuid(),
+            CandidateId = candidate.Id,
+            FeeId = feeStructure.Id,
+            CourseId = course.Id,
+            EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            Status = EnrollmentStatus.PendingAssignment,
+            Notes = "New student registration"
         };
 
         enquiry.Email = email;

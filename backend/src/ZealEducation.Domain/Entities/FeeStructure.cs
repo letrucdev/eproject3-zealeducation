@@ -15,6 +15,7 @@ public class FeeStructure : BaseAuditableEntity
     public string? Notes { get; set; }
 
     public Candidate Candidate { get; set; } = default!;
+    public Enrollment? Enrollment { get; set; }
     public ICollection<InstallmentPlan> InstallmentPlans { get; set; } = [];
     public ICollection<PaymentTransaction> PaymentTransactions { get; set; } = [];
     public Fine? Fine { get; set; }

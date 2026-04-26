@@ -81,7 +81,7 @@
                   @for (course of items; track course.courseId) {
                     <hlm-combobox-item [value]="course">
                       {{ course.courseName }} -
-                      {{ course.baseFee | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN' }}
+                      {{ course.baseFee | vnd }}
                     </hlm-combobox-item>
                   }
                 </div>

@@ -19,13 +19,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         authToken.clear();
         currentUser.clear();
         inject(Router).navigateByUrl('/login');
-      }
-
-      /*      if (err.status === HttpStatusCode.BadRequest) {
-        toast.error(resolveValidateError(err));
-      } */
-
-      if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {
+      } else if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {
         toast.error(resolveMessage(err));
       }
 

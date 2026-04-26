@@ -381,6 +381,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<DateOnly>("EnrollmentDate")
                         .HasColumnType("date");
 
+                    b.Property<Guid?>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("InchargeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -407,6 +410,10 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.HasIndex("CandidateId");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("FeeId")
+                        .IsUnique()
+                        .HasFilter("[FeeId] IS NOT NULL");
 
                     b.HasIndex("InchargeId");
 
@@ -654,6 +661,10 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(12,2)");
 
+                    b.Property<string>("BankTransferProofPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -661,6 +672,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("InstallmentPlanId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("PaymentDate")
@@ -676,6 +690,10 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<Guid>("ProcessedByStaffId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ReceiptFilePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("ReceiptNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -690,6 +708,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FeeId");
+
+                    b.HasIndex("InstallmentPlanId");
 
                     b.HasIndex("ProcessedByStaffId");
 
@@ -1011,6 +1031,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "Fee")
+                        .WithOne("Enrollment")
+                        .HasForeignKey("ZealEducation.Domain.Entities.Enrollment", "FeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ZealEducation.Domain.Entities.Staff", "Incharge")
                         .WithMany()
                         .HasForeignKey("InchargeId")
@@ -1021,6 +1046,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("Candidate");
 
                     b.Navigation("Course");
+
+                    b.Navigation("Fee");
 
                     b.Navigation("Incharge");
                 });
@@ -1093,6 +1120,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ZealEducation.Domain.Entities.InstallmentPlan", "InstallmentPlan")
+                        .WithMany()
+                        .HasForeignKey("InstallmentPlanId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ZealEducation.Domain.Entities.Staff", "ProcessedByStaff")
                         .WithMany()
                         .HasForeignKey("ProcessedByStaffId")
@@ -1100,6 +1132,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("FeeStructure");
+
+                    b.Navigation("InstallmentPlan");
 
                     b.Navigation("ProcessedByStaff");
                 });
@@ -1122,39 +1156,41 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .HasForeignKey("ManagedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                    modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
-                        {
-                            b.Navigation("Enrollments");
-                        });
-
-                    modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
-                        {
-                            b.Navigation("Batches");
-
-                            b.Navigation("Enquiries");
-                        });
-
-                    modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
-                        {
-                            b.Navigation("Notes");
-                        });
-
-                    modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
-                        {
-                            b.Navigation("Fine");
-
-                            b.Navigation("InstallmentPlans");
-
-                            b.Navigation("PaymentTransactions");
-                        });
-
-                    modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
-                        {
-                            b.Navigation("Faculty");
-                        });
-#pragma warning restore 612, 618
-
                 });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
+                {
+                    b.Navigation("Enrollments");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
+                {
+                    b.Navigation("Batches");
+
+                    b.Navigation("Enquiries");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
+                {
+                    b.Navigation("Notes");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Fine");
+
+                    b.Navigation("InstallmentPlans");
+
+                    b.Navigation("PaymentTransactions");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
+                {
+                    b.Navigation("Faculty");
+                });
+#pragma warning restore 612, 618
         }
     }
 }
