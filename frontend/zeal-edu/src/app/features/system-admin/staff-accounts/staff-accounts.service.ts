@@ -3,11 +3,11 @@ import { Injectable, Signal, inject } from '@angular/core';
 import { QueryClient } from '@tanstack/query-core';
 import { injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../../../core/http/api-response';
-import { PaginatedList } from '../../../core/models/paginated-list';
-import { StaffDetail } from '../../../core/models/staff-detail';
-import { StaffListItem } from '../../../core/models/staff-list-item';
-import { StaffStatistics } from '../../../core/models/staff-statistics';
+import { ApiResponse } from '@core/http/api-response';
+import { PaginatedList } from '@core/models/paginated-list';
+import { StaffDetail } from '@core/models/staff-detail';
+import { StaffListItem } from '@core/models/staff-list-item';
+import { StaffStatistics } from '@core/models/staff-statistics';
 import {
   CreateFacultyPayload,
   CreateStaffPayload,

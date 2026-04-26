@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
-import { AuthService } from '../../../core/auth/auth-service';
-import { CurrentUser } from '../../../core/auth/current-user';
-import { navMenusForRole } from '../../../core/layout/nav-items';
+import { AuthService } from '@core/auth/auth-service';
+import { CurrentUser } from '@core/auth/current-user';
+import { navMenusForRole } from '@core/layout/nav-items';
 import { HttpStatusCode } from '@angular/common/http';
-import { resolveMessage } from '../../../core/http/error-interceptor';
+import { resolveMessage } from '@core/http/error-interceptor';
 
 @Component({
   selector: 'app-login-form',

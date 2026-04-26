@@ -5,16 +5,16 @@ import { lucideEye } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { AuditAction } from '../../../../core/models/audit-action';
-import { AuditLogListItem } from '../../../../core/models/audit-log-list-item';
-import { PaginatedList } from '../../../../core/models/paginated-list';
+import { AuditAction } from '@core/models/audit-action';
+import { AuditLogListItem } from '@core/models/audit-log-list-item';
+import { PaginatedList } from '@core/models/paginated-list';
 import {
   DataTable,
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
-} from '../../../../shared/components/data-table';
-import { getUserInitials } from '../../../../core/utils/user-initials';
+} from '@shared/components/data-table';
+import { getUserInitials } from '@core/utils/user-initials';
 
 @Directive({
   selector: '[auditLogCell]',

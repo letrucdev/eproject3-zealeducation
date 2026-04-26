@@ -17,8 +17,8 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { EnquirySource } from '../../../../core/models/enquiry-source';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { EnquirySource } from '@core/models/enquiry-source';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
 
 export interface EnquiryFilterValue {

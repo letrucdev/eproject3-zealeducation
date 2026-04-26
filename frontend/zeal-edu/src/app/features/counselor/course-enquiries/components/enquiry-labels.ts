@@ -1,5 +1,5 @@
-import { EnquirySource } from '../../../../core/models/enquiry-source';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { EnquirySource } from '@core/models/enquiry-source';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 
 export const ENQUIRY_STATUS_LABELS: Record<EnquiryStatus, string> = {
   [EnquiryStatus.New]: 'New',

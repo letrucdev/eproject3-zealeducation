@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
-import { UserRole } from '../models/user-role';
-import { CurrentUser } from '../auth/current-user';
+import { UserRole } from '@core/models/user-role';
+import { CurrentUser } from '@core/auth/current-user';
 
 export const defaultRoleRedirect: CanMatchFn = () => {
   const role = inject(CurrentUser).role();

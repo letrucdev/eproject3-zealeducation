@@ -5,17 +5,17 @@ import { lucideEye, lucidePencil, lucideUserCheck } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { CourseEnquiryListItem } from '../../../../core/models/course-enquiry-list-item';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { CourseEnquiryListItem } from '@core/models/course-enquiry-list-item';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import {
   DataTable,
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
-} from '../../../../shared/components/data-table';
-import { PaginatedList } from '../../../../core/models/paginated-list';
+} from '@shared/components/data-table';
+import { PaginatedList } from '@core/models/paginated-list';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
-import { EnquirySource } from '../../../../core/models/enquiry-source';
+import { EnquirySource } from '@core/models/enquiry-source';
 
 @Directive({
   selector: '[enquiryCell]',
