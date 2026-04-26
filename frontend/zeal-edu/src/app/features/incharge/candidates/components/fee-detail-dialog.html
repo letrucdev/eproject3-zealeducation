@@ -1,0 +1,235 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-5xl w-[95vw] flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Fee Detail</h2>
+      <p class="text-muted-foreground text-sm">
+        Installment schedule and payment transactions for this fee structure.
+      </p>
+    </div>
+
+    <div class="mt-2 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+      @if (detailQuery.isPending()) {
+        <hlm-skeleton class="h-32" />
+        <hlm-skeleton class="h-40" />
+      } @else if (detailQuery.isError()) {
+        <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+          Failed to load fee detail.
+        </div>
+      } @else if (detailQuery.data(); as detail) {
+        <!-- Summary -->
+        <section class="grid gap-4 rounded-lg border p-4 md:grid-cols-3">
+          <div class="flex flex-col">
+            <span class="text-xs uppercase text-muted-foreground">Total Fee</span>
+            <span class="text-xl font-semibold">{{ detail.totalFee | vnd }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs uppercase text-muted-foreground">Paid</span>
+            <span class="text-xl font-semibold text-emerald-700">
+              {{ detail.amountPaid | vnd }}
+            </span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs uppercase text-muted-foreground">Outstanding</span>
+            <span
+              class="text-xl font-semibold"
+              [class.text-rose-600]="detail.outstandingBalance > 0"
+            >
+              {{ detail.outstandingBalance | vnd }}
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 md:col-span-3">
+            <span class="text-xs text-muted-foreground">Status:</span>
+            @switch (detail.paymentStatus) {
+              @case (paymentStatuses.Unpaid) {
+                <span hlmBadge class="bg-slate-100 text-slate-800">Unpaid</span>
+              }
+              @case (paymentStatuses.Partial) {
+                <span hlmBadge class="bg-amber-100 text-amber-800">Partial</span>
+              }
+              @case (paymentStatuses.Paid) {
+                <span hlmBadge class="bg-emerald-100 text-emerald-800">Paid</span>
+              }
+              @case (paymentStatuses.Overdue) {
+                <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+              }
+            }
+            <span hlmBadge variant="secondary">{{ detail.feeType }}</span>
+            @if (detail.paymentType !== paymentTypes.NotSet) {
+              <span hlmBadge variant="outline">
+                {{ paymentTypeLabels[detail.paymentType] }}
+              </span>
+            }
+          </div>
+          @if (detail.notes) {
+            <div class="md:col-span-3">
+              <span class="text-xs uppercase text-muted-foreground">Notes</span>
+              <p class="text-sm whitespace-pre-line">{{ detail.notes }}</p>
+            </div>
+          }
+        </section>
+
+        <!-- Installments -->
+        @if (detail.paymentType === paymentTypes.Installment) {
+          <section>
+            <h3 class="text-sm font-semibold mb-2">Installment Schedule</h3>
+            <div class="overflow-x-auto rounded-lg border">
+              <table class="w-full text-sm">
+                <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+                  <tr>
+                    <th class="px-3 py-2">No.</th>
+                    <th class="px-3 py-2 text-right">Amount Due</th>
+                    <th class="px-3 py-2">Due Date</th>
+                    <th class="px-3 py-2 text-right">Paid</th>
+                    <th class="px-3 py-2 text-right">Penalty</th>
+                    <th class="px-3 py-2 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (i of detail.installmentPlans; track i.id) {
+                    <tr class="border-b">
+                      <td class="px-3 py-2 font-medium">{{ i.installmentNo }}</td>
+                      <td class="px-3 py-2 text-right">{{ i.amountDue | vnd }}</td>
+                      <td class="px-3 py-2">
+                        <span
+                          [class.text-rose-600]="isInstallmentOverdue(i.dueDate, i.status)"
+                          [class.font-medium]="isInstallmentOverdue(i.dueDate, i.status)"
+                        >
+                          {{ i.dueDate | date: 'dd MMM yyyy' }}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2 text-right">{{ i.amountPaid | vnd }}</td>
+                      <td class="px-3 py-2 text-right">{{ i.penaltyAmount | vnd }}</td>
+                      <td class="px-3 py-2 text-center">
+                        @switch (i.status) {
+                          @case (installmentStatuses.Pending) {
+                            @if (isInstallmentOverdue(i.dueDate, i.status)) {
+                              <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+                            } @else {
+                              <span hlmBadge class="bg-slate-100 text-slate-800">Pending</span>
+                            }
+                          }
+                          @case (installmentStatuses.Paid) {
+                            <span hlmBadge class="bg-emerald-100 text-emerald-800">Paid</span>
+                          }
+                          @case (installmentStatuses.Overdue) {
+                            <span hlmBadge class="bg-rose-100 text-rose-800">Overdue</span>
+                          }
+                          @case (installmentStatuses.PartiallyPaid) {
+                            <span hlmBadge class="bg-amber-100 text-amber-800">Partial</span>
+                          }
+                        }
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="px-3 py-6 text-center text-muted-foreground">
+                        No installments recorded.
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        <!-- Transactions -->
+        <section>
+          <h3 class="text-sm font-semibold mb-2">Payment Transactions</h3>
+          <div class="overflow-x-auto rounded-lg border">
+            <table class="w-full text-sm">
+              <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+                <tr>
+                  <th class="px-3 py-2">Receipt</th>
+                  <th class="px-3 py-2">Date</th>
+                  <th class="px-3 py-2 text-right">Amount</th>
+                  <th class="px-3 py-2 text-center">Method</th>
+                  <th class="px-3 py-2">Inst. No.</th>
+                  <th class="px-3 py-2">Processed By</th>
+                  <th class="px-3 py-2 text-center">Proof</th>
+                  <th class="px-3 py-2 text-right">Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (tx of detail.paymentTransactions; track tx.id) {
+                  <tr class="border-b">
+                    <td class="px-3 py-2 font-mono">{{ tx.receiptNumber }}</td>
+                    <td class="px-3 py-2">{{ tx.paymentDate | date: 'dd MMM yyyy HH:mm' }}</td>
+                    <td class="px-3 py-2 text-right font-medium">{{ tx.amount | vnd }}</td>
+                    <td class="px-3 py-2 text-center">
+                      @switch (tx.paymentMethod) {
+                        @case (paymentMethods.Cash) {
+                          <span hlmBadge class="bg-emerald-100 text-emerald-800">
+                            {{ paymentMethodLabels[paymentMethods.Cash] }}
+                          </span>
+                        }
+                        @case (paymentMethods.BankTransfer) {
+                          <span hlmBadge class="bg-sky-100 text-sky-800">
+                            {{ paymentMethodLabels[paymentMethods.BankTransfer] }}
+                          </span>
+                        }
+                      }
+                    </td>
+                    <td class="px-3 py-2">
+                      @if (tx.installmentNo != null) {
+                        #{{ tx.installmentNo }}
+                      } @else {
+                        <span class="text-muted-foreground">Full</span>
+                      }
+                    </td>
+                    <td class="px-3 py-2">{{ tx.processedByStaffName ?? '-' }}</td>
+                    <td class="px-3 py-2 text-center">
+                      @if (tx.hasBankTransferProof) {
+                        <button
+                          hlmBtn
+                          variant="ghost"
+                          size="sm"
+                          type="button"
+                          (click)="onViewProofClicked(tx)"
+                          [attr.aria-label]="'View bank transfer proof for ' + tx.receiptNumber"
+                        >
+                          <ng-icon hlm name="lucideEye" size="sm" />
+                        </button>
+                      } @else {
+                        <span class="text-muted-foreground">-</span>
+                      }
+                    </td>
+                    <td class="px-3 py-2 text-right">
+                      <button
+                        hlmBtn
+                        variant="ghost"
+                        size="sm"
+                        type="button"
+                        (click)="onDownloadReceiptClicked(tx)"
+                        [disabled]="downloadingReceiptId() === tx.id"
+                        [attr.aria-label]="'Download receipt ' + tx.receiptNumber"
+                      >
+                        <ng-icon hlm name="lucideDownload" size="sm" />
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="8" class="px-3 py-6 text-center text-muted-foreground">
+                      No transactions yet.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+    </div>
+
+    <div hlmDialogFooter class="mt-2 shrink-0">
+      <button hlmBtn variant="outline" type="button" (click)="onClose()">Close</button>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<app-bank-transfer-proof-dialog #bankTransferProofDialog />

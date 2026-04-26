@@ -1,0 +1,136 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <a hlmBtn variant="ghost" size="sm" [routerLink]="backLink()" class="self-start">
+      <ng-icon hlm name="lucideArrowLeft" size="sm" />
+      Back to Batch Detail
+    </a>
+    <h1 class="text-2xl font-semibold tracking-tight">Attendance</h1>
+  </header>
+
+  @if (attendanceQuery.isPending()) {
+    <div class="grid gap-4">
+      <hlm-skeleton class="h-32" />
+      <hlm-skeleton class="h-64" />
+    </div>
+  } @else if (attendanceQuery.isError()) {
+    <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      Failed to load session attendance.
+    </div>
+  } @else if (attendanceQuery.data(); as data) {
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle class="font-mono">{{ data.batchCode }}</h2>
+        <p hlmCardDescription>
+          {{ data.sessionDate | date: 'EEEE, dd MMM yyyy' }}
+          ({{ data.startTime.substring(0, 5) }} - {{ data.endTime.substring(0, 5) }})
+        </p>
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+          @switch (data.status) {
+            @case (sessionStatuses.Scheduled) {
+              <span hlmBadge class="bg-amber-100 text-amber-800">Scheduled</span>
+            }
+            @case (sessionStatuses.Completed) {
+              <span hlmBadge class="bg-emerald-100 text-emerald-800">Completed</span>
+            }
+            @case (sessionStatuses.Cancelled) {
+              <span hlmBadge class="bg-rose-100 text-rose-800">Cancelled</span>
+            }
+          }
+        </div>
+      </div>
+      <div hlmCardContent class="grid gap-4 md:grid-cols-2">
+        @if (data.topic) {
+          <div class="flex flex-col">
+            <span class="text-xs uppercase text-muted-foreground">Topic</span>
+            <span class="font-medium">{{ data.topic }}</span>
+          </div>
+        }
+        @if (data.location) {
+          <div class="flex flex-col">
+            <span class="text-xs uppercase text-muted-foreground">Location</span>
+            <span class="font-medium">{{ data.location }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section hlmCard>
+      <div hlmCardHeader class="flex flex-row flex-wrap items-start justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <h3 hlmCardTitle>Attendance Roster</h3>
+          <p hlmCardDescription>
+            {{ data.rows.length }} candidate(s) in this batch. Mark each candidate's attendance and
+            click Save to commit.
+          </p>
+        </div>
+        <button
+          hlmBtn
+          size="sm"
+          type="button"
+          (click)="onSave()"
+          [disabled]="data.rows.length === 0 || markMutation.isPending() || isLocked()"
+        >
+          <ng-icon hlm name="lucideSave" size="sm" />
+          {{ markMutation.isPending() ? 'Saving...' : 'Save Attendance' }}
+        </button>
+      </div>
+      <div hlmCardContent class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+            <tr>
+              <th class="px-3 py-2">Code</th>
+              <th class="px-3 py-2">Name</th>
+              <th class="px-3 py-2 w-44">Status</th>
+              <th class="px-3 py-2">Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data.rows; track row.enrollmentId) {
+              <tr class="border-b">
+                <td class="px-3 py-2 font-mono">{{ row.candidateCode }}</td>
+                <td class="px-3 py-2 font-medium">{{ row.fullName }}</td>
+                <td class="px-3 py-2">
+                  <hlm-select
+                    class="w-full"
+                    [itemToString]="statusLabel"
+                    [value]="getStatus(row.enrollmentId)"
+                    (valueChange)="onStatusChanged(row.enrollmentId, $event)"
+                    [disabled]="isLocked()"
+                  >
+                    <hlm-select-trigger class="w-full">
+                      <hlm-select-value placeholder="Select status" />
+                    </hlm-select-trigger>
+                    <hlm-select-content *hlmSelectPortal>
+                      <hlm-select-item [value]="statuses.Present">Present</hlm-select-item>
+                      <hlm-select-item [value]="statuses.Absent">Absent</hlm-select-item>
+                      <hlm-select-item [value]="statuses.Late">Late</hlm-select-item>
+                      <hlm-select-item [value]="statuses.Excused">Excused</hlm-select-item>
+                    </hlm-select-content>
+                  </hlm-select>
+                </td>
+                <td class="px-3 py-2">
+                  <input
+                    hlmInput
+                    type="text"
+                    class="w-full"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                    [value]="getRemarks(row.enrollmentId)"
+                    (input)="onRemarksChanged(row.enrollmentId, $any($event.target).value)"
+                    [disabled]="isLocked()"
+                  />
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="px-3 py-6 text-center text-muted-foreground">
+                  No candidates are enrolled in this batch yet.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</section>

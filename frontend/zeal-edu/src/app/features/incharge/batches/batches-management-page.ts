@@ -8,6 +8,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { toast } from '@spartan-ng/brain/sonner';
 import { BatchListItem } from '@core/models/batch-list-item';
 import { BatchStatus } from '@core/models/batch-status';
@@ -38,6 +39,7 @@ import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog'
 })
 export default class BatchesManagementPage {
   private readonly _service = inject(BatchesService);
+  private readonly _router = inject(Router);
 
   protected readonly formDialog = viewChild.required<BatchFormDialog>('formDialog');
   protected readonly assignDialog = viewChild.required<BatchAssignFacultyDialog>('assignDialog');
@@ -109,6 +111,10 @@ export default class BatchesManagementPage {
 
   onCreateClicked(): void {
     this.formDialog().openCreate();
+  }
+
+  onViewClicked(row: BatchListItem): void {
+    void this._router.navigate(['/app/incharge/batches', row.batchId]);
   }
 
   onEditClicked(row: BatchListItem): void {

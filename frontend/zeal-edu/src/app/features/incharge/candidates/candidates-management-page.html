@@ -1,0 +1,38 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Candidates</h1>
+      <p class="text-muted-foreground mt-1 max-w-2xl text-sm">
+        Search candidates, update their information, and apply fines.
+      </p>
+    </div>
+  </header>
+
+  <app-candidate-filter-bar
+    [initial]="initialFilter"
+    (filterChanged)="onFilterChanged($event)"
+  />
+
+  <app-candidate-table
+    [page]="listQuery.data()"
+    [isLoading]="listQuery.isPending()"
+    [pageSize]="pageSize()"
+    (viewClicked)="onViewClicked($event)"
+    (editClicked)="onEditClicked($event)"
+    (fineClicked)="onFineClicked($event)"
+    (pageChanged)="onPageChanged($event)"
+    (pageSizeChanged)="onPageSizeChanged($event)"
+  />
+
+  <app-candidate-update-dialog
+    #updateDialog
+    [submitting]="updateMutation.isPending()"
+    (submitted)="onUpdateSubmitted($event)"
+  />
+
+  <app-apply-fine-dialog
+    #fineDialog
+    [submitting]="applyFineMutation.isPending()"
+    (submitted)="onApplyFineSubmitted($event)"
+  />
+</section>

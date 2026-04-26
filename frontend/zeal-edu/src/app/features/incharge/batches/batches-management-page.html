@@ -20,6 +20,7 @@
     [page]="listQuery.data()"
     [isLoading]="listQuery.isPending()"
     [pageSize]="pageSize()"
+    (viewClicked)="onViewClicked($event)"
     (editClicked)="onEditClicked($event)"
     (assignFacultyClicked)="onAssignFacultyClicked($event)"
     (deleteClicked)="onDeleteClicked($event)"

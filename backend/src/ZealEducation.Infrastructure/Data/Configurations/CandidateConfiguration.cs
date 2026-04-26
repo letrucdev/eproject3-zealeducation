@@ -22,6 +22,9 @@ public class CandidateConfiguration : IEntityTypeConfiguration<Candidate>
         builder.Property(c => c.EmergencyContact)
             .HasMaxLength(100);
 
+        builder.Property(c => c.Notes)
+            .HasColumnType("nvarchar(max)");
+
         builder.Property(c => c.Status)
             .IsRequired()
             .HasMaxLength(20)

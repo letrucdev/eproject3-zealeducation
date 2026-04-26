@@ -32,3 +32,19 @@ export interface UpdateBatchPayload {
 export interface AssignFacultyPayload {
   facultyId: string | null;
 }
+
+export interface BatchEnrollmentsQuery {
+  page: number;
+  pageSize: number;
+  search?: string;
+}
+
+export interface AssignableCandidatesQuery {
+  page: number;
+  pageSize: number;
+  search?: string;
+}
+
+export interface AssignCandidatesPayload {
+  enrollmentIds: string[];
+}

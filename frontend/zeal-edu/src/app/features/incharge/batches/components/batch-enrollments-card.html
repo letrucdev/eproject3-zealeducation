@@ -1,0 +1,98 @@
+<section hlmCard>
+  <div hlmCardHeader class="flex flex-row flex-wrap items-start justify-between gap-3">
+    <div class="flex flex-col gap-1">
+      <h3 hlmCardTitle>Enrolled Candidates</h3>
+      <p hlmCardDescription>
+        @if (page(); as p) {
+          {{ p.totalCount }} candidate(s) currently enrolled in this batch.
+        } @else {
+          Candidates enrolled in this batch.
+        }
+      </p>
+    </div>
+    <button
+      hlmBtn
+      size="sm"
+      type="button"
+      (click)="addClicked.emit()"
+      [disabled]="!canAddCandidate()"
+    >
+      <ng-icon hlm name="lucideUserPlus" size="sm" />
+      Add Candidate
+    </button>
+  </div>
+  <div hlmCardContent class="overflow-x-auto">
+    @if (isLoading() && !page()) {
+      <div class="grid gap-2">
+        <hlm-skeleton class="h-10" />
+        <hlm-skeleton class="h-10" />
+        <hlm-skeleton class="h-10" />
+      </div>
+    } @else {
+      <table class="w-full text-sm">
+        <thead class="text-left text-xs uppercase text-muted-foreground border-b">
+          <tr>
+            <th class="px-3 py-2">Code</th>
+            <th class="px-3 py-2">Full Name</th>
+            <th class="px-3 py-2">Contact</th>
+            <th class="px-3 py-2">Enrolled On</th>
+            <th class="px-3 py-2 text-center">Status</th>
+            <th class="px-3 py-2 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of page()?.items ?? []; track item.enrollmentId) {
+            <tr class="border-b">
+              <td class="px-3 py-2 font-mono">{{ item.candidateCode }}</td>
+              <td class="px-3 py-2 font-medium">{{ item.fullName }}</td>
+              <td class="px-3 py-2 text-xs">
+                <div class="flex flex-col">
+                  <span>{{ item.email }}</span>
+                  <span class="text-muted-foreground">{{ item.phone }}</span>
+                </div>
+              </td>
+              <td class="px-3 py-2">{{ item.enrollmentDate | date: 'dd MMM yyyy' }}</td>
+              <td class="px-3 py-2 text-center">
+                @switch (item.status) {
+                  @case (enrollmentStatuses.Enrolled) {
+                    <span hlmBadge class="bg-emerald-100 text-emerald-800">Enrolled</span>
+                  }
+                  @case (enrollmentStatuses.Completed) {
+                    <span hlmBadge class="bg-sky-100 text-sky-800">Completed</span>
+                  }
+                  @case (enrollmentStatuses.Withdrawn) {
+                    <span hlmBadge class="bg-rose-100 text-rose-800">Withdrawn</span>
+                  }
+                  @case (enrollmentStatuses.OnBreak) {
+                    <span hlmBadge class="bg-slate-100 text-slate-800">On Break</span>
+                  }
+                  @default {
+                    <span hlmBadge class="bg-amber-100 text-amber-800">{{ item.status }}</span>
+                  }
+                }
+              </td>
+              <td class="px-3 py-2 text-right">
+                <button
+                  hlmBtn
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  (click)="viewClicked.emit(item)"
+                  [attr.aria-label]="'View ' + item.candidateCode"
+                >
+                  <ng-icon hlm name="lucideEye" size="sm" />
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="px-3 py-6 text-center text-muted-foreground">
+                No candidates have been enrolled in this batch yet.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</section>

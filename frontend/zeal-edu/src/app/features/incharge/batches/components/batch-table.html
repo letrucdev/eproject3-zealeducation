@@ -67,6 +67,16 @@
         variant="ghost"
         size="sm"
         type="button"
+        (click)="viewClicked.emit(row)"
+        [attr.aria-label]="'View ' + row.batchCode"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
         (click)="assignFacultyClicked.emit(row)"
         [attr.aria-label]="'Assign faculty to ' + row.batchCode"
         [disabled]="row.status === statuses.Cancelled || row.status === statuses.Completed"

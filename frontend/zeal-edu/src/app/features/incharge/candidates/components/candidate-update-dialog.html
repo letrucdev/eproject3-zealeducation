@@ -1,0 +1,125 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-3xl w-2xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Edit Candidate</h2>
+      <p class="text-muted-foreground text-sm">
+        Update personal information, contact, status, and internal notes.
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <hlm-field>
+          <label hlmFieldLabel for="cand-full-name">Full Name</label>
+          <input
+            hlmInput
+            id="cand-full-name"
+            type="text"
+            formControlName="fullName"
+            class="w-full"
+            maxlength="100"
+            placeholder="e.g. Nguyen Van A"
+          />
+          <hlm-field-error validator="required">Full name is required.</hlm-field-error>
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="cand-email">Email</label>
+            <input
+              hlmInput
+              id="cand-email"
+              type="email"
+              formControlName="email"
+              class="w-full"
+              maxlength="100"
+            />
+            <hlm-field-error validator="required">Email is required.</hlm-field-error>
+            <hlm-field-error validator="email">Email format is invalid.</hlm-field-error>
+            <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="cand-phone">Phone</label>
+            <input
+              hlmInput
+              id="cand-phone"
+              type="tel"
+              formControlName="phone"
+              class="w-full"
+              maxlength="10"
+              placeholder="10 digits"
+            />
+            <hlm-field-error validator="required">Phone is required.</hlm-field-error>
+            <hlm-field-error validator="pattern">Phone must be 10 digits.</hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label hlmFieldLabel for="cand-status">Status</label>
+          <hlm-select formControlName="status" class="w-full" [itemToString]="statusLabel">
+            <hlm-select-trigger class="w-full">
+              <hlm-select-value placeholder="Select status" />
+            </hlm-select-trigger>
+            <hlm-select-content *hlmSelectPortal>
+              <hlm-select-item [value]="statuses.Active">Active</hlm-select-item>
+              <hlm-select-item [value]="statuses.OnBreak">On Break</hlm-select-item>
+              <hlm-select-item [value]="statuses.Graduated">Graduated</hlm-select-item>
+              <hlm-select-item [value]="statuses.Dropped">Dropped</hlm-select-item>
+            </hlm-select-content>
+          </hlm-select>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="cand-address">Address</label>
+          <textarea
+            hlmTextarea
+            id="cand-address"
+            formControlName="address"
+            class="w-full"
+            rows="2"
+            placeholder="Permanent address"
+          ></textarea>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="cand-emergency">Emergency Contact</label>
+          <input
+            hlmInput
+            id="cand-emergency"
+            type="text"
+            formControlName="emergencyContact"
+            class="w-full"
+            maxlength="100"
+            placeholder="Name and phone of emergency contact"
+          />
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="cand-notes">Internal Notes</label>
+          <textarea
+            hlmTextarea
+            id="cand-notes"
+            formControlName="notes"
+            class="w-full"
+            rows="3"
+            placeholder="Optional notes visible to incharge staff"
+          ></textarea>
+        </hlm-field>
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          {{ submitting() ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>
