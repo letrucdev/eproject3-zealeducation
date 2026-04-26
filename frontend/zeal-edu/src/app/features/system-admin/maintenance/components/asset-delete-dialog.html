@@ -1,0 +1,15 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content *hlmDialogPortal class="sm:max-w-[425px]" [showCloseButton]="true">
+    <div hlmDialogHeader>
+      <h3 hlmDialogTitle>Delete Asset</h3>
+      <p class="text-muted-foreground text-sm mt-2">
+        Are you sure you want to delete the asset <strong>{{ asset()?.assetName }}</strong>? This action cannot be undone.
+      </p>
+    </div>
+
+    <div hlmDialogFooter class="mt-6 flex justify-end gap-2">
+      <button hlmBtn variant="outline" type="button" (click)="close()">Cancel</button>
+      <button hlmBtn variant="destructive" type="button" (click)="onConfirm()">Delete</button>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>
