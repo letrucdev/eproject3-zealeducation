@@ -27,8 +27,24 @@ public class GetCoursesQueryHandler(
             query = query.Where(c => c.IsActive == isActive);
         }
 
-        var projected = query
-            .OrderByDescending(c => c.CreatedAt)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("coursename", "desc") => query.OrderByDescending(c => c.CourseName),
+            ("coursename", _) => query.OrderBy(c => c.CourseName),
+            ("basefee", "desc") => query.OrderByDescending(c => c.BaseFee),
+            ("basefee", _) => query.OrderBy(c => c.BaseFee),
+            ("isactive", "desc") => query.OrderByDescending(c => c.IsActive),
+            ("isactive", _) => query.OrderBy(c => c.IsActive),
+            ("updatedat", "asc") => query.OrderBy(c => c.UpdatedAt),
+            ("updatedat", _) => query.OrderByDescending(c => c.UpdatedAt),
+            ("createdat", "asc") => query.OrderBy(c => c.CreatedAt),
+            _ => query.OrderByDescending(c => c.CreatedAt),
+        };
+
+        var projected = ordered
             .ThenBy(c => c.CourseName)
             .Select(c => new CourseListItemDto
             {

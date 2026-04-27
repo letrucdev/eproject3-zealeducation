@@ -1,0 +1,128 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Bulk Create Sessions</h2>
+      <p class="text-muted-foreground text-sm">
+        Select days of the week and a time slot. Sessions will be generated for every matching
+        date within the batch period.
+      </p>
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
+    >
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        @if (batch(); as b) {
+          <p class="text-muted-foreground text-xs">
+            Batch period: <span class="font-medium text-foreground">{{ b.startDate }}</span> →
+            <span class="font-medium text-foreground">{{ b.endDate }}</span>
+          </p>
+        }
+
+        <hlm-field>
+          <label hlmFieldLabel>Days of week</label>
+          <div class="flex flex-wrap gap-3">
+            @for (day of dayOptions; track day.value) {
+              <label
+                class="border-input bg-background hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm"
+              >
+                <hlm-checkbox
+                  [checked]="isDaySelected(day.value)"
+                  (checkedChange)="toggleDay(day.value, $event)"
+                  [attr.aria-label]="day.label"
+                />
+                <span>{{ day.label }}</span>
+              </label>
+            }
+          </div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button hlmBtn variant="outline" size="sm" type="button" (click)="presetWholeWeek()">
+              Cả tuần
+            </button>
+            <button hlmBtn variant="outline" size="sm" type="button" (click)="presetMwf()">
+              T2-T4-T6
+            </button>
+            <button hlmBtn variant="outline" size="sm" type="button" (click)="presetTt()">
+              T3-T5
+            </button>
+            <button hlmBtn variant="outline" size="sm" type="button" (click)="presetWeekend()">
+              T7-CN
+            </button>
+          </div>
+          @if (form.controls.daysOfWeek.invalid && form.controls.daysOfWeek.dirty) {
+            <p class="text-destructive text-sm">Select at least one day.</p>
+          }
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="bulk-start-time">Start Time</label>
+            <input
+              hlmInput
+              id="bulk-start-time"
+              type="time"
+              formControlName="startTime"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Start time is required.</hlm-field-error>
+          </hlm-field>
+          <hlm-field>
+            <label hlmFieldLabel for="bulk-end-time">End Time</label>
+            <input
+              hlmInput
+              id="bulk-end-time"
+              type="time"
+              formControlName="endTime"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">End time is required.</hlm-field-error>
+            <hlm-field-error validator="endBeforeStart">
+              End time must be after start time.
+            </hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label hlmFieldLabel for="bulk-topic">Topic (optional)</label>
+          <input
+            hlmInput
+            id="bulk-topic"
+            type="text"
+            formControlName="topic"
+            class="w-full"
+            maxlength="200"
+            placeholder="Applied to every generated session"
+          />
+          <hlm-field-error validator="maxlength">Max 200 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="bulk-location">Location (optional)</label>
+          <input
+            hlmInput
+            id="bulk-location"
+            type="text"
+            formControlName="location"
+            class="w-full"
+            maxlength="100"
+            placeholder="e.g. Room 101"
+          />
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          {{ submitting() ? 'Creating...' : 'Create sessions' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

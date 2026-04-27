@@ -7,4 +7,6 @@ public record GetCoursesQuery(
     int Page = 1,
     int PageSize = 10,
     string? Search = null,
-    bool? IsActive = null) : IRequest<PaginatedList<CourseListItemDto>>;
+    bool? IsActive = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<CourseListItemDto>>;

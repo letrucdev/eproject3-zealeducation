@@ -67,9 +67,29 @@ public class GetEnquiriesQueryHandler(
                 OpenStatuses.Contains(x.Enquiry.Status));
         }
 
-        var projected = query
-            .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 1 : 0)
-            .ThenBy(x => x.Enquiry.NextFollowUpDate)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("status", "desc") => query.OrderByDescending(x => x.Enquiry.Status),
+            ("status", _) => query.OrderBy(x => x.Enquiry.Status),
+            ("source", "desc") => query.OrderByDescending(x => x.Enquiry.Source),
+            ("source", _) => query.OrderBy(x => x.Enquiry.Source),
+            ("createdat", "asc") => query.OrderBy(x => x.Enquiry.CreatedAt),
+            ("createdat", _) => query.OrderByDescending(x => x.Enquiry.CreatedAt),
+            ("nextfollowupdate", "desc") => query
+                .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 0 : 1)
+                .ThenByDescending(x => x.Enquiry.NextFollowUpDate),
+            ("nextfollowupdate", _) => query
+                .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 1 : 0)
+                .ThenBy(x => x.Enquiry.NextFollowUpDate),
+            _ => query
+                .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 1 : 0)
+                .ThenBy(x => x.Enquiry.NextFollowUpDate),
+        };
+
+        var projected = ordered
             .ThenByDescending(x => x.Enquiry.CreatedAt)
             .Select(x => new CourseEnquiryListItemDto
             {

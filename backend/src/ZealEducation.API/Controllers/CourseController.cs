@@ -26,9 +26,11 @@ public class CourseController(ISender sender) : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetCoursesQuery(page, pageSize, search, isActive));
+        var result = await sender.Send(new GetCoursesQuery(page, pageSize, search, isActive, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<CourseListItemDto>>.Success(result));
     }
 

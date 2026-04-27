@@ -73,8 +73,6 @@ export class CandidatesService {
       },
       onSuccess: () => {
         this._invalidateAll();
-        void this._queryClient.invalidateQueries({ queryKey: PAYMENTS_LIST_KEY });
-        void this._queryClient.invalidateQueries({ queryKey: PAYMENTS_DETAIL_KEY });
       },
     }));
   }
@@ -90,6 +88,8 @@ export class CandidatesService {
     if (query.status) params = params.set('status', query.status);
     if (query.courseId) params = params.set('courseId', query.courseId);
     if (query.batchId) params = params.set('batchId', query.batchId);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<CandidateListItem>>>('/candidates', { params }),
@@ -116,6 +116,8 @@ export class CandidatesService {
 
   private _invalidateAll(): void {
     void this._queryClient.invalidateQueries({ queryKey: CANDIDATE_QUERY_KEY });
-    void this._queryClient.removeQueries({ queryKey: CANDIDATE_DETAIL_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: PAYMENTS_LIST_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: PAYMENTS_DETAIL_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: CANDIDATE_DETAIL_QUERY_KEY });
   }
 }

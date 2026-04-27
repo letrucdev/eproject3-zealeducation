@@ -38,8 +38,22 @@ public class GetBatchEnrollmentsQueryHandler(
                 x.user.Phone.Contains(search));
         }
 
-        var projected = query
-            .OrderByDescending(x => x.enrollment.EnrollmentDate)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("candidatecode", "desc") => query.OrderByDescending(x => x.candidate.CandidateCode),
+            ("candidatecode", _) => query.OrderBy(x => x.candidate.CandidateCode),
+            ("fullname", "desc") => query.OrderByDescending(x => x.user.FullName),
+            ("fullname", _) => query.OrderBy(x => x.user.FullName),
+            ("status", "desc") => query.OrderByDescending(x => x.enrollment.Status),
+            ("status", _) => query.OrderBy(x => x.enrollment.Status),
+            ("enrollmentdate", "asc") => query.OrderBy(x => x.enrollment.EnrollmentDate),
+            _ => query.OrderByDescending(x => x.enrollment.EnrollmentDate),
+        };
+
+        var projected = ordered
             .ThenBy(x => x.candidate.CandidateCode)
             .Select(x => new BatchEnrollmentItemDto
             {

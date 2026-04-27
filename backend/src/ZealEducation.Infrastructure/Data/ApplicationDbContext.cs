@@ -24,6 +24,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Fine> Fines => Set<Fine>();
     public DbSet<ClassSession> ClassSessions => Set<ClassSession>();
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+    public DbSet<Examination> Examinations => Set<Examination>();
+    public DbSet<ExamResult> ExamResults => Set<ExamResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

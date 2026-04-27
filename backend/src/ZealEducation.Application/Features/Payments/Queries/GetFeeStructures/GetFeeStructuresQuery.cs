@@ -9,4 +9,6 @@ public record GetFeeStructuresQuery(
     int PageSize = 10,
     string? Search = null,
     PaymentStatus? Status = null,
-    FeeType? Type = null) : IRequest<PaginatedList<FeeStructureListItemDto>>;
+    FeeType? Type = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<FeeStructureListItemDto>>;

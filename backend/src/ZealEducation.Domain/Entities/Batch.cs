@@ -18,4 +18,5 @@ public class Batch : BaseAuditableEntity
     public Faculty? Faculty { get; set; }
     public ICollection<Enrollment> Enrollments { get; set; } = [];
     public ICollection<ClassSession> ClassSessions { get; set; } = [];
+    public ICollection<Examination> Examinations { get; set; } = [];
 }

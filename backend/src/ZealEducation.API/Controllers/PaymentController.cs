@@ -28,9 +28,11 @@ public class PaymentController(ISender sender) : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null,
         [FromQuery] PaymentStatus? status = null,
-        [FromQuery] FeeType? type = null)
+        [FromQuery] FeeType? type = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetFeeStructuresQuery(page, pageSize, search, status, type));
+        var result = await sender.Send(new GetFeeStructuresQuery(page, pageSize, search, status, type, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<FeeStructureListItemDto>>.Success(result));
     }
 

@@ -59,6 +59,24 @@ const endAfterStartValidator: ValidatorFn = (control: AbstractControl): Validati
   return new Date(endDate) <= new Date(startDate) ? { endBeforeStart: true } : null;
 };
 
+const todayIso = (): string => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const startNotPastValidator =
+  (initial: () => BatchDetail | null): ValidatorFn =>
+  (control) => {
+    const value = control.value as string | null;
+    if (!value) return null;
+    const original = initial()?.startDate ?? null;
+    if (original && value === original) return null;
+    return value < todayIso() ? { startInPast: true } : null;
+  };
+
 @Component({
   selector: 'app-batch-form-dialog',
   imports: [
@@ -92,6 +110,13 @@ export class BatchFormDialog {
   readonly initial = signal<BatchDetail | null>(null);
   readonly isEdit = computed(() => this.mode() === 'edit');
 
+  protected readonly startDateMin = computed(() => {
+    const today = todayIso();
+    const original = this.initial()?.startDate;
+    if (original && original < today) return original;
+    return today;
+  });
+
   protected readonly statuses = BatchStatus;
   protected readonly statusLabel = (v: BatchStatus): string => BATCH_STATUS_LABELS[v];
 
@@ -99,7 +124,10 @@ export class BatchFormDialog {
     batchCode: this._fb.nonNullable.control('', [Validators.required, Validators.maxLength(30)]),
     course: this._fb.control<CourseListItem | null>(null, [Validators.required]),
     faculty: this._fb.control<FacultyListItem | null>(null),
-    startDate: this._fb.nonNullable.control('', [Validators.required]),
+    startDate: this._fb.nonNullable.control('', [
+      Validators.required,
+      startNotPastValidator(() => this.initial()),
+    ]),
     endDate: this._fb.nonNullable.control('', [Validators.required, endAfterStartValidator]),
     location: this._fb.nonNullable.control('', [Validators.maxLength(100)]),
     maxCapacity: this._fb.nonNullable.control<number>(30, [

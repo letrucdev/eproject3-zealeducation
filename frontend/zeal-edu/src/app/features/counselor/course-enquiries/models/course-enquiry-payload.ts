@@ -41,4 +41,6 @@ export interface EnquiryListQuery {
   status?: EnquiryStatus;
   source?: EnquirySource;
   dueFollowUpOnly?: boolean;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }

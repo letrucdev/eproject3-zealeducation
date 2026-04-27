@@ -10,4 +10,6 @@ public record GetEnquiriesQuery(
     string? Search = null,
     EnquiryStatus? Status = null,
     EnquirySource? Source = null,
-    bool? DueFollowUpOnly = null) : IRequest<PaginatedList<CourseEnquiryListItemDto>>;
+    bool? DueFollowUpOnly = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<CourseEnquiryListItemDto>>;

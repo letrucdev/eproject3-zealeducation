@@ -13,20 +13,28 @@
     [isLoading]="statsQuery.isPending()"
   />
 
-  <app-course-filter-bar
-    [initial]="initialFilter"
-    (filterChanged)="onFilterChanged($event)"
-    (createClicked)="onCreateClicked()"
-  />
-
-  <app-course-table
-    [page]="listQuery.data()"
-    [isLoading]="listQuery.isPending()"
-    [pageSize]="pageSize()"
-    (editClicked)="onEditClicked($event)"
-    (pageChanged)="onPageChanged($event)"
-    (pageSizeChanged)="onPageSizeChanged($event)"
-  />
+  <section hlmCard>
+    <div hlmCardHeader>
+      <app-course-filter-bar
+        [initial]="initialFilter"
+        (filterChanged)="onFilterChanged($event)"
+        (createClicked)="onCreateClicked()"
+      />
+    </div>
+    <div hlmCardContent>
+      <app-course-table
+        [page]="listQuery.data()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        (editClicked)="onEditClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      />
+    </div>
+  </section>
 
   <app-course-form-dialog
     #formDialog

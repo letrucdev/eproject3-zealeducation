@@ -20,11 +20,14 @@
     [page]="listQuery.data()"
     [isLoading]="listQuery.isPending()"
     [pageSize]="pageSize()"
+    [sortBy]="sortBy()"
+    [sortDirection]="sortDirection()"
     (viewClicked)="onViewClicked($event)"
     (editClicked)="onEditClicked($event)"
     (convertClicked)="onConvertClicked($event)"
     (pageChanged)="onPageChanged($event)"
     (pageSizeChanged)="onPageSizeChanged($event)"
+    (sortChanged)="onSortChanged($event)"
   />
 
   <app-enquiry-form-dialog

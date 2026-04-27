@@ -3,11 +3,14 @@
   [page]="page()"
   [isLoading]="isLoading()"
   [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
   [trackBy]="trackById"
   itemLabel="candidates"
   emptyMessage="No candidates found."
   (pageChanged)="pageChanged.emit($event)"
   (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template candidateCell="candidateCode" let-row>
     <span class="font-mono font-medium">{{ row.candidateCode }}</span>

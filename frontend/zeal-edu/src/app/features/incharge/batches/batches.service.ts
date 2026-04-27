@@ -14,14 +14,28 @@ import {
   UpdateClassSessionPayload,
 } from '@core/models/class-session';
 import { MarkAttendancePayload, SessionAttendance } from '@core/models/attendance';
+import {
+  ExamResult,
+  ExamResultsQuery,
+  OverrideExamResultPayload,
+} from '@core/models/exam-result';
+import {
+  CreateExaminationPayload,
+  Examination,
+  UpdateExaminationPayload,
+} from '@core/models/examination';
 import { PaginatedList } from '@core/models/paginated-list';
 import {
   AssignCandidatesPayload,
   AssignFacultyPayload,
   AssignableCandidatesQuery,
   BatchEnrollmentsQuery,
+  BatchExaminationsQuery,
   BatchListQuery,
+  BatchSessionsQuery,
   CreateBatchPayload,
+  CreateBulkSessionsPayload,
+  CreateBulkSessionsResponse,
   UpdateBatchPayload,
 } from './models/batch-payload';
 
@@ -32,6 +46,8 @@ export const BATCH_ENROLLMENTS_QUERY_KEY = ['batch-enrollments'] as const;
 export const BATCH_ASSIGNABLE_QUERY_KEY = ['batch-assignable'] as const;
 export const BATCH_SESSIONS_QUERY_KEY = ['batch-sessions'] as const;
 export const SESSION_ATTENDANCE_QUERY_KEY = ['session-attendance'] as const;
+export const BATCH_EXAMINATIONS_QUERY_KEY = ['batch-examinations'] as const;
+export const EXAM_RESULTS_QUERY_KEY = ['exam-results'] as const;
 
 interface CreateBatchResponse {
   batchId: string;
@@ -101,11 +117,37 @@ export class BatchesService {
     }));
   }
 
-  sessionsQuery(batchId: Signal<string | null>) {
-    return injectQuery<ClassSession[], HttpErrorResponse>(() => ({
+  sessionsQuery(batchId: Signal<string | null>, params: Signal<BatchSessionsQuery>) {
+    return injectQuery<PaginatedList<ClassSession>, HttpErrorResponse>(() => ({
       enabled: batchId() !== null,
-      queryKey: [...BATCH_SESSIONS_QUERY_KEY, batchId()],
-      queryFn: () => this._fetchSessions(batchId() as string),
+      queryKey: [...BATCH_SESSIONS_QUERY_KEY, batchId(), params()],
+      queryFn: () => this._fetchSessions(batchId() as string, params()),
+      staleTime: 30_000,
+      placeholderData: keepPreviousData,
+    }));
+  }
+
+  examinationsQuery(batchId: Signal<string | null>, params: Signal<BatchExaminationsQuery>) {
+    return injectQuery<PaginatedList<Examination>, HttpErrorResponse>(() => ({
+      enabled: batchId() !== null,
+      queryKey: [...BATCH_EXAMINATIONS_QUERY_KEY, batchId(), params()],
+      queryFn: () => this._fetchExaminations(batchId() as string, params()),
+      staleTime: 30_000,
+      placeholderData: keepPreviousData,
+    }));
+  }
+
+  examResultsQuery(
+    examinationId: Signal<string | null>,
+    params: Signal<ExamResultsQuery>,
+    enabled: Signal<boolean>,
+  ) {
+    return injectQuery<PaginatedList<ExamResult>, HttpErrorResponse>(() => ({
+      enabled: enabled() && examinationId() !== null,
+      queryKey: [...EXAM_RESULTS_QUERY_KEY, examinationId(), params()],
+      queryFn: () => this._fetchExamResults(examinationId() as string, params()),
+      staleTime: 15_000,
+      placeholderData: keepPreviousData,
     }));
   }
 
@@ -194,7 +236,29 @@ export class BatchesService {
         return response.data;
       },
       onSuccess: () => {
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
+        this._invalidateAll();
+      },
+    }));
+  }
+
+  createBulkSessionsMutation() {
+    return injectMutation<
+      CreateBulkSessionsResponse,
+      HttpErrorResponse,
+      { batchId: string; payload: CreateBulkSessionsPayload }
+    >(() => ({
+      mutationFn: async ({ batchId, payload }) => {
+        const response = await firstValueFrom(
+          this._http.post<ApiResponse<CreateBulkSessionsResponse>>(
+            `/batches/${batchId}/sessions/bulk`,
+            payload,
+          ),
+        );
+        if (!response.data) throw new Error(response.message || 'Failed to create sessions');
+        return response.data;
+      },
+      onSuccess: () => {
+        this._invalidateAll();
       },
     }));
   }
@@ -220,6 +284,65 @@ export class BatchesService {
       onSuccess: () => {
         this._invalidateAll();
       },
+    }));
+  }
+
+  createExaminationMutation() {
+    return injectMutation<
+      string,
+      HttpErrorResponse,
+      { batchId: string; payload: CreateExaminationPayload }
+    >(() => ({
+      mutationFn: async ({ batchId, payload }) => {
+        const response = await firstValueFrom(
+          this._http.post<ApiResponse<string>>(`/batches/${batchId}/examinations`, payload),
+        );
+        if (!response.data) throw new Error(response.message || 'Failed to create examination');
+        return response.data;
+      },
+      onSuccess: () => {
+        this._invalidateAll();
+      },
+    }));
+  }
+
+  updateExaminationMutation() {
+    return injectMutation<
+      unknown,
+      HttpErrorResponse,
+      { examinationId: string; payload: UpdateExaminationPayload }
+    >(() => ({
+      mutationFn: ({ examinationId, payload }) =>
+        firstValueFrom(
+          this._http.put<ApiResponse<unknown>>(`/examinations/${examinationId}`, payload),
+        ),
+      onSuccess: () => {
+        this._invalidateAll();
+      },
+    }));
+  }
+
+  deleteExaminationMutation() {
+    return injectMutation<unknown, HttpErrorResponse, string>(() => ({
+      mutationFn: (examinationId) =>
+        firstValueFrom(this._http.delete<ApiResponse<unknown>>(`/examinations/${examinationId}`)),
+      onSuccess: () => {
+        this._invalidateAll();
+      },
+    }));
+  }
+
+  overrideExamResultMutation() {
+    return injectMutation<
+      unknown,
+      HttpErrorResponse,
+      { resultId: string; payload: OverrideExamResultPayload }
+    >(() => ({
+      mutationFn: ({ resultId, payload }) =>
+        firstValueFrom(
+          this._http.put<ApiResponse<unknown>>(`/exam-results/${resultId}/override`, payload),
+        ),
+      onSuccess: () => this._invalidateExamResults(),
     }));
   }
 
@@ -250,6 +373,8 @@ export class BatchesService {
     if (query.courseId) params = params.set('courseId', query.courseId);
     if (query.facultyId) params = params.set('facultyId', query.facultyId);
     if (query.status) params = params.set('status', query.status);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<BatchListItem>>>('/batches', { params }),
@@ -290,6 +415,8 @@ export class BatchesService {
     if (query.search && query.search.trim().length > 0) {
       params = params.set('search', query.search.trim());
     }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<BatchEnrollmentItem>>>(
@@ -320,11 +447,63 @@ export class BatchesService {
     return response.data ?? emptyPaginated<AssignableCandidate>(query);
   }
 
-  private async _fetchSessions(batchId: string): Promise<ClassSession[]> {
+  private async _fetchSessions(
+    batchId: string,
+    query: BatchSessionsQuery,
+  ): Promise<PaginatedList<ClassSession>> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
+
     const response = await firstValueFrom(
-      this._http.get<ApiResponse<ClassSession[]>>(`/batches/${batchId}/sessions`),
+      this._http.get<ApiResponse<PaginatedList<ClassSession>>>(`/batches/${batchId}/sessions`, {
+        params,
+      }),
     );
-    return response.data ?? [];
+    return response.data ?? emptyPaginated<ClassSession>(query);
+  }
+
+  private async _fetchExaminations(
+    batchId: string,
+    query: BatchExaminationsQuery,
+  ): Promise<PaginatedList<Examination>> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+    if (query.search && query.search.trim().length > 0) {
+      params = params.set('search', query.search.trim());
+    }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
+
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<PaginatedList<Examination>>>(
+        `/batches/${batchId}/examinations`,
+        { params },
+      ),
+    );
+    return response.data ?? emptyPaginated<Examination>(query);
+  }
+
+  private async _fetchExamResults(
+    examinationId: string,
+    query: ExamResultsQuery,
+  ): Promise<PaginatedList<ExamResult>> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
+
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<PaginatedList<ExamResult>>>(
+        `/examinations/${examinationId}/results`,
+        { params },
+      ),
+    );
+    return response.data ?? emptyPaginated<ExamResult>(query);
   }
 
   private async _fetchSessionAttendance(sessionId: string): Promise<SessionAttendance> {
@@ -338,8 +517,15 @@ export class BatchesService {
   private _invalidateAll(): void {
     void this._queryClient.invalidateQueries({ queryKey: BATCH_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_STATS_QUERY_KEY });
-    void this._queryClient.invalidateQueries({ queryKey: BATCH_DETAIL_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_ENROLLMENTS_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_ASSIGNABLE_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_DETAIL_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_EXAMINATIONS_QUERY_KEY });
+  }
+
+  private _invalidateExamResults(): void {
+    void this._queryClient.invalidateQueries({ queryKey: EXAM_RESULTS_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_EXAMINATIONS_QUERY_KEY });
   }
 }

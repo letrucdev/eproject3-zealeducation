@@ -10,4 +10,6 @@ public record GetCandidatesQuery(
     string? Search = null,
     CandidateStatus? Status = null,
     Guid? CourseId = null,
-    Guid? BatchId = null) : IRequest<PaginatedList<CandidateListItemDto>>;
+    Guid? BatchId = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<CandidateListItemDto>>;

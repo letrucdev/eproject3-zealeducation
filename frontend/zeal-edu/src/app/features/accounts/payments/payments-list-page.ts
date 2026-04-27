@@ -24,6 +24,7 @@ import {
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
+  DataTableSortChange,
 } from '@shared/components/data-table';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
 import { FeeStructureListItem } from './models/fee-structure';
@@ -97,6 +98,8 @@ export default class PaymentsListPage {
   protected readonly search = signal<string>('');
   protected readonly statusFilter = signal<PaymentStatus | null>(null);
   protected readonly typeFilter = signal<FeeType | null>(null);
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
 
   private readonly _params = computed<FeeStructureListQuery>(() => ({
     page: this.page(),
@@ -104,6 +107,8 @@ export default class PaymentsListPage {
     search: this.search() || undefined,
     status: this.statusFilter(),
     type: this.typeFilter(),
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._params);
@@ -113,10 +118,10 @@ export default class PaymentsListPage {
     { key: 'candidateFullName', header: 'Candidate', width: 'w-32' },
     { key: 'courseTitle', header: 'Course', width: 'w-56' },
     { key: 'feeType', header: 'Type', width: 'w-28' },
-    { key: 'totalFee', header: 'Total', width: 'w-32', align: 'right' },
-    { key: 'amountPaid', header: 'Paid', width: 'w-32', align: 'right' },
-    { key: 'outstandingBalance', header: 'Outstanding', width: 'w-32', align: 'right' },
-    { key: 'paymentStatus', header: 'Status', width: 'w-32', align: 'center' },
+    { key: 'totalFee', header: 'Total', sortable: true, width: 'w-32', align: 'right' },
+    { key: 'amountPaid', header: 'Paid', sortable: true, width: 'w-32', align: 'right' },
+    { key: 'outstandingBalance', header: 'Outstanding', sortable: true, width: 'w-32', align: 'right' },
+    { key: 'paymentStatus', header: 'Status', sortable: true, width: 'w-32', align: 'center' },
     { key: 'actions', header: 'Actions', width: 'w-20', align: 'right' },
   ];
 
@@ -151,6 +156,12 @@ export default class PaymentsListPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 }

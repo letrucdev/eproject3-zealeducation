@@ -10,30 +10,19 @@ import { LoginForm } from './login-form';
   providers: [provideIcons({ lucideSchool2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="grid min-h-svh lg:grid-cols-2">
-      <div class="flex flex-col gap-4 p-6 md:p-10">
-        <div class="flex justify-center gap-2 md:justify-start">
-          <a routerLink="." class="flex items-center gap-2 font-medium">
-            <div
-              class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md"
-            >
-              <ng-icon name="lucideSchool2" class="text-base" />
-            </div>
-            Zeal Education
-          </a>
-        </div>
-        <div class="flex flex-1 items-center justify-center">
-          <div class="w-full max-w-md">
-            <app-login-form />
+    <div
+      class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
+    >
+      <div class="flex w-full max-w-sm flex-col gap-6 md:max-w-4xl">
+        <a routerLink="." class="flex items-center gap-2 self-center font-medium">
+          <div
+            class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md"
+          >
+            <ng-icon name="lucideSchool2" class="text-base" />
           </div>
-        </div>
-      </div>
-      <div class="relative hidden lg:block">
-        <img
-          src="/signinbg.jpg"
-          alt="Login background image"
-          class="size-full object-cover"
-        />
+          Zeal Education
+        </a>
+        <app-login-form />
       </div>
     </div>
   `,

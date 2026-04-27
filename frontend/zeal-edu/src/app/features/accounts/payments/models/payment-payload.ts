@@ -12,6 +12,8 @@ export interface FeeStructureListQuery {
   search?: string;
   status?: PaymentStatus | null;
   type?: FeeType | null;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface SetPaymentTypePayload {

@@ -41,8 +41,24 @@ public class GetBatchesQueryHandler(
             query = query.Where(b => b.Status == status);
         }
 
-        var projected = query
-            .OrderByDescending(b => b.CreatedAt)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("batchcode", "desc") => query.OrderByDescending(b => b.BatchCode),
+            ("batchcode", _) => query.OrderBy(b => b.BatchCode),
+            ("coursename", "desc") => query.OrderByDescending(b => b.Course.CourseName),
+            ("coursename", _) => query.OrderBy(b => b.Course.CourseName),
+            ("status", "desc") => query.OrderByDescending(b => b.Status),
+            ("status", _) => query.OrderBy(b => b.Status),
+            ("startdate", "desc") => query.OrderByDescending(b => b.StartDate),
+            ("startdate", _) => query.OrderBy(b => b.StartDate),
+            ("createdat", "asc") => query.OrderBy(b => b.CreatedAt),
+            _ => query.OrderByDescending(b => b.CreatedAt),
+        };
+
+        var projected = ordered
             .ThenBy(b => b.BatchCode)
             .Select(b => new BatchListItemDto
             {

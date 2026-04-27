@@ -13,6 +13,8 @@ import {
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
+  DataTableSortChange,
+  SortDirection,
 } from '@shared/components/data-table';
 
 @Directive({
@@ -41,6 +43,8 @@ export class BatchTable {
   readonly page = input<PaginatedList<BatchListItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
 
   readonly viewClicked = output<BatchListItem>();
   readonly editClicked = output<BatchListItem>();
@@ -48,16 +52,17 @@ export class BatchTable {
   readonly deleteClicked = output<BatchListItem>();
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly statuses = BatchStatus;
 
   protected readonly columns: DataTableColumn<BatchListItem>[] = [
-    { key: 'batchCode', header: 'Batch Code', width: 'w-36' },
-    { key: 'courseName', header: 'Course', width: 'w-64' },
+    { key: 'batchCode', header: 'Batch Code', sortable: true, width: 'w-36' },
+    { key: 'courseName', header: 'Course', sortable: true, width: 'w-64' },
     { key: 'facultyName', header: 'Faculty', width: 'w-56' },
-    { key: 'schedule', header: 'Schedule', width: 'w-56' },
+    { key: 'schedule', header: 'Schedule', sortable: true, sortKey: 'startDate', width: 'w-56' },
     { key: 'capacity', header: 'Capacity', width: 'w-32', align: 'center' },
-    { key: 'status', header: 'Status', width: 'w-40', align: 'center' },
+    { key: 'status', header: 'Status', sortable: true, width: 'w-40', align: 'center' },
     { key: 'actions', header: 'Actions', width: 'w-40', align: 'right' },
   ];
 

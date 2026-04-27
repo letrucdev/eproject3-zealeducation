@@ -54,11 +54,14 @@
     [page]="listQuery.data()"
     [isLoading]="listQuery.isPending()"
     [pageSize]="pageSize()"
+    [sortBy]="sortBy()"
+    [sortDirection]="sortDirection()"
     [trackBy]="trackById"
     itemLabel="fee records"
     emptyMessage="No fee structures found."
     (pageChanged)="onPageChanged($event)"
     (pageSizeChanged)="onPageSizeChanged($event)"
+    (sortChanged)="onSortChanged($event)"
   >
     <ng-template paymentCell="candidateCode" let-row>
       <span class="font-mono text-sm">{{ row.candidateCode }}</span>

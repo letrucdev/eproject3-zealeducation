@@ -13,7 +13,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
-import { lucideChevronLeft, lucideChevronRight } from '@ng-icons/lucide';
+import {
+  lucideArrowDown,
+  lucideArrowUp,
+  lucideArrowUpDown,
+  lucideChevronLeft,
+  lucideChevronRight,
+} from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
@@ -23,7 +29,12 @@ import { HlmTableImports } from '@spartan-ng/helm/table';
 import { PaginatedList } from '@core/models/paginated-list';
 import { DigitsOnlyDirective } from '@shared/directives/digits-only.directive';
 import { DataTableCellContext, DataTableCellDef } from './data-table-cell.directive';
-import { DataTableAlign, DataTableColumn } from './data-table-column';
+import {
+  DataTableAlign,
+  DataTableColumn,
+  DataTableSortChange,
+  SortDirection,
+} from './data-table-column';
 
 @Component({
   selector: 'app-data-table',
@@ -42,6 +53,9 @@ import { DataTableAlign, DataTableColumn } from './data-table-column';
     provideIcons({
       lucideChevronLeft,
       lucideChevronRight,
+      lucideArrowUpDown,
+      lucideArrowUp,
+      lucideArrowDown,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,8 +74,12 @@ export class DataTable<T = unknown> {
   readonly pageSizeOptions = input<number[]>([10, 20, 50]);
   readonly itemLabel = input<string>('items');
 
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
+
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly cellDefs = contentChildren<DataTableCellDef<T>>(DataTableCellDef);
   protected readonly skeletonRows = [0, 1, 2, 3, 4];
@@ -106,6 +124,21 @@ export class DataTable<T = unknown> {
 
   protected cellTemplateFor(key: string): TemplateRef<DataTableCellContext<T>> | null {
     return this.cellDefs().find((def) => def.appDataTableCell() === key)?.template ?? null;
+  }
+
+  protected onSort(col: DataTableColumn<T>): void {
+    if (!col.sortable) return;
+    const key = col.sortKey ?? col.key;
+    const next: SortDirection =
+      this.sortBy() === key && this.sortDirection() === 'asc' ? 'desc' : 'asc';
+    this.sortChanged.emit({ sortBy: key, sortDirection: next });
+  }
+
+  protected sortIcon(col: DataTableColumn<T>): 'lucideArrowUpDown' | 'lucideArrowUp' | 'lucideArrowDown' {
+    if (!col.sortable) return 'lucideArrowUpDown';
+    const key = col.sortKey ?? col.key;
+    if (this.sortBy() !== key) return 'lucideArrowUpDown';
+    return this.sortDirection() === 'desc' ? 'lucideArrowDown' : 'lucideArrowUp';
   }
 
   protected headerClasses(col: DataTableColumn<T>): string {

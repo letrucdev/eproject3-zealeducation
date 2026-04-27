@@ -55,8 +55,24 @@ public class GetFeeStructuresQueryHandler(
                 (x.course != null && x.course.CourseName.ToLower().Contains(search)));
         }
 
-        var projected = query
-            .OrderByDescending(x => x.fee.CreatedAt)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("totalfee", "desc") => query.OrderByDescending(x => x.fee.TotalFee),
+            ("totalfee", _) => query.OrderBy(x => x.fee.TotalFee),
+            ("amountpaid", "desc") => query.OrderByDescending(x => x.fee.AmountPaid),
+            ("amountpaid", _) => query.OrderBy(x => x.fee.AmountPaid),
+            ("outstandingbalance", "desc") => query.OrderByDescending(x => x.fee.OutstandingBalance),
+            ("outstandingbalance", _) => query.OrderBy(x => x.fee.OutstandingBalance),
+            ("paymentstatus", "desc") => query.OrderByDescending(x => x.fee.PaymentStatus),
+            ("paymentstatus", _) => query.OrderBy(x => x.fee.PaymentStatus),
+            ("createdat", "asc") => query.OrderBy(x => x.fee.CreatedAt),
+            _ => query.OrderByDescending(x => x.fee.CreatedAt),
+        };
+
+        var projected = ordered
             .Select(x => new FeeStructureListItemDto
             {
                 FeeId = x.fee.Id,

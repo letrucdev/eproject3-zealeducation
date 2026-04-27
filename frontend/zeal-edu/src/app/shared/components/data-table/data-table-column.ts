@@ -9,4 +9,13 @@ export interface DataTableColumn<T = unknown> {
   headerClass?: string;
   cellClass?: string;
   value?: (row: T) => string | number | null | undefined;
+  sortable?: boolean;
+  sortKey?: string;
+}
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface DataTableSortChange {
+  sortBy: string;
+  sortDirection: SortDirection;
 }

@@ -10,4 +10,6 @@ public record GetBatchesQuery(
     string? Search = null,
     Guid? CourseId = null,
     Guid? FacultyId = null,
-    BatchStatus? Status = null) : IRequest<PaginatedList<BatchListItemDto>>;
+    BatchStatus? Status = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<BatchListItemDto>>;

@@ -126,6 +126,8 @@ export class PaymentsService {
     }
     if (query.status) params = params.set('status', query.status);
     if (query.type) params = params.set('type', query.type);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<FeeStructureListItem>>>('/payments/fee-structures', {

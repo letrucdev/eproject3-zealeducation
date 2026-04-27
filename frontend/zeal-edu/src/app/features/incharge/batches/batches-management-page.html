@@ -10,23 +10,31 @@
 
   <app-batch-stats-cards [stats]="statsQuery.data()" [isLoading]="statsQuery.isPending()" />
 
-  <app-batch-filter-bar
-    [initial]="initialFilter"
-    (filterChanged)="onFilterChanged($event)"
-    (createClicked)="onCreateClicked()"
-  />
-
-  <app-batch-table
-    [page]="listQuery.data()"
-    [isLoading]="listQuery.isPending()"
-    [pageSize]="pageSize()"
-    (viewClicked)="onViewClicked($event)"
-    (editClicked)="onEditClicked($event)"
-    (assignFacultyClicked)="onAssignFacultyClicked($event)"
-    (deleteClicked)="onDeleteClicked($event)"
-    (pageChanged)="onPageChanged($event)"
-    (pageSizeChanged)="onPageSizeChanged($event)"
-  />
+  <section hlmCard>
+    <div hlmCardHeader>
+      <app-batch-filter-bar
+        [initial]="initialFilter"
+        (filterChanged)="onFilterChanged($event)"
+        (createClicked)="onCreateClicked()"
+      />
+    </div>
+    <div hlmCardContent>
+      <app-batch-table
+        [page]="listQuery.data()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        (viewClicked)="onViewClicked($event)"
+        (editClicked)="onEditClicked($event)"
+        (assignFacultyClicked)="onAssignFacultyClicked($event)"
+        (deleteClicked)="onDeleteClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      />
+    </div>
+  </section>
 
   <app-batch-form-dialog
     #formDialog
