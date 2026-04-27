@@ -7,6 +7,8 @@ export interface CandidateListQuery {
   status?: CandidateStatus | null;
   courseId?: string | null;
   batchId?: string | null;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface UpdateCandidatePayload {

@@ -13,6 +13,8 @@ export interface CourseListQuery {
   pageSize?: number;
   search?: string;
   isActive?: boolean;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface CreateCoursePayload {
@@ -103,6 +105,8 @@ export class CoursesService {
     if (query.isActive !== undefined) {
       params = params.set('isActive', String(query.isActive));
     }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<CourseListItem>>>('/courses', { params }),

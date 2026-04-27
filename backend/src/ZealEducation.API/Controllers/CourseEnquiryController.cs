@@ -26,9 +26,11 @@ public class CourseEnquiryController(ISender sender) : ControllerBase
         [FromQuery] string? search = null,
         [FromQuery] EnquiryStatus? status = null,
         [FromQuery] EnquirySource? source = null,
-        [FromQuery] bool? dueFollowUpOnly = null)
+        [FromQuery] bool? dueFollowUpOnly = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetEnquiriesQuery(page, pageSize, search, status, source, dueFollowUpOnly));
+        var result = await sender.Send(new GetEnquiriesQuery(page, pageSize, search, status, source, dueFollowUpOnly, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<CourseEnquiryListItemDto>>.Success(result));
     }
 

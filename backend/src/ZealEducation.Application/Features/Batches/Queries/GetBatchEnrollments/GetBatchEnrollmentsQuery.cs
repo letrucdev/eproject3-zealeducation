@@ -7,4 +7,6 @@ public record GetBatchEnrollmentsQuery(
     Guid BatchId,
     int Page = 1,
     int PageSize = 10,
-    string? Search = null) : IRequest<PaginatedList<BatchEnrollmentItemDto>>;
+    string? Search = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<BatchEnrollmentItemDto>>;

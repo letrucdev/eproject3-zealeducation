@@ -13,6 +13,8 @@ import {
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
+  DataTableSortChange,
+  SortDirection,
 } from '@shared/components/data-table';
 
 @Directive({
@@ -49,17 +51,20 @@ export class CourseTable {
   readonly page = input<PaginatedList<CourseListItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
 
   readonly editClicked = output<CourseListItem>();
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly columns: DataTableColumn<CourseListItem>[] = [
-    { key: 'courseName', header: 'Course Name', width: 'w-72' },
+    { key: 'courseName', header: 'Course Name', sortable: true, width: 'w-72' },
     { key: 'durationWeeks', header: 'Duration', width: 'w-32', align: 'center' },
-    { key: 'baseFee', header: 'Base Fee', width: 'w-36', align: 'right' },
-    { key: 'isActive', header: 'Status', width: 'w-32', align: 'center' },
-    { key: 'updatedAt', header: 'Last Updated', width: 'w-40' },
+    { key: 'baseFee', header: 'Base Fee', sortable: true, width: 'w-36', align: 'right' },
+    { key: 'isActive', header: 'Status', sortable: true, width: 'w-32', align: 'center' },
+    { key: 'updatedAt', header: 'Last Updated', sortable: true, width: 'w-40' },
     { key: 'actions', header: 'Actions', width: 'w-28', align: 'right' },
   ];
 

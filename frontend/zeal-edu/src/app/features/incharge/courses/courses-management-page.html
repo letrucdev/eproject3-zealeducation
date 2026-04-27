@@ -23,9 +23,12 @@
     [page]="listQuery.data()"
     [isLoading]="listQuery.isPending()"
     [pageSize]="pageSize()"
+    [sortBy]="sortBy()"
+    [sortDirection]="sortDirection()"
     (editClicked)="onEditClicked($event)"
     (pageChanged)="onPageChanged($event)"
     (pageSizeChanged)="onPageSizeChanged($event)"
+    (sortChanged)="onSortChanged($event)"
   />
 
   <app-course-form-dialog

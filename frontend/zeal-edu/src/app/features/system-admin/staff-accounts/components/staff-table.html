@@ -3,11 +3,14 @@
   [page]="page()"
   [isLoading]="isLoading()"
   [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
   [trackBy]="trackById"
   itemLabel="staff"
   emptyMessage="No staff found."
   (pageChanged)="pageChanged.emit($event)"
   (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template staffCell="username" let-row>
     <span class="font-mono text-xs font-semibold">{{ row.username }}</span>

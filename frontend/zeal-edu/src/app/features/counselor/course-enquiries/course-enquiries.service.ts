@@ -122,6 +122,8 @@ export class CourseEnquiriesService {
     if (query.status) params = params.set('status', query.status);
     if (query.source) params = params.set('source', query.source);
     if (query.dueFollowUpOnly) params = params.set('dueFollowUpOnly', 'true');
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<CourseEnquiryListItem>>>('/course-enquiries', {

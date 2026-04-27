@@ -3,11 +3,14 @@
   [page]="page()"
   [isLoading]="isLoading()"
   [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
   [trackBy]="trackById"
   itemLabel="enquiries"
   emptyMessage="No enquiries found."
   (pageChanged)="pageChanged.emit($event)"
   (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template enquiryCell="fullName" let-row>
     <div class="flex flex-col">

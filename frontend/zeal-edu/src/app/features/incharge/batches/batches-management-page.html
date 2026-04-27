@@ -20,12 +20,15 @@
     [page]="listQuery.data()"
     [isLoading]="listQuery.isPending()"
     [pageSize]="pageSize()"
+    [sortBy]="sortBy()"
+    [sortDirection]="sortDirection()"
     (viewClicked)="onViewClicked($event)"
     (editClicked)="onEditClicked($event)"
     (assignFacultyClicked)="onAssignFacultyClicked($event)"
     (deleteClicked)="onDeleteClicked($event)"
     (pageChanged)="onPageChanged($event)"
     (pageSizeChanged)="onPageSizeChanged($event)"
+    (sortChanged)="onSortChanged($event)"
   />
 
   <app-batch-form-dialog

@@ -11,6 +11,8 @@ import {
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
+  DataTableSortChange,
+  SortDirection,
 } from '@shared/components/data-table';
 import { CandidateListItem } from '../models/candidate-list-item';
 
@@ -46,22 +48,25 @@ export class CandidateTable {
   readonly page = input<PaginatedList<CandidateListItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
 
   readonly viewClicked = output<CandidateListItem>();
   readonly editClicked = output<CandidateListItem>();
   readonly fineClicked = output<CandidateListItem>();
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly statuses = CandidateStatus;
 
   protected readonly columns: DataTableColumn<CandidateListItem>[] = [
-    { key: 'candidateCode', header: 'Code', width: 'w-32' },
-    { key: 'fullName', header: 'Full Name', width: 'w-56' },
+    { key: 'candidateCode', header: 'Code', sortable: true, width: 'w-32' },
+    { key: 'fullName', header: 'Full Name', sortable: true, width: 'w-56' },
     { key: 'contact', header: 'Contact', width: 'w-56' },
     { key: 'currentCourse', header: 'Course', width: 'w-56' },
     { key: 'currentBatch', header: 'Batch', width: 'w-36' },
-    { key: 'status', header: 'Status', width: 'w-32', align: 'center' },
+    { key: 'status', header: 'Status', sortable: true, width: 'w-32', align: 'center' },
     { key: 'actions', header: 'Actions', width: 'w-36', align: 'right' },
   ];
 

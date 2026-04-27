@@ -16,6 +16,13 @@ public class UpdateBatchCommandHandler(
         var batch = await batchRepository.GetByIdAsync(request.BatchId, cancellationToken)
             ?? throw new NotFoundException(nameof(Batch), request.BatchId);
 
+        if (request.StartDate != batch.StartDate)
+        {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            if (request.StartDate < today)
+                throw new ConflictException("Start date must be today or later.");
+        }
+
         var batchCode = request.BatchCode.Trim();
 
         if (!string.Equals(batch.BatchCode, batchCode, StringComparison.Ordinal))

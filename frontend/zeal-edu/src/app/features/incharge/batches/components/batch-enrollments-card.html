@@ -21,78 +21,72 @@
       Add Candidate
     </button>
   </div>
-  <div hlmCardContent class="overflow-x-auto">
-    @if (isLoading() && !page()) {
-      <div class="grid gap-2">
-        <hlm-skeleton class="h-10" />
-        <hlm-skeleton class="h-10" />
-        <hlm-skeleton class="h-10" />
-      </div>
-    } @else {
-      <table class="w-full text-sm">
-        <thead class="text-left text-xs uppercase text-muted-foreground border-b">
-          <tr>
-            <th class="px-3 py-2">Code</th>
-            <th class="px-3 py-2">Full Name</th>
-            <th class="px-3 py-2">Contact</th>
-            <th class="px-3 py-2">Enrolled On</th>
-            <th class="px-3 py-2 text-center">Status</th>
-            <th class="px-3 py-2 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of page()?.items ?? []; track item.enrollmentId) {
-            <tr class="border-b">
-              <td class="px-3 py-2 font-mono">{{ item.candidateCode }}</td>
-              <td class="px-3 py-2 font-medium">{{ item.fullName }}</td>
-              <td class="px-3 py-2 text-xs">
-                <div class="flex flex-col">
-                  <span>{{ item.email }}</span>
-                  <span class="text-muted-foreground">{{ item.phone }}</span>
-                </div>
-              </td>
-              <td class="px-3 py-2">{{ item.enrollmentDate | date: 'dd MMM yyyy' }}</td>
-              <td class="px-3 py-2 text-center">
-                @switch (item.status) {
-                  @case (enrollmentStatuses.Enrolled) {
-                    <span hlmBadge class="bg-emerald-100 text-emerald-800">Enrolled</span>
-                  }
-                  @case (enrollmentStatuses.Completed) {
-                    <span hlmBadge class="bg-sky-100 text-sky-800">Completed</span>
-                  }
-                  @case (enrollmentStatuses.Withdrawn) {
-                    <span hlmBadge class="bg-rose-100 text-rose-800">Withdrawn</span>
-                  }
-                  @case (enrollmentStatuses.OnBreak) {
-                    <span hlmBadge class="bg-slate-100 text-slate-800">On Break</span>
-                  }
-                  @default {
-                    <span hlmBadge class="bg-amber-100 text-amber-800">{{ item.status }}</span>
-                  }
-                }
-              </td>
-              <td class="px-3 py-2 text-right">
-                <button
-                  hlmBtn
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  (click)="viewClicked.emit(item)"
-                  [attr.aria-label]="'View ' + item.candidateCode"
-                >
-                  <ng-icon hlm name="lucideEye" size="sm" />
-                </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="6" class="px-3 py-6 text-center text-muted-foreground">
-                No candidates have been enrolled in this batch yet.
-              </td>
-            </tr>
+  <div hlmCardContent>
+    <app-data-table
+      [columns]="columns"
+      [page]="page()"
+      [isLoading]="isLoading()"
+      [pageSize]="pageSize()"
+      [sortBy]="sortBy()"
+      [sortDirection]="sortDirection()"
+      [trackBy]="trackById"
+      itemLabel="candidates"
+      emptyMessage="No candidates have been enrolled in this batch yet."
+      (pageChanged)="pageChanged.emit($event)"
+      (pageSizeChanged)="pageSizeChanged.emit($event)"
+      (sortChanged)="sortChanged.emit($event)"
+    >
+      <ng-template enrollmentCell="candidateCode" let-row>
+        <span class="font-mono">{{ row.candidateCode }}</span>
+      </ng-template>
+
+      <ng-template enrollmentCell="fullName" let-row>
+        <span class="font-medium">{{ row.fullName }}</span>
+      </ng-template>
+
+      <ng-template enrollmentCell="contact" let-row>
+        <div class="flex flex-col text-xs">
+          <span>{{ row.email }}</span>
+          <span class="text-muted-foreground">{{ row.phone }}</span>
+        </div>
+      </ng-template>
+
+      <ng-template enrollmentCell="enrollmentDate" let-row>
+        {{ row.enrollmentDate | date: 'dd MMM yyyy' }}
+      </ng-template>
+
+      <ng-template enrollmentCell="status" let-row>
+        @switch (row.status) {
+          @case (enrollmentStatuses.Enrolled) {
+            <span hlmBadge class="bg-emerald-100 text-emerald-800">Enrolled</span>
           }
-        </tbody>
-      </table>
-    }
+          @case (enrollmentStatuses.Completed) {
+            <span hlmBadge class="bg-sky-100 text-sky-800">Completed</span>
+          }
+          @case (enrollmentStatuses.Withdrawn) {
+            <span hlmBadge class="bg-rose-100 text-rose-800">Withdrawn</span>
+          }
+          @case (enrollmentStatuses.OnBreak) {
+            <span hlmBadge class="bg-slate-100 text-slate-800">On Break</span>
+          }
+          @default {
+            <span hlmBadge class="bg-amber-100 text-amber-800">{{ row.status }}</span>
+          }
+        }
+      </ng-template>
+
+      <ng-template enrollmentCell="actions" let-row>
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          type="button"
+          (click)="viewClicked.emit(row)"
+          [attr.aria-label]="'View ' + row.candidateCode"
+        >
+          <ng-icon hlm name="lucideEye" size="sm" />
+        </button>
+      </ng-template>
+    </app-data-table>
   </div>
 </section>

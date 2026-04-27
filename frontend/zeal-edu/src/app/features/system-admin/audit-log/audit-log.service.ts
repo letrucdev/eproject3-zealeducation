@@ -53,6 +53,8 @@ export class AuditLogService {
     if (query.toDate) {
       params = params.set('toDate', query.toDate);
     }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<AuditLogListItem>>>('/audit-logs', { params }),

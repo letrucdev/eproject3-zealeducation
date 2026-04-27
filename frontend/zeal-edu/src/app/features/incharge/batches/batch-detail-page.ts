@@ -31,8 +31,13 @@ import { BatchEnrollmentsCard } from './components/batch-enrollments-card';
 import { BatchFormDialog, BatchFormSubmit } from './components/batch-form-dialog';
 import { BatchInfoCard } from './components/batch-info-card';
 import { BatchSessionsCard } from './components/batch-sessions-card';
+import {
+  BulkSessionFormDialog,
+  BulkSessionFormSubmit,
+} from './components/bulk-session-form-dialog';
 import { SessionFormDialog, SessionFormSubmit } from './components/session-form-dialog';
-import { BatchEnrollmentsQuery } from './models/batch-payload';
+import { BatchEnrollmentsQuery, BatchSessionsQuery } from './models/batch-payload';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-batch-detail-page',
@@ -48,6 +53,7 @@ import { BatchEnrollmentsQuery } from './models/batch-payload';
     AssignCandidatesDialog,
     BatchAssignFacultyDialog,
     SessionFormDialog,
+    BulkSessionFormDialog,
     ConfirmDialog,
   ],
   providers: [provideIcons({ lucideArrowLeft })],
@@ -64,6 +70,8 @@ export default class BatchDetailPage {
   protected readonly assignFacultyDialog =
     viewChild.required<BatchAssignFacultyDialog>('assignFacultyDialog');
   protected readonly sessionDialog = viewChild.required<SessionFormDialog>('sessionDialog');
+  protected readonly bulkSessionDialog =
+    viewChild.required<BulkSessionFormDialog>('bulkSessionDialog');
   protected readonly confirmDialog = viewChild.required<ConfirmDialog>('confirmDialog');
 
   private readonly _routeParam = toSignal(this._route.paramMap, { initialValue: null });
@@ -73,11 +81,27 @@ export default class BatchDetailPage {
   });
 
   protected readonly enrollmentsPage = signal(1);
-  protected readonly enrollmentsPageSize = 10;
+  protected readonly enrollmentsPageSize = signal(10);
+  protected readonly enrollmentsSortBy = signal<string | null>('enrollmentDate');
+  protected readonly enrollmentsSortDirection = signal<'asc' | 'desc'>('desc');
+
+  protected readonly sessionsPage = signal(1);
+  protected readonly sessionsPageSize = signal(10);
+  protected readonly sessionsSortBy = signal<string | null>('sessionDate');
+  protected readonly sessionsSortDirection = signal<'asc' | 'desc'>('asc');
 
   private readonly _enrollmentsParams = computed<BatchEnrollmentsQuery>(() => ({
     page: this.enrollmentsPage(),
-    pageSize: this.enrollmentsPageSize,
+    pageSize: this.enrollmentsPageSize(),
+    sortBy: this.enrollmentsSortBy() ?? undefined,
+    sortDirection: this.enrollmentsSortDirection(),
+  }));
+
+  private readonly _sessionsParams = computed<BatchSessionsQuery>(() => ({
+    page: this.sessionsPage(),
+    pageSize: this.sessionsPageSize(),
+    sortBy: this.sessionsSortBy() ?? undefined,
+    sortDirection: this.sessionsSortDirection(),
   }));
 
   protected readonly detailQuery = this._service.detailQuery(this.currentBatchId);
@@ -85,13 +109,17 @@ export default class BatchDetailPage {
     this.currentBatchId,
     this._enrollmentsParams,
   );
-  protected readonly sessionsQuery = this._service.sessionsQuery(this.currentBatchId);
+  protected readonly sessionsQuery = this._service.sessionsQuery(
+    this.currentBatchId,
+    this._sessionsParams,
+  );
 
   protected readonly updateMutation = this._service.updateMutation();
   protected readonly assignCandidatesMutation = this._service.assignCandidatesMutation();
   protected readonly assignFacultyMutation = this._service.assignFacultyMutation();
   protected readonly deleteBatchMutation = this._service.deleteMutation();
   protected readonly createSessionMutation = this._service.createSessionMutation();
+  protected readonly createBulkSessionsMutation = this._service.createBulkSessionsMutation();
   protected readonly updateSessionMutation = this._service.updateSessionMutation();
   protected readonly deleteSessionMutation = this._service.deleteSessionMutation();
 
@@ -154,6 +182,29 @@ export default class BatchDetailPage {
     const id = this.currentBatchId();
     if (!id) return;
     this.sessionDialog().openCreate(id);
+  }
+
+  protected onBulkCreateSessions(): void {
+    const detail = this.detailQuery.data();
+    if (!detail) return;
+    this.bulkSessionDialog().open(detail);
+  }
+
+  protected onBulkSubmitted(event: BulkSessionFormSubmit): void {
+    this.createBulkSessionsMutation.mutate(
+      { batchId: event.batchId, payload: event.payload },
+      {
+        onSuccess: (res) => {
+          const skipped = res.skippedDates.length;
+          const message =
+            skipped === 0
+              ? `Created ${res.createdCount} session(s).`
+              : `Created ${res.createdCount} session(s); skipped ${skipped} due to time conflict.`;
+          toast.success(message);
+          this.bulkSessionDialog().close();
+        },
+      },
+    );
   }
 
   protected onEditSession(session: ClassSession): void {
@@ -267,5 +318,31 @@ export default class BatchDetailPage {
 
   protected onEnrollmentsPageChanged(page: number): void {
     this.enrollmentsPage.set(page);
+  }
+
+  protected onEnrollmentsPageSizeChanged(size: number): void {
+    this.enrollmentsPageSize.set(size);
+    this.enrollmentsPage.set(1);
+  }
+
+  protected onEnrollmentsSortChanged(change: DataTableSortChange): void {
+    this.enrollmentsSortBy.set(change.sortBy);
+    this.enrollmentsSortDirection.set(change.sortDirection);
+    this.enrollmentsPage.set(1);
+  }
+
+  protected onSessionsPageChanged(page: number): void {
+    this.sessionsPage.set(page);
+  }
+
+  protected onSessionsPageSizeChanged(size: number): void {
+    this.sessionsPageSize.set(size);
+    this.sessionsPage.set(1);
+  }
+
+  protected onSessionsSortChanged(change: DataTableSortChange): void {
+    this.sessionsSortBy.set(change.sortBy);
+    this.sessionsSortDirection.set(change.sortDirection);
+    this.sessionsPage.set(1);
   }
 }

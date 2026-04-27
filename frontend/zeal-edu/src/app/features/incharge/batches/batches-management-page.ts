@@ -23,6 +23,7 @@ import { BatchStatsCards } from './components/batch-stats-cards';
 import { BatchTable } from './components/batch-table';
 import { BatchListQuery } from './models/batch-payload';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-batches-management-page',
@@ -51,6 +52,8 @@ export default class BatchesManagementPage {
   protected readonly pageSize = signal(10);
   protected readonly search = signal('');
   protected readonly statusFilter = signal<BatchStatus | null>(null);
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
 
   protected readonly initialFilter: BatchFilterValue = { search: '', status: null };
 
@@ -61,6 +64,8 @@ export default class BatchesManagementPage {
     pageSize: this.pageSize(),
     search: this.search() || undefined,
     status: this.statusFilter(),
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -79,7 +84,8 @@ export default class BatchesManagementPage {
     effect(() => {
       const detail = this.detailQuery.data();
       const currentId = this.focusedBatchId();
-      if (!detail || currentId !== detail.batchId) return;
+      const isFetching = this.detailQuery.isFetching();
+      if (!detail || currentId !== detail.batchId || isFetching) return;
 
       untracked(() => {
         this.formDialog().openEdit(detail);
@@ -109,6 +115,12 @@ export default class BatchesManagementPage {
     this.page.set(1);
   }
 
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
+    this.page.set(1);
+  }
+
   onCreateClicked(): void {
     this.formDialog().openCreate();
   }
@@ -118,6 +130,7 @@ export default class BatchesManagementPage {
   }
 
   onEditClicked(row: BatchListItem): void {
+    //  console.log(row.batchId);
     this.focusedBatchId.set(row.batchId);
   }
 
@@ -140,6 +153,9 @@ export default class BatchesManagementPage {
           onSuccess: () => {
             toast.success('Batch updated successfully.');
             this.formDialog().close();
+          },
+          onSettled: () => {
+            this.focusedBatchId.set(null);
           },
         },
       );

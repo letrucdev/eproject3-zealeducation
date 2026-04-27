@@ -20,6 +20,7 @@ import { EnquirySource } from '@core/models/enquiry-source';
 import { EnquiryStatus } from '@core/models/enquiry-status';
 import { CourseEnquiriesService } from './course-enquiries.service';
 import { EnquiryListQuery } from './models/course-enquiry-payload';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 type DialogIntent = 'none' | 'edit' | 'view' | 'convert';
 
@@ -49,6 +50,8 @@ export default class CourseEnquiriesPage {
   protected readonly statusFilter = signal<EnquiryStatus | ''>('');
   protected readonly sourceFilter = signal<EnquirySource | ''>('');
   protected readonly dueFollowUpOnly = signal(false);
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('asc');
 
   protected readonly initialFilter: EnquiryFilterValue = {
     search: '',
@@ -67,6 +70,8 @@ export default class CourseEnquiriesPage {
     status: this.statusFilter() || undefined,
     source: this.sourceFilter() || undefined,
     dueFollowUpOnly: this.dueFollowUpOnly() || undefined,
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -128,6 +133,12 @@ export default class CourseEnquiriesPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 

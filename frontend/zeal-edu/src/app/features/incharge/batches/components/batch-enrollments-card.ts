@@ -1,25 +1,48 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Directive, input, output } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
 import { lucideEye, lucideUserPlus } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { BatchEnrollmentItem } from '@core/models/batch-enrollment';
 import { EnrollmentStatus } from '@features/incharge/candidates/models/candidate-detail';
 import { PaginatedList } from '@core/models/paginated-list';
+import {
+  DataTable,
+  DataTableCellContext,
+  DataTableCellDef,
+  DataTableColumn,
+  DataTableSortChange,
+  SortDirection,
+} from '@shared/components/data-table';
+
+@Directive({
+  selector: '[enrollmentCell]',
+  providers: [{ provide: DataTableCellDef, useExisting: EnrollmentCellDef }],
+})
+export class EnrollmentCellDef extends DataTableCellDef<BatchEnrollmentItem> {
+  override readonly appDataTableCell = input.required<string>({ alias: 'enrollmentCell' });
+
+  static override ngTemplateContextGuard(
+    _dir: EnrollmentCellDef,
+    ctx: unknown,
+  ): ctx is DataTableCellContext<BatchEnrollmentItem> {
+    return true;
+  }
+}
 
 @Component({
   selector: 'app-batch-enrollments-card',
   imports: [
     DatePipe,
+    DataTable,
+    EnrollmentCellDef,
     HlmCardImports,
     HlmBadgeImports,
     HlmButtonImports,
     HlmIconImports,
-    HlmSkeletonImports,
   ],
   providers: [provideIcons({ lucideEye, lucideUserPlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,9 +52,26 @@ export class BatchEnrollmentsCard {
   readonly page = input<PaginatedList<BatchEnrollmentItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly canAddCandidate = input<boolean>(true);
+  readonly pageSize = input<number>(10);
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
 
   readonly addClicked = output<void>();
   readonly viewClicked = output<BatchEnrollmentItem>();
+  readonly pageChanged = output<number>();
+  readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly enrollmentStatuses = EnrollmentStatus;
+
+  protected readonly columns: DataTableColumn<BatchEnrollmentItem>[] = [
+    { key: 'candidateCode', header: 'Code', sortable: true, width: 'w-32' },
+    { key: 'fullName', header: 'Full Name', sortable: true, width: 'w-56' },
+    { key: 'contact', header: 'Contact', width: 'w-64' },
+    { key: 'enrollmentDate', header: 'Enrolled On', sortable: true, width: 'w-40' },
+    { key: 'status', header: 'Status', sortable: true, align: 'center', width: 'w-32' },
+    { key: 'actions', header: 'Actions', align: 'right', width: 'w-24' },
+  ];
+
+  protected readonly trackById = (row: BatchEnrollmentItem): string => row.enrollmentId;
 }

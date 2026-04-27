@@ -53,8 +53,22 @@ public class GetCandidatesQueryHandler(
                 enrollmentRepository.Query().Any(e => e.CandidateId == x.candidate.Id && e.BatchId == batchId));
         }
 
-        var projected = query
-            .OrderByDescending(x => x.candidate.RegisteredAt)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("candidatecode", "desc") => query.OrderByDescending(x => x.candidate.CandidateCode),
+            ("candidatecode", _) => query.OrderBy(x => x.candidate.CandidateCode),
+            ("fullname", "desc") => query.OrderByDescending(x => x.user.FullName),
+            ("fullname", _) => query.OrderBy(x => x.user.FullName),
+            ("status", "desc") => query.OrderByDescending(x => x.candidate.Status),
+            ("status", _) => query.OrderBy(x => x.candidate.Status),
+            ("registeredat", "asc") => query.OrderBy(x => x.candidate.RegisteredAt),
+            _ => query.OrderByDescending(x => x.candidate.RegisteredAt),
+        };
+
+        var projected = ordered
             .ThenBy(x => x.candidate.CandidateCode)
             .Select(x => new
             {

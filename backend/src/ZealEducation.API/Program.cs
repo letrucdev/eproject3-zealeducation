@@ -65,7 +65,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.InitialiseDatabaseAsync();
+//await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<GlobalExceptionHandler>();

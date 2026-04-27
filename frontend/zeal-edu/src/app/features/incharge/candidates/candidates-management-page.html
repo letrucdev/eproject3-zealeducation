@@ -17,11 +17,14 @@
     [page]="listQuery.data()"
     [isLoading]="listQuery.isPending()"
     [pageSize]="pageSize()"
+    [sortBy]="sortBy()"
+    [sortDirection]="sortDirection()"
     (viewClicked)="onViewClicked($event)"
     (editClicked)="onEditClicked($event)"
     (fineClicked)="onFineClicked($event)"
     (pageChanged)="onPageChanged($event)"
     (pageSizeChanged)="onPageSizeChanged($event)"
+    (sortChanged)="onSortChanged($event)"
   />
 
   <app-candidate-update-dialog

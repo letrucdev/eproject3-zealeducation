@@ -21,6 +21,7 @@ import {
 } from './components/course-form-dialog';
 import { CourseStatsCards } from './components/course-stats-cards';
 import { CourseTable } from './components/course-table';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-courses-management-page',
@@ -37,6 +38,8 @@ export default class CoursesManagementPage {
   protected readonly pageSize = signal(10);
   protected readonly search = signal('');
   protected readonly isActiveFilter = signal<boolean | null>(null);
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
 
   protected readonly initialFilter: CourseFilterValue = { search: '', isActive: null };
 
@@ -47,6 +50,8 @@ export default class CoursesManagementPage {
     pageSize: this.pageSize(),
     search: this.search() || undefined,
     isActive: this.isActiveFilter() ?? undefined,
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -90,6 +95,12 @@ export default class CoursesManagementPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 

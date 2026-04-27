@@ -143,9 +143,13 @@
               id="batch-start-date"
               type="date"
               formControlName="startDate"
+              [attr.min]="startDateMin()"
               class="w-full"
             />
             <hlm-field-error validator="required">Start date is required.</hlm-field-error>
+            <hlm-field-error validator="startInPast">
+              Start date cannot be in the past.
+            </hlm-field-error>
           </hlm-field>
 
           <hlm-field>

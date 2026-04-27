@@ -23,9 +23,11 @@ public class CandidateController(ISender sender) : ControllerBase
         [FromQuery] string? search = null,
         [FromQuery] CandidateStatus? status = null,
         [FromQuery] Guid? courseId = null,
-        [FromQuery] Guid? batchId = null)
+        [FromQuery] Guid? batchId = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetCandidatesQuery(page, pageSize, search, status, courseId, batchId));
+        var result = await sender.Send(new GetCandidatesQuery(page, pageSize, search, status, courseId, batchId, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<CandidateListItemDto>>.Success(result));
     }
 

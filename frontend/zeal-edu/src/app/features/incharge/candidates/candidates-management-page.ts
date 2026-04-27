@@ -14,12 +14,10 @@ import { CandidatesService } from './candidates.service';
 import { ApplyFineDialog, ApplyFineSubmit } from './components/apply-fine-dialog';
 import { CandidateFilterBar, CandidateFilterValue } from './components/candidate-filter-bar';
 import { CandidateTable } from './components/candidate-table';
-import {
-  CandidateUpdateDialog,
-  CandidateUpdateSubmit,
-} from './components/candidate-update-dialog';
+import { CandidateUpdateDialog, CandidateUpdateSubmit } from './components/candidate-update-dialog';
 import { CandidateListItem } from './models/candidate-list-item';
 import { CandidateListQuery } from './models/candidate-payload';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-candidates-management-page',
@@ -40,6 +38,8 @@ export default class CandidatesManagementPage {
   protected readonly statusFilter = signal<CandidateListQuery['status']>(null);
   protected readonly courseFilter = signal<string | null>(null);
   protected readonly batchFilter = signal<string | null>(null);
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
 
   protected readonly initialFilter: CandidateFilterValue = {
     search: '',
@@ -57,6 +57,8 @@ export default class CandidatesManagementPage {
     status: this.statusFilter(),
     courseId: this.courseFilter(),
     batchId: this.batchFilter(),
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -68,7 +70,8 @@ export default class CandidatesManagementPage {
     effect(() => {
       const detail = this.detailQuery.data();
       const currentId = this.focusedCandidateId();
-      if (!detail || currentId !== detail.candidateId) return;
+      const isFetching = this.detailQuery.isFetching();
+      if (!detail || currentId !== detail.candidateId || isFetching) return;
 
       untracked(() => {
         this.updateDialog().open(detail);
@@ -97,6 +100,12 @@ export default class CandidatesManagementPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 

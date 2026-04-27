@@ -13,6 +13,7 @@ using ZealEducation.Application.Features.Batches.Queries.GetBatchById;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchEnrollments;
 using ZealEducation.Application.Features.Batches.Queries.GetBatches;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchStatistics;
+using ZealEducation.Application.Features.ClassSessions.Commands.CreateBulkSessions;
 using ZealEducation.Application.Features.ClassSessions.Commands.CreateClassSession;
 using ZealEducation.Application.Features.ClassSessions.Queries.GetBatchSessions;
 using ZealEducation.Domain.Enums;
@@ -34,9 +35,11 @@ public class BatchController(ISender sender) : ControllerBase
         [FromQuery] string? search = null,
         [FromQuery] Guid? courseId = null,
         [FromQuery] Guid? facultyId = null,
-        [FromQuery] BatchStatus? status = null)
+        [FromQuery] BatchStatus? status = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetBatchesQuery(page, pageSize, search, courseId, facultyId, status));
+        var result = await sender.Send(new GetBatchesQuery(page, pageSize, search, courseId, facultyId, status, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<BatchListItemDto>>.Success(result));
     }
 
@@ -107,9 +110,11 @@ public class BatchController(ISender sender) : ControllerBase
         Guid id,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetBatchEnrollmentsQuery(id, page, pageSize, search));
+        var result = await sender.Send(new GetBatchEnrollmentsQuery(id, page, pageSize, search, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<BatchEnrollmentItemDto>>.Success(result));
     }
 
@@ -135,10 +140,15 @@ public class BatchController(ISender sender) : ControllerBase
 
     [HttpGet("{id:guid}/sessions")]
     [Authorize(Roles = InchargeOnly)]
-    public async Task<ActionResult<ApiResponse<List<ClassSessionDto>>>> GetSessions(Guid id)
+    public async Task<ActionResult<ApiResponse<PaginatedList<ClassSessionDto>>>> GetSessions(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetBatchSessionsQuery(id));
-        return Ok(ApiResponse<List<ClassSessionDto>>.Success(result));
+        var result = await sender.Send(new GetBatchSessionsQuery(id, page, pageSize, sortBy, sortDirection));
+        return Ok(ApiResponse<PaginatedList<ClassSessionDto>>.Success(result));
     }
 
     [HttpPost("{id:guid}/sessions")]
@@ -156,6 +166,22 @@ public class BatchController(ISender sender) : ControllerBase
         return Ok(ApiResponse<Guid>.Success(sessionId, "Class session created successfully"));
     }
 
+    [HttpPost("{id:guid}/sessions/bulk")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<CreateBulkSessionsResponse>>> CreateBulkSessions(
+        Guid id, [FromBody] CreateBulkSessionsRequest body)
+    {
+        var result = await sender.Send(new CreateBulkSessionsCommand(
+            id,
+            body.DaysOfWeek,
+            body.StartTime,
+            body.EndTime,
+            body.Topic,
+            body.Location));
+
+        return Ok(ApiResponse<CreateBulkSessionsResponse>.Success(result, "Sessions created successfully"));
+    }
+
     public record UpdateBatchRequest(
         string BatchCode,
         Guid CourseId,
@@ -171,6 +197,13 @@ public class BatchController(ISender sender) : ControllerBase
 
     public record CreateClassSessionRequest(
         DateOnly SessionDate,
+        TimeOnly StartTime,
+        TimeOnly EndTime,
+        string? Topic,
+        string? Location);
+
+    public record CreateBulkSessionsRequest(
+        List<DayOfWeek> DaysOfWeek,
         TimeOnly StartTime,
         TimeOnly EndTime,
         string? Topic,

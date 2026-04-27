@@ -21,7 +21,10 @@ import {
   AssignableCandidatesQuery,
   BatchEnrollmentsQuery,
   BatchListQuery,
+  BatchSessionsQuery,
   CreateBatchPayload,
+  CreateBulkSessionsPayload,
+  CreateBulkSessionsResponse,
   UpdateBatchPayload,
 } from './models/batch-payload';
 
@@ -101,11 +104,13 @@ export class BatchesService {
     }));
   }
 
-  sessionsQuery(batchId: Signal<string | null>) {
-    return injectQuery<ClassSession[], HttpErrorResponse>(() => ({
+  sessionsQuery(batchId: Signal<string | null>, params: Signal<BatchSessionsQuery>) {
+    return injectQuery<PaginatedList<ClassSession>, HttpErrorResponse>(() => ({
       enabled: batchId() !== null,
-      queryKey: [...BATCH_SESSIONS_QUERY_KEY, batchId()],
-      queryFn: () => this._fetchSessions(batchId() as string),
+      queryKey: [...BATCH_SESSIONS_QUERY_KEY, batchId(), params()],
+      queryFn: () => this._fetchSessions(batchId() as string, params()),
+      staleTime: 30_000,
+      placeholderData: keepPreviousData,
     }));
   }
 
@@ -194,7 +199,29 @@ export class BatchesService {
         return response.data;
       },
       onSuccess: () => {
-        void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
+        this._invalidateAll();
+      },
+    }));
+  }
+
+  createBulkSessionsMutation() {
+    return injectMutation<
+      CreateBulkSessionsResponse,
+      HttpErrorResponse,
+      { batchId: string; payload: CreateBulkSessionsPayload }
+    >(() => ({
+      mutationFn: async ({ batchId, payload }) => {
+        const response = await firstValueFrom(
+          this._http.post<ApiResponse<CreateBulkSessionsResponse>>(
+            `/batches/${batchId}/sessions/bulk`,
+            payload,
+          ),
+        );
+        if (!response.data) throw new Error(response.message || 'Failed to create sessions');
+        return response.data;
+      },
+      onSuccess: () => {
+        this._invalidateAll();
       },
     }));
   }
@@ -250,6 +277,8 @@ export class BatchesService {
     if (query.courseId) params = params.set('courseId', query.courseId);
     if (query.facultyId) params = params.set('facultyId', query.facultyId);
     if (query.status) params = params.set('status', query.status);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<BatchListItem>>>('/batches', { params }),
@@ -290,6 +319,8 @@ export class BatchesService {
     if (query.search && query.search.trim().length > 0) {
       params = params.set('search', query.search.trim());
     }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<BatchEnrollmentItem>>>(
@@ -320,11 +351,22 @@ export class BatchesService {
     return response.data ?? emptyPaginated<AssignableCandidate>(query);
   }
 
-  private async _fetchSessions(batchId: string): Promise<ClassSession[]> {
+  private async _fetchSessions(
+    batchId: string,
+    query: BatchSessionsQuery,
+  ): Promise<PaginatedList<ClassSession>> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
+
     const response = await firstValueFrom(
-      this._http.get<ApiResponse<ClassSession[]>>(`/batches/${batchId}/sessions`),
+      this._http.get<ApiResponse<PaginatedList<ClassSession>>>(`/batches/${batchId}/sessions`, {
+        params,
+      }),
     );
-    return response.data ?? [];
+    return response.data ?? emptyPaginated<ClassSession>(query);
   }
 
   private async _fetchSessionAttendance(sessionId: string): Promise<SessionAttendance> {
@@ -338,8 +380,9 @@ export class BatchesService {
   private _invalidateAll(): void {
     void this._queryClient.invalidateQueries({ queryKey: BATCH_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_STATS_QUERY_KEY });
-    void this._queryClient.invalidateQueries({ queryKey: BATCH_DETAIL_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_ENROLLMENTS_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_ASSIGNABLE_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_DETAIL_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
   }
 }

@@ -7,6 +7,8 @@ export interface BatchListQuery {
   courseId?: string | null;
   facultyId?: string | null;
   status?: BatchStatus | null;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface CreateBatchPayload {
@@ -37,6 +39,15 @@ export interface BatchEnrollmentsQuery {
   page: number;
   pageSize: number;
   search?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+export interface BatchSessionsQuery {
+  page: number;
+  pageSize: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface AssignableCandidatesQuery {
@@ -47,4 +58,17 @@ export interface AssignableCandidatesQuery {
 
 export interface AssignCandidatesPayload {
   enrollmentIds: string[];
+}
+
+export interface CreateBulkSessionsPayload {
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  topic: string | null;
+  location: string | null;
+}
+
+export interface CreateBulkSessionsResponse {
+  createdCount: number;
+  skippedDates: string[];
 }

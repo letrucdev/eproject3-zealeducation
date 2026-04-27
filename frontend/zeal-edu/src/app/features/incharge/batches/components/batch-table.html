@@ -3,11 +3,14 @@
   [page]="page()"
   [isLoading]="isLoading()"
   [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
   [trackBy]="trackById"
   itemLabel="batches"
   emptyMessage="No batches found."
   (pageChanged)="pageChanged.emit($event)"
   (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template batchCell="batchCode" let-row>
     <span class="font-mono font-medium">{{ row.batchCode }}</span>

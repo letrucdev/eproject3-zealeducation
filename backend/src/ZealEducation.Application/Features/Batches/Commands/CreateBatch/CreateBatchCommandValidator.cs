@@ -18,6 +18,10 @@ public class CreateBatchCommandValidator : AbstractValidator<CreateBatchCommand>
             .GreaterThan(0).WithMessage("Max capacity must be greater than 0")
             .LessThanOrEqualTo(500).WithMessage("Max capacity is unrealistic");
 
+        RuleFor(x => x.StartDate)
+            .GreaterThanOrEqualTo(_ => DateOnly.FromDateTime(DateTime.UtcNow.Date))
+            .WithMessage("Start date must be today or later.");
+
         RuleFor(x => x.EndDate)
             .GreaterThan(x => x.StartDate)
             .WithMessage("End date must be after start date");
