@@ -45,7 +45,7 @@ export function resolveMessage(err: HttpErrorResponse): string {
   } */
 
   const body = err.error as ApiResponse<{ errors: [] }>;
-  if (body) {
+  if (body.data) {
     return body.data?.errors.join('\n') ?? body.message;
   }
 

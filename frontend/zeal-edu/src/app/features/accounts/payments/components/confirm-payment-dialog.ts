@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   output,
   signal,
   viewChild,
@@ -54,6 +55,7 @@ export class ConfirmPaymentDialog {
   private readonly _fb = inject(FormBuilder);
 
   readonly submitted = output<ConfirmPaymentDialogSubmit>();
+  readonly submitting = input(false);
 
   protected readonly dlg = viewChild.required<HlmDialog>('dlg');
 
@@ -76,6 +78,7 @@ export class ConfirmPaymentDialog {
   protected readonly proofError = signal<string | null>(null);
 
   protected readonly canSubmit = computed<boolean>(() => {
+    if (this.submitting()) return false;
     if (this.form.invalid) return false;
     if (this.selectedMethod() === PaymentMethod.BankTransfer) {
       return this.proofFile() !== null && this.proofError() === null;
@@ -149,6 +152,7 @@ export class ConfirmPaymentDialog {
   }
 
   protected onSubmit(): void {
+    if (this.submitting()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

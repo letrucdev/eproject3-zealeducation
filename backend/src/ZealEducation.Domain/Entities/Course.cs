@@ -12,4 +12,5 @@ public class Course : BaseAuditableEntity
 
     public ICollection<CourseEnquiry> Enquiries { get; set; } = [];
     public ICollection<Batch> Batches { get; set; } = [];
+    public ICollection<StudyMaterial> StudyMaterials { get; set; } = [];
 }

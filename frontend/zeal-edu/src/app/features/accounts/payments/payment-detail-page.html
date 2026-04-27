@@ -329,9 +329,17 @@
   }
 </section>
 
-<app-installment-plan-dialog #installmentDialog (submitted)="onInstallmentPlanSubmitted($event)" />
+<app-installment-plan-dialog
+  #installmentDialog
+  [submitting]="setPaymentTypeMutation.isPending()"
+  (submitted)="onInstallmentPlanSubmitted($event)"
+/>
 
-<app-confirm-payment-dialog #confirmPaymentDialog (submitted)="onConfirmPaymentSubmitted($event)" />
+<app-confirm-payment-dialog
+  #confirmPaymentDialog
+  [submitting]="confirmPaymentMutation.isPending()"
+  (submitted)="onConfirmPaymentSubmitted($event)"
+/>
 
 <app-confirm-dialog #fullPaymentTypeConfirm (confirmed)="onFullPaymentConfirmed()" />
 

@@ -73,6 +73,12 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideUsers',
         roles: [UserRole.Incharge],
       },
+      {
+        label: 'Materials',
+        route: '/app/incharge/materials',
+        icon: 'lucideFolderOpen',
+        roles: [UserRole.Incharge],
+      },
     ],
   },
   {

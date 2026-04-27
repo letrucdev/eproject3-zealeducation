@@ -5,6 +5,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   output,
   signal,
   viewChild,
@@ -49,6 +50,7 @@ export class InstallmentPlanDialog {
   private readonly _fb = inject(FormBuilder);
 
   readonly submitted = output<InstallmentPlanDialogSubmit>();
+  readonly submitting = input(false);
 
   protected readonly dlg = viewChild.required<HlmDialog>('dlg');
 
@@ -109,6 +111,7 @@ export class InstallmentPlanDialog {
   }
 
   protected onSubmit(): void {
+    if (this.submitting()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

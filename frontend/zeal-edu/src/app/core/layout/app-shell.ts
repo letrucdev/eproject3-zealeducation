@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
 import {
   lucideBookOpen,
+  lucideFolderOpen,
   lucideGraduationCap,
   lucidePanelLeft,
   lucideScrollText,
@@ -47,6 +48,7 @@ import { environment } from '@/environments/environment';
       lucideBookOpen,
       lucideWallet,
       lucideUsers,
+      lucideFolderOpen,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

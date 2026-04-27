@@ -76,8 +76,12 @@
 
       <div hlmDialogFooter class="mt-2">
         <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
-        <button hlmBtn type="submit" [disabled]="availableOptions().length === 0 || form.invalid">
-          Confirm Plan
+        <button
+          hlmBtn
+          type="submit"
+          [disabled]="availableOptions().length === 0 || form.invalid || submitting()"
+        >
+          {{ submitting() ? 'Saving...' : 'Confirm Plan' }}
         </button>
       </div>
     </form>
