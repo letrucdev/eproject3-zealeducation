@@ -29,9 +29,23 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@features/counselor/counselor.routes').then((m) => m.COUNSELOR_ROUTES),
       },
+      {
+        path: 'incharge',
+        canMatch: [hasRole(UserRole.Incharge)],
+        data: { breadcrumb: 'InCharge' },
+        loadChildren: () =>
+          import('@features/incharge/incharge.routes').then((m) => m.INCHARGE_ROUTES),
+      },
+      {
+        path: 'accounts',
+        canMatch: [hasRole(UserRole.AccountsStaff)],
+        data: { breadcrumb: 'Accounts' },
+        loadChildren: () =>
+          import('@features/accounts/accounts.routes').then((m) => m.ACCOUNTS_ROUTES),
+      },
       { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },
-  { path: '', pathMatch: 'full', redirectTo: 'app' },
-  { path: '**', redirectTo: 'app' },
+  { path: '', pathMatch: 'full', redirectTo: '/app' },
+  { path: '**', redirectTo: '/app' },
 ];

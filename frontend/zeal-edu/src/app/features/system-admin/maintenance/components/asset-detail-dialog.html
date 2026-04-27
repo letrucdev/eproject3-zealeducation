@@ -1,0 +1,66 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content *hlmDialogPortal class="sm:max-w-3xl w-[90vw]" [showCloseButton]="true">
+    @if (asset(); as a) {
+      <div hlmDialogHeader>
+        <h3 hlmDialogTitle>Asset Details &ndash; {{ a.assetName }}</h3>
+        <p class="text-muted-foreground text-sm">
+          Complete information about the selected asset.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-y-4 gap-x-6 py-4 text-sm">
+        <div>
+          <p class="font-medium text-muted-foreground">Asset Name</p>
+          <p>{{ a.assetName }}</p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Asset Type</p>
+          <p>{{ a.assetType }}</p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Serial Number</p>
+          <p class="font-mono">{{ a.serialNumber }}</p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Location</p>
+          <p>{{ a.location }}</p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Condition</p>
+          <p>
+            <span hlmBadge [variant]="conditionVariant(a.conditionStatus)">
+              {{ a.conditionStatus }}
+            </span>
+          </p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Purchase Date</p>
+          <p>{{ a.purchaseDate | date: 'dd MMM yyyy' }}</p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Last Maintenance</p>
+          <p>
+            @if (a.lastMaintenance) {
+              {{ a.lastMaintenance | date: 'dd MMM yyyy' }}
+            } @else {
+              &mdash;
+            }
+          </p>
+        </div>
+        <div>
+          <p class="font-medium text-muted-foreground">Managed By</p>
+          <p>{{ a.managedByName || '&mdash;' }}</p>
+        </div>
+        
+        <div class="col-span-2">
+          <p class="font-medium text-muted-foreground">Notes</p>
+          <p class="whitespace-pre-wrap">{{ a.notes || 'No additional notes.' }}</p>
+        </div>
+      </div>
+
+      <div hlmDialogFooter class="mt-4">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Close</button>
+      </div>
+    }
+  </hlm-dialog-content>
+</hlm-dialog>

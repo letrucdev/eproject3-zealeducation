@@ -1,0 +1,29 @@
+using FluentValidation;
+
+namespace ZealEducation.Application.Features.Batches.Commands.UpdateBatch;
+
+public class UpdateBatchCommandValidator : AbstractValidator<UpdateBatchCommand>
+{
+    public UpdateBatchCommandValidator()
+    {
+        RuleFor(x => x.BatchId).NotEmpty();
+
+        RuleFor(x => x.BatchCode)
+            .NotEmpty().WithMessage("Batch code is required")
+            .MaximumLength(30);
+
+        RuleFor(x => x.CourseId).NotEmpty().WithMessage("Course is required");
+
+        RuleFor(x => x.Location).MaximumLength(100);
+
+        RuleFor(x => x.MaxCapacity)
+            .GreaterThan(0).WithMessage("Max capacity must be greater than 0")
+            .LessThanOrEqualTo(500).WithMessage("Max capacity is unrealistic");
+
+        RuleFor(x => x.EndDate)
+            .GreaterThan(x => x.StartDate)
+            .WithMessage("End date must be after start date");
+
+        RuleFor(x => x.Status).IsInEnum();
+    }
+}

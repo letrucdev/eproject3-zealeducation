@@ -9,6 +9,7 @@ public class Candidate : BaseAuditableEntity
     public string CandidateCode { get; set; } = default!;
     public string? Address { get; set; }
     public string? EmergencyContact { get; set; }
+    public string? Notes { get; set; }
     public CandidateStatus Status { get; set; } = CandidateStatus.Active;
     public DateTime RegisteredAt { get; set; }
     public Guid? RegisteredByStaffId { get; set; }

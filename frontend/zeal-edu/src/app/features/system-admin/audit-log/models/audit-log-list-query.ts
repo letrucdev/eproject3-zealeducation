@@ -9,4 +9,6 @@ export interface AuditLogListQuery {
   tableName?: string;
   fromDate?: string;
   toDate?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }

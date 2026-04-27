@@ -1,9 +1,12 @@
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
 using ZealEducation.Application;
 using ZealEducation.Infrastructure;
 using ZealEducation.Infrastructure.Data;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +65,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.InitialiseDatabaseAsync();
+//await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<GlobalExceptionHandler>();

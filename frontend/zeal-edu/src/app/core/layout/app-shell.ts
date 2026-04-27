@@ -2,11 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
 import {
+  lucideBookOpen,
   lucideGraduationCap,
   lucidePanelLeft,
   lucideScrollText,
   lucideUserPlus,
+  lucideUsers,
   lucideUserSearch,
+  lucideWallet,
   lucideWrench,
 } from '@ng-icons/lucide';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -41,6 +44,9 @@ import { environment } from '@/environments/environment';
       lucideGraduationCap,
       lucideScrollText,
       lucideUserSearch,
+      lucideBookOpen,
+      lucideWallet,
+      lucideUsers,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,219 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-3xl w-2xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isEdit() ? 'Edit Batch' : 'New Batch' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isEdit()
+            ? 'Update batch schedule, capacity, and status.'
+            : 'Create a new batch, link it to a course, and optionally assign a faculty.'
+        }}
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="batch-code">Batch Code</label>
+            <input
+              hlmInput
+              id="batch-code"
+              type="text"
+              formControlName="batchCode"
+              class="w-full"
+              maxlength="30"
+              placeholder="e.g. WD-2026-01"
+            />
+            <hlm-field-error validator="required">Batch code is required.</hlm-field-error>
+            <hlm-field-error validator="maxlength">Max 30 characters.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="batch-max-capacity">Max Capacity</label>
+            <input
+              hlmInput
+              id="batch-max-capacity"
+              type="number"
+              min="1"
+              max="500"
+              step="1"
+              formControlName="maxCapacity"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Max capacity is required.</hlm-field-error>
+            <hlm-field-error validator="min">Must be at least 1.</hlm-field-error>
+            <hlm-field-error validator="max">Max 500.</hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label hlmFieldLabel>Course</label>
+          <hlm-combobox
+            formControlName="course"
+            [(search)]="courseSearch"
+            [itemToString]="courseItemToString"
+            class="w-full"
+          >
+            <hlm-combobox-input placeholder="Search for a course..." showClear />
+            <hlm-combobox-content *hlmComboboxPortal>
+              @if (courses.isError()) {
+                <hlm-combobox-status>Failed to load courses.</hlm-combobox-status>
+              } @else if (courses.isPending()) {
+                <hlm-combobox-status>
+                  <hlm-spinner />
+                  Loading...
+                </hlm-combobox-status>
+              } @else {
+                @let items = courses.data()?.items ?? [];
+                @if (items.length === 0) {
+                  <hlm-combobox-empty>No courses found.</hlm-combobox-empty>
+                }
+                <div hlmComboboxList>
+                  @for (course of items; track course.courseId) {
+                    <hlm-combobox-item [value]="course">
+                      {{ course.courseName }}
+                    </hlm-combobox-item>
+                  }
+                </div>
+              }
+            </hlm-combobox-content>
+          </hlm-combobox>
+          <hlm-field-error validator="required">Course is required.</hlm-field-error>
+        </hlm-field>
+
+        @if (!isEdit()) {
+          <hlm-field>
+            <label hlmFieldLabel>Faculty (optional)</label>
+            <hlm-combobox
+              formControlName="faculty"
+              [(search)]="facultySearch"
+              [itemToString]="facultyItemToString"
+              class="w-full"
+            >
+              <hlm-combobox-input
+                placeholder="Search faculty by name, code, or specialization..."
+                showClear
+              />
+              <hlm-combobox-content *hlmComboboxPortal>
+                @if (faculties.isError()) {
+                  <hlm-combobox-status>Failed to load faculty.</hlm-combobox-status>
+                } @else if (faculties.isPending()) {
+                  <hlm-combobox-status>
+                    <hlm-spinner />
+                    Loading...
+                  </hlm-combobox-status>
+                } @else {
+                  @let items = faculties.data()?.items ?? [];
+                  @if (items.length === 0) {
+                    <hlm-combobox-empty>No faculty found.</hlm-combobox-empty>
+                  }
+                  <div hlmComboboxList>
+                    @for (faculty of items; track faculty.facultyId) {
+                      <hlm-combobox-item [value]="faculty">
+                        <div class="flex flex-col">
+                          <span>{{ faculty.fullName }} ({{ faculty.facultyCode }})</span>
+                          <span class="text-muted-foreground text-xs">
+                            {{ faculty.specialization }}
+                          </span>
+                        </div>
+                      </hlm-combobox-item>
+                    }
+                  </div>
+                }
+              </hlm-combobox-content>
+            </hlm-combobox>
+            <p class="text-muted-foreground text-xs">
+              Leave empty to create as "Needs Instructor" and assign later.
+            </p>
+          </hlm-field>
+        }
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="batch-start-date">Start Date</label>
+            <input
+              hlmInput
+              id="batch-start-date"
+              type="date"
+              formControlName="startDate"
+              [attr.min]="startDateMin()"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Start date is required.</hlm-field-error>
+            <hlm-field-error validator="startInPast">
+              Start date cannot be in the past.
+            </hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="batch-end-date">End Date</label>
+            <input
+              hlmInput
+              id="batch-end-date"
+              type="date"
+              formControlName="endDate"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">End date is required.</hlm-field-error>
+            <hlm-field-error validator="endBeforeStart">
+              End date must be after start date.
+            </hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label hlmFieldLabel for="batch-location">Location (optional)</label>
+          <input
+            hlmInput
+            id="batch-location"
+            type="text"
+            formControlName="location"
+            class="w-full"
+            maxlength="100"
+            placeholder="e.g. Campus A - Room 101"
+          />
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        @if (isEdit()) {
+          <hlm-field>
+            <label hlmFieldLabel for="batch-status">Status</label>
+            <hlm-select formControlName="status" class="w-full" [itemToString]="statusLabel">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select status" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                <hlm-select-item [value]="statuses.NeedsInstructor" disabled>
+                  Needs Instructor
+                </hlm-select-item>
+                <hlm-select-item [value]="statuses.Active">Active</hlm-select-item>
+                <hlm-select-item [value]="statuses.Completed">Completed</hlm-select-item>
+                <hlm-select-item [value]="statuses.Cancelled">Cancelled</hlm-select-item>
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+        }
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create batch' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<app-confirm-dialog
+  #confirmDialog
+  (confirmed)="onStatusConfirmed()"
+  (cancelled)="onStatusCancelled()"
+/>

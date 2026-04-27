@@ -67,4 +67,6 @@ export interface StaffListQuery {
   search?: string;
   role?: UserRole;
   isActive?: boolean;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }

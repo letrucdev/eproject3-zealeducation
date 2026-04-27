@@ -111,7 +111,7 @@ export class EnquiryDetailDialog {
       `Status: ${this.statusLabel(d.status)}`,
       `Phone: ${d.phone}`,
       `Email: ${d.email ?? '—'}`,
-      `Course: ${d.courseInterested}`,
+      `Course: ${d.courseInterestedName}`,
       `Source: ${this.sourceLabel(d.source)}`,
       `Next Follow-Up: ${d.nextFollowUpDate ? new Date(d.nextFollowUpDate).toLocaleDateString() : '—'}`,
       `Assigned Counselor: ${d.assignedCounselorName}`,

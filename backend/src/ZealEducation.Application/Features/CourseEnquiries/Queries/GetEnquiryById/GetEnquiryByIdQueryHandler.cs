@@ -11,25 +11,29 @@ public class GetEnquiryByIdQueryHandler(
     IRepository<EnquiryNote> noteRepository,
     IRepository<Staff> staffRepository,
     IRepository<UserAccount> userRepository,
-    IRepository<Candidate> candidateRepository) : IRequestHandler<GetEnquiryByIdQuery, CourseEnquiryDetailDto>
+    IRepository<Candidate> candidateRepository,
+    IRepository<Course> courseRepository) : IRequestHandler<GetEnquiryByIdQuery, CourseEnquiryDetailDto>
 {
     public async Task<CourseEnquiryDetailDto> Handle(GetEnquiryByIdQuery request, CancellationToken cancellationToken)
     {
         var enquiries = enquiryRepository.Query();
         var staffs = staffRepository.Query();
         var users = userRepository.Query();
+        var courses = courseRepository.Query();
 
         var detail = await (from e in enquiries
                             where e.Id == request.EnquiryId
                             join s in staffs on e.AssignedCounselorId equals s.Id
                             join u in users on s.UserAccountId equals u.Id
+                            join c in courses on e.CourseInterestedId equals c.Id
                             select new CourseEnquiryDetailDto
                             {
                                 EnquiryId = e.Id,
                                 FullName = e.FullName,
                                 Phone = e.Phone,
                                 Email = e.Email,
-                                CourseInterested = e.CourseInterested,
+                                CourseInterestedId = e.CourseInterestedId,
+                                CourseInterestedName = c.CourseName,
                                 Source = e.Source,
                                 Status = e.Status,
                                 NextFollowUpDate = e.NextFollowUpDate,

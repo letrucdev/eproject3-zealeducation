@@ -63,8 +63,20 @@ public class GetAuditLogsQueryHandler(
             query = query.Where(x => x.Log.ChangedAt <= to);
         }
 
-        var projected = query
-            .OrderByDescending(x => x.Log.ChangedAt)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("action", "desc") => query.OrderByDescending(x => x.Log.Action),
+            ("action", _) => query.OrderBy(x => x.Log.Action),
+            ("user", "desc") => query.OrderByDescending(x => x.User.FullName),
+            ("user", _) => query.OrderBy(x => x.User.FullName),
+            ("changedat", "asc") => query.OrderBy(x => x.Log.ChangedAt),
+            _ => query.OrderByDescending(x => x.Log.ChangedAt),
+        };
+
+        var projected = ordered
             .Select(x => new AuditLogListItemDto
             {
                 Id = x.Log.Id,

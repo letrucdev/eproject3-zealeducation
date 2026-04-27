@@ -9,4 +9,6 @@ public record GetStaffsQuery(
     int PageSize = 10,
     string? Search = null,
     UserRole? Role = null,
-    bool? IsActive = null) : IRequest<PaginatedList<StaffListItemDto>>;
+    bool? IsActive = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<StaffListItemDto>>;

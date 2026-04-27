@@ -22,9 +22,8 @@ public class UpdateEnquiryCommandValidator : AbstractValidator<UpdateEnquiryComm
             .EmailAddress().When(x => !string.IsNullOrWhiteSpace(x.Email))
             .MaximumLength(100);
 
-        RuleFor(x => x.CourseInterested)
-            .NotEmpty().WithMessage("Course is required")
-            .MaximumLength(150);
+        RuleFor(x => x.CourseInterestedId)
+            .NotEmpty().WithMessage("Course is required");
 
         RuleFor(x => x.Source).IsInEnum();
 

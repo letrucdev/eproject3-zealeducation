@@ -1,0 +1,92 @@
+<section hlmCard>
+  <div hlmCardHeader class="flex flex-row flex-wrap items-start justify-between gap-3">
+    <div class="flex flex-col gap-1">
+      <h3 hlmCardTitle>Enrolled Candidates</h3>
+      <p hlmCardDescription>
+        @if (page(); as p) {
+          {{ p.totalCount }} candidate(s) currently enrolled in this batch.
+        } @else {
+          Candidates enrolled in this batch.
+        }
+      </p>
+    </div>
+    <button
+      hlmBtn
+      size="sm"
+      type="button"
+      (click)="addClicked.emit()"
+      [disabled]="!canAddCandidate()"
+    >
+      <ng-icon hlm name="lucideUserPlus" size="sm" />
+      Add Candidate
+    </button>
+  </div>
+  <div hlmCardContent>
+    <app-data-table
+      [columns]="columns"
+      [page]="page()"
+      [isLoading]="isLoading()"
+      [pageSize]="pageSize()"
+      [sortBy]="sortBy()"
+      [sortDirection]="sortDirection()"
+      [trackBy]="trackById"
+      itemLabel="candidates"
+      emptyMessage="No candidates have been enrolled in this batch yet."
+      (pageChanged)="pageChanged.emit($event)"
+      (pageSizeChanged)="pageSizeChanged.emit($event)"
+      (sortChanged)="sortChanged.emit($event)"
+    >
+      <ng-template enrollmentCell="candidateCode" let-row>
+        <span class="font-mono">{{ row.candidateCode }}</span>
+      </ng-template>
+
+      <ng-template enrollmentCell="fullName" let-row>
+        <span class="font-medium">{{ row.fullName }}</span>
+      </ng-template>
+
+      <ng-template enrollmentCell="contact" let-row>
+        <div class="flex flex-col text-xs">
+          <span>{{ row.email }}</span>
+          <span class="text-muted-foreground">{{ row.phone }}</span>
+        </div>
+      </ng-template>
+
+      <ng-template enrollmentCell="enrollmentDate" let-row>
+        {{ row.enrollmentDate | date: 'dd MMM yyyy' }}
+      </ng-template>
+
+      <ng-template enrollmentCell="status" let-row>
+        @switch (row.status) {
+          @case (enrollmentStatuses.Enrolled) {
+            <span hlmBadge class="bg-emerald-100 text-emerald-800">Enrolled</span>
+          }
+          @case (enrollmentStatuses.Completed) {
+            <span hlmBadge class="bg-sky-100 text-sky-800">Completed</span>
+          }
+          @case (enrollmentStatuses.Withdrawn) {
+            <span hlmBadge class="bg-rose-100 text-rose-800">Withdrawn</span>
+          }
+          @case (enrollmentStatuses.OnBreak) {
+            <span hlmBadge class="bg-slate-100 text-slate-800">On Break</span>
+          }
+          @default {
+            <span hlmBadge class="bg-amber-100 text-amber-800">{{ row.status }}</span>
+          }
+        }
+      </ng-template>
+
+      <ng-template enrollmentCell="actions" let-row>
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          type="button"
+          (click)="viewClicked.emit(row)"
+          [attr.aria-label]="'View ' + row.candidateCode"
+        >
+          <ng-icon hlm name="lucideEye" size="sm" />
+        </button>
+      </ng-template>
+    </app-data-table>
+  </div>
+</section>

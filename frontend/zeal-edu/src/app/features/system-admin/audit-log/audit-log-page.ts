@@ -19,6 +19,7 @@ import {
 } from './components/audit-log-filter-bar';
 import { AuditLogTable } from './components/audit-log-table';
 import { AuditLogListQuery } from './models/audit-log-list-query';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-audit-log-page',
@@ -43,9 +44,12 @@ import { AuditLogListQuery } from './models/audit-log-list-query';
         [page]="listQuery.data()"
         [isLoading]="listQuery.isPending()"
         [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
         (viewClicked)="onViewClicked($event)"
         (pageChanged)="onPageChanged($event)"
         (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
       />
 
       <app-audit-log-detail-dialog
@@ -68,6 +72,8 @@ export default class AuditLogPage {
   protected readonly tableNameFilter = signal('');
   protected readonly fromDate = signal('');
   protected readonly toDate = signal('');
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
   protected readonly selectedId = signal<string | null>(null);
 
   protected readonly initialFilter: AuditLogFilterValue = {
@@ -86,6 +92,8 @@ export default class AuditLogPage {
     tableName: this.tableNameFilter() || undefined,
     fromDate: this.fromDate() ? new Date(this.fromDate()).toISOString() : undefined,
     toDate: this.toDate() ? this._endOfDay(this.toDate()) : undefined,
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -118,6 +126,12 @@ export default class AuditLogPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 

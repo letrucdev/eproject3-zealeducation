@@ -65,6 +65,13 @@ Rules:
 - Use the async pipe to handle observables
 - Do not assume globals like (`new Date()`) are available.
 
+## Shared Pipes
+
+- For VND currency formatting, use the `vnd` pipe from `@shared/pipes/vnd-pipe` — do NOT repeat `currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'`.
+  - Template: `{{ value | vnd }}`
+  - Component: `import { VndPipe } from '@shared/pipes/vnd-pipe';` and add `VndPipe` to `imports`.
+  - To change the default VND format (digits, symbol, locale), edit `src/app/shared/pipes/vnd-pipe.ts` only.
+
 ## Services
 
 - Design services around a single responsibility

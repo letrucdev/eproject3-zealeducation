@@ -2,18 +2,35 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZealEducation.API.Common.Models;
+using ZealEducation.Application.Common.Models;
 using ZealEducation.Application.Features.Faculties.Commands.CreateFaculty;
 using ZealEducation.Application.Features.Faculties.Commands.UpdateFaculty;
+using ZealEducation.Application.Features.Faculties.Queries.GetFaculties;
 using ZealEducation.Domain.Enums;
 
 namespace ZealEducation.API.Controllers;
 
 [ApiController]
 [Route("api/faculty")]
-[Authorize(Roles = nameof(UserRole.SystemAdmin))]
+[Authorize]
 public class FacultyController(ISender sender) : ControllerBase
 {
+    private const string ReadRoles = $"{nameof(UserRole.SystemAdmin)},{nameof(UserRole.Incharge)}";
+    private const string WriteRoles = nameof(UserRole.SystemAdmin);
+
+    [HttpGet]
+    [Authorize(Roles = ReadRoles)]
+    public async Task<ActionResult<ApiResponse<PaginatedList<FacultyListItemDto>>>> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
+    {
+        var result = await sender.Send(new GetFacultiesQuery(page, pageSize, search));
+        return Ok(ApiResponse<PaginatedList<FacultyListItemDto>>.Success(result));
+    }
+
     [HttpPost]
+    [Authorize(Roles = WriteRoles)]
     public async Task<ActionResult<ApiResponse<CreateFacultyResponse>>> Create([FromBody] CreateFacultyCommand command)
     {
         var result = await sender.Send(command);
@@ -24,6 +41,7 @@ public class FacultyController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = WriteRoles)]
     public async Task<ActionResult<ApiResponse<object>>> Update(Guid id, [FromBody] UpdateFacultyRequest body)
     {
         var command = new UpdateFacultyCommand(
