@@ -1,0 +1,129 @@
+<section hlmCard>
+  <div hlmCardHeader class="flex flex-col gap-4">
+    <div class="flex flex-row flex-wrap items-start justify-between gap-3 w-full">
+      <div class="flex flex-col gap-1 mr-auto">
+        <h3 hlmCardTitle>Exams</h3>
+        <p hlmCardDescription>
+          @if (page(); as p) {
+            {{ p.totalCount }} exam(s) scheduled for this batch.
+          } @else {
+            Exams scheduled for this batch.
+          }
+        </p>
+      </div>
+      <div class="flex flex-row gap-2">
+        <button
+          hlmBtn
+          size="sm"
+          type="button"
+          (click)="addClicked.emit()"
+          [disabled]="!canMutate()"
+        >
+          <ng-icon hlm name="lucideCirclePlus" size="sm" />
+          Add Exam
+        </button>
+      </div>
+    </div>
+    <div class="relative w-full sm:max-w-xs">
+      <ng-icon
+        hlm
+        name="lucideSearch"
+        size="sm"
+        class="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
+      />
+      <input
+        hlmInput
+        type="search"
+        [formControl]="searchControl"
+        placeholder="Search by name or location"
+        aria-label="Search exams"
+        class="w-full pl-9"
+      />
+    </div>
+  </div>
+  <div hlmCardContent>
+    <app-data-table
+      [columns]="columns"
+      [page]="page()"
+      [isLoading]="isLoading()"
+      [pageSize]="pageSize()"
+      [sortBy]="sortBy()"
+      [sortDirection]="sortDirection()"
+      [trackBy]="trackById"
+      itemLabel="exams"
+      emptyMessage="No exams have been scheduled yet."
+      (pageChanged)="pageChanged.emit($event)"
+      (pageSizeChanged)="pageSizeChanged.emit($event)"
+      (sortChanged)="sortChanged.emit($event)"
+    >
+      <ng-template examinationCell="examName" let-row>
+        <span class="font-medium">{{ row.examName }}</span>
+      </ng-template>
+
+      <ng-template examinationCell="examDate" let-row>
+        {{ row.examDate | date: 'EEE, dd MMM yyyy' }}
+      </ng-template>
+
+      <ng-template examinationCell="location" let-row>
+        {{ row.location || '-' }}
+      </ng-template>
+
+      <ng-template examinationCell="maxScore" let-row>
+        {{ row.maxScore }}
+      </ng-template>
+
+      <ng-template examinationCell="passScore" let-row>
+        {{ row.passScore }}
+      </ng-template>
+
+      <ng-template examinationCell="scheduledByName" let-row>
+        {{ row.scheduledByName }}
+      </ng-template>
+
+      <ng-template examinationCell="actions" let-row>
+        <div class="flex items-center justify-end gap-1">
+          <button
+            hlmBtn
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="viewResultsClicked.emit(row)"
+            [attr.aria-label]="'View results for ' + row.examName"
+          >
+            <ng-icon hlm name="lucideListChecks" size="sm" />
+          </button>
+          <button
+            hlmBtn
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="editClicked.emit(row)"
+            [disabled]="!canMutate() || row.hasResults"
+            [attr.aria-label]="
+              row.hasResults
+                ? 'Cannot edit: exam already has results'
+                : 'Edit ' + row.examName
+            "
+          >
+            <ng-icon hlm name="lucidePencil" size="sm" />
+          </button>
+          <button
+            hlmBtn
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="deleteClicked.emit(row)"
+            [disabled]="!canMutate() || row.hasResults"
+            [attr.aria-label]="
+              row.hasResults
+                ? 'Cannot delete: exam already has results'
+                : 'Delete ' + row.examName
+            "
+          >
+            <ng-icon hlm name="lucideTrash2" size="sm" />
+          </button>
+        </div>
+      </ng-template>
+    </app-data-table>
+  </div>
+</section>

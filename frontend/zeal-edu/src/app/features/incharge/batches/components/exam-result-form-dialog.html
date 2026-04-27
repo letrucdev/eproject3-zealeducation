@@ -1,0 +1,105 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-lg w-lg flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isReOverride() ? 'Update Override' : 'Override Exam Result' }}
+      </h2>
+      @if (examination(); as exam) {
+        <p class="text-muted-foreground text-sm">
+          {{ exam.examName }} — Max {{ exam.maxScore }}, Pass {{ exam.passScore }}.
+        </p>
+      }
+    </div>
+
+    <div
+      class="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+      role="status"
+    >
+      @if (isReOverride()) {
+        Updating the override will replace the score, grade, and reason. The original grader is
+        still recorded.
+      } @else {
+        This will mark the result as overridden by Incharge. The original grader is still recorded.
+      }
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        @if (editingResult(); as r) {
+          <div class="bg-muted/50 rounded-md border p-3 text-sm">
+            <div class="text-muted-foreground">Candidate</div>
+            <div class="font-medium">{{ r.candidateCode }} — {{ r.candidateFullName }}</div>
+          </div>
+        }
+
+        <hlm-field>
+          <label hlmFieldLabel for="exam-result-score">Score</label>
+          <input
+            hlmInput
+            id="exam-result-score"
+            type="number"
+            formControlName="score"
+            class="w-full"
+            min="0"
+            [attr.max]="examination()?.maxScore ?? null"
+            step="0.01"
+          />
+          <hlm-field-error validator="required">Score is required.</hlm-field-error>
+          <hlm-field-error validator="min">Score cannot be negative.</hlm-field-error>
+          <hlm-field-error validator="scoreExceedsMax">
+            Score cannot exceed the exam max score.
+          </hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="exam-result-grade">Grade (optional)</label>
+          <input
+            hlmInput
+            id="exam-result-grade"
+            type="text"
+            formControlName="grade"
+            class="w-full"
+            maxlength="5"
+            placeholder="e.g. A, B+, P"
+          />
+          <hlm-field-error validator="maxlength">Max 5 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="exam-result-reason">Override reason</label>
+          <textarea
+            hlmInput
+            id="exam-result-reason"
+            formControlName="overrideReason"
+            class="w-full"
+            rows="3"
+            maxlength="500"
+            placeholder="Explain why this result is being overridden"
+          ></textarea>
+          <hlm-field-error validator="required">Override reason is required.</hlm-field-error>
+          <hlm-field-error validator="minlength">
+            Override reason must be at least 5 characters.
+          </hlm-field-error>
+          <hlm-field-error validator="maxlength">Max 500 characters.</hlm-field-error>
+        </hlm-field>
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            Saving...
+          } @else if (isReOverride()) {
+            Save changes
+          } @else {
+            Override result
+          }
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

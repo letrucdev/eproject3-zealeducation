@@ -1,0 +1,98 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-5xl w-5xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      @if (examination(); as exam) {
+        <h2 hlmDialogTitle>Results for: {{ exam.examName }}</h2>
+      } @else {
+        <h2 hlmDialogTitle>Exam Results</h2>
+      }
+      <p class="text-muted-foreground text-sm">{{ description() }}</p>
+    </div>
+
+    <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+      <app-data-table
+        [columns]="columns"
+        [page]="page()"
+        [isLoading]="isLoading()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        [trackBy]="trackById"
+        itemLabel="results"
+        emptyMessage="No results recorded for this exam yet."
+        (pageChanged)="pageChanged.emit($event)"
+        (pageSizeChanged)="pageSizeChanged.emit($event)"
+        (sortChanged)="sortChanged.emit($event)"
+      >
+        <ng-template examResultCell="candidateCode" let-row>
+          <span class="font-mono">{{ row.candidateCode }}</span>
+        </ng-template>
+
+        <ng-template examResultCell="candidateFullName" let-row>
+          <span class="font-medium">{{ row.candidateFullName }}</span>
+        </ng-template>
+
+        <ng-template examResultCell="score" let-row>
+          {{ row.score }}
+        </ng-template>
+
+        <ng-template examResultCell="grade" let-row>
+          {{ row.grade || '-' }}
+        </ng-template>
+
+        <ng-template examResultCell="status" let-row>
+          @if (row.isPassed) {
+            <span hlmBadge class="bg-emerald-100 text-emerald-800">Pass</span>
+          } @else {
+            <span hlmBadge class="bg-rose-100 text-rose-800">Fail</span>
+          }
+          @if (row.isOverridden) {
+            <span
+              hlmBadge
+              class="ml-1 cursor-help bg-amber-100 text-amber-800"
+              [attr.title]="row.overrideReason || 'No reason recorded'"
+            >
+              Overridden
+            </span>
+          }
+        </ng-template>
+
+        <ng-template examResultCell="gradedByName" let-row>
+          <div class="flex flex-col text-xs">
+            <span>{{ row.gradedByName }}</span>
+            @if (row.isOverridden && row.overrideByName) {
+              <span class="text-muted-foreground">overridden by {{ row.overrideByName }}</span>
+            }
+          </div>
+        </ng-template>
+
+        <ng-template examResultCell="gradedAt" let-row>
+          {{ row.gradedAt | date: 'dd MMM yyyy, HH:mm' }}
+        </ng-template>
+
+        <ng-template examResultCell="actions" let-row>
+          <div class="flex items-center justify-end gap-1">
+            <button
+              hlmBtn
+              variant="ghost"
+              size="sm"
+              type="button"
+              (click)="overrideClicked.emit(row)"
+              [attr.aria-label]="
+                (row.isOverridden ? 'Update override for ' : 'Override result for ') +
+                row.candidateCode
+              "
+              [attr.title]="row.isOverridden ? 'Update override' : 'Override result'"
+            >
+              <ng-icon hlm name="lucideShieldCheck" size="sm" />
+            </button>
+          </div>
+        </ng-template>
+      </app-data-table>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

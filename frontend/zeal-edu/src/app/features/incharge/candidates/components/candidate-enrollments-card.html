@@ -24,8 +24,13 @@
               </div>
             </td>
             <td class="px-3 py-2">
-              @if (e.batchCode) {
-                <span class="font-mono">{{ e.batchCode }}</span>
+              @if (e.batchCode && e.batchId) {
+                <a
+                  [routerLink]="['/app/incharge/batches', e.batchId]"
+                  class="font-mono text-primary underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
+                >
+                  {{ e.batchCode }}
+                </a>
               } @else {
                 <span class="text-muted-foreground italic">Not assigned</span>
               }

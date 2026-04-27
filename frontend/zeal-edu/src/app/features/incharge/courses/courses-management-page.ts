@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { CourseListItem } from '@core/models/course-list-item';
 import { CourseListQuery, CoursesService } from '@core/services/courses.service';
 import {
@@ -25,7 +26,7 @@ import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-courses-management-page',
-  imports: [CourseStatsCards, CourseFilterBar, CourseTable, CourseFormDialog],
+  imports: [HlmCardImports, CourseStatsCards, CourseFilterBar, CourseTable, CourseFormDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'courses-management-page.html',
 })

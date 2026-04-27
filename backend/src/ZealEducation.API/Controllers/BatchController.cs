@@ -16,6 +16,8 @@ using ZealEducation.Application.Features.Batches.Queries.GetBatchStatistics;
 using ZealEducation.Application.Features.ClassSessions.Commands.CreateBulkSessions;
 using ZealEducation.Application.Features.ClassSessions.Commands.CreateClassSession;
 using ZealEducation.Application.Features.ClassSessions.Queries.GetBatchSessions;
+using ZealEducation.Application.Features.Examinations.Commands.CreateExamination;
+using ZealEducation.Application.Features.Examinations.Queries.GetBatchExaminations;
 using ZealEducation.Domain.Enums;
 
 namespace ZealEducation.API.Controllers;
@@ -208,4 +210,40 @@ public class BatchController(ISender sender) : ControllerBase
         TimeOnly EndTime,
         string? Topic,
         string? Location);
+
+    [HttpGet("{id:guid}/examinations")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<PaginatedList<ExaminationDto>>>> GetExaminations(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
+    {
+        var result = await sender.Send(new GetBatchExaminationsQuery(id, page, pageSize, search, sortBy, sortDirection));
+        return Ok(ApiResponse<PaginatedList<ExaminationDto>>.Success(result));
+    }
+
+    [HttpPost("{id:guid}/examinations")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<Guid>>> CreateExamination(Guid id, [FromBody] CreateExaminationRequest body)
+    {
+        var examinationId = await sender.Send(new CreateExaminationCommand(
+            id,
+            body.ExamName,
+            body.ExamDate,
+            body.Location,
+            body.MaxScore,
+            body.PassScore));
+
+        return Ok(ApiResponse<Guid>.Success(examinationId, "Examination created successfully"));
+    }
+
+    public record CreateExaminationRequest(
+        string ExamName,
+        DateOnly ExamDate,
+        string? Location,
+        int MaxScore,
+        int PassScore);
 }

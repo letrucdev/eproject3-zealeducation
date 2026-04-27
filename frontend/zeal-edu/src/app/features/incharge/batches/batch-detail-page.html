@@ -25,15 +25,35 @@
       (deleteClicked)="onDeleteBatch()"
     />
 
+    <app-batch-examinations-card
+      [page]="examinationsQuery.data()"
+      [isLoading]="examinationsQuery.isPending()"
+      [pageSize]="examinationsPageSize()"
+      [search]="examinationsSearch()"
+      [sortBy]="examinationsSortBy()"
+      [sortDirection]="examinationsSortDirection()"
+      [canMutate]="canMutate()"
+      (addClicked)="onAddExamination()"
+      (viewResultsClicked)="onViewResults($event)"
+      (editClicked)="onEditExamination($event)"
+      (deleteClicked)="onDeleteExamination($event)"
+      (searchChanged)="onExaminationsSearchChanged($event)"
+      (pageChanged)="onExaminationsPageChanged($event)"
+      (pageSizeChanged)="onExaminationsPageSizeChanged($event)"
+      (sortChanged)="onExaminationsSortChanged($event)"
+    />
+
     <app-batch-enrollments-card
       [page]="enrollmentsQuery.data()"
       [isLoading]="enrollmentsQuery.isPending()"
       [pageSize]="enrollmentsPageSize()"
+      [search]="enrollmentsSearch()"
       [sortBy]="enrollmentsSortBy()"
       [sortDirection]="enrollmentsSortDirection()"
       [canAddCandidate]="canAddCandidate()"
       (addClicked)="onAddCandidate()"
       (viewClicked)="onViewCandidate($event)"
+      (searchChanged)="onEnrollmentsSearchChanged($event)"
       (pageChanged)="onEnrollmentsPageChanged($event)"
       (pageSizeChanged)="onEnrollmentsPageSizeChanged($event)"
       (sortChanged)="onEnrollmentsSortChanged($event)"
@@ -86,6 +106,32 @@
   #bulkSessionDialog
   [submitting]="createBulkSessionsMutation.isPending()"
   (submitted)="onBulkSubmitted($event)"
+/>
+
+<app-examination-form-dialog
+  #examinationDialog
+  [submitting]="isSubmittingExamination()"
+  (submitted)="onExaminationSubmitted($event)"
+/>
+
+<app-exam-results-dialog
+  #examResultsDialog
+  [examination]="activeExamination()"
+  [page]="examResultsQuery.data()"
+  [isLoading]="examResultsQuery.isPending()"
+  [pageSize]="examResultsPageSize()"
+  [sortBy]="examResultsSortBy()"
+  [sortDirection]="examResultsSortDirection()"
+  (overrideClicked)="onOverrideExamResult($event)"
+  (pageChanged)="onExamResultsPageChanged($event)"
+  (pageSizeChanged)="onExamResultsPageSizeChanged($event)"
+  (sortChanged)="onExamResultsSortChanged($event)"
+/>
+
+<app-exam-result-form-dialog
+  #examResultFormDialog
+  [submitting]="isSubmittingExamResult()"
+  (submitted)="onExamResultSubmitted($event)"
 />
 
 <app-confirm-dialog

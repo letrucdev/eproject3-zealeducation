@@ -20,4 +20,5 @@ public class Enrollment : BaseAuditableEntity
     public Staff? Incharge { get; set; }
     public FeeStructure? Fee { get; set; }
     public ICollection<AttendanceRecord> AttendanceRecords { get; set; } = [];
+    public ICollection<ExamResult> ExamResults { get; set; } = [];
 }

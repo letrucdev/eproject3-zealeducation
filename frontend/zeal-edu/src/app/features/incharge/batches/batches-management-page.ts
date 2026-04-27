@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { BatchListItem } from '@core/models/batch-list-item';
 import { BatchStatus } from '@core/models/batch-status';
 import { BatchesService } from './batches.service';
@@ -28,6 +29,7 @@ import { DataTableSortChange } from '@shared/components/data-table';
 @Component({
   selector: 'app-batches-management-page',
   imports: [
+    HlmCardImports,
     BatchStatsCards,
     BatchFilterBar,
     BatchTable,
