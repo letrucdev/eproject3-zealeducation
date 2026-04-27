@@ -50,6 +50,14 @@ export interface BatchSessionsQuery {
   sortDirection?: 'asc' | 'desc';
 }
 
+export interface BatchExaminationsQuery {
+  page: number;
+  pageSize: number;
+  search?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
 export interface AssignableCandidatesQuery {
   page: number;
   pageSize: number;

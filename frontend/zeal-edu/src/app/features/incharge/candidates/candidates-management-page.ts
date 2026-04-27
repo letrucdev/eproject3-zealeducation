@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { CandidatesService } from './candidates.service';
 import { ApplyFineDialog, ApplyFineSubmit } from './components/apply-fine-dialog';
 import { CandidateFilterBar, CandidateFilterValue } from './components/candidate-filter-bar';
@@ -21,7 +22,13 @@ import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-candidates-management-page',
-  imports: [CandidateFilterBar, CandidateTable, CandidateUpdateDialog, ApplyFineDialog],
+  imports: [
+    HlmCardImports,
+    CandidateFilterBar,
+    CandidateTable,
+    CandidateUpdateDialog,
+    ApplyFineDialog,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'candidates-management-page.html',
 })

@@ -8,24 +8,29 @@
     </div>
   </header>
 
-  <app-candidate-filter-bar
-    [initial]="initialFilter"
-    (filterChanged)="onFilterChanged($event)"
-  />
-
-  <app-candidate-table
-    [page]="listQuery.data()"
-    [isLoading]="listQuery.isPending()"
-    [pageSize]="pageSize()"
-    [sortBy]="sortBy()"
-    [sortDirection]="sortDirection()"
-    (viewClicked)="onViewClicked($event)"
-    (editClicked)="onEditClicked($event)"
-    (fineClicked)="onFineClicked($event)"
-    (pageChanged)="onPageChanged($event)"
-    (pageSizeChanged)="onPageSizeChanged($event)"
-    (sortChanged)="onSortChanged($event)"
-  />
+  <section hlmCard>
+    <div hlmCardHeader>
+      <app-candidate-filter-bar
+        [initial]="initialFilter"
+        (filterChanged)="onFilterChanged($event)"
+      />
+    </div>
+    <div hlmCardContent>
+      <app-candidate-table
+        [page]="listQuery.data()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        (viewClicked)="onViewClicked($event)"
+        (editClicked)="onEditClicked($event)"
+        (fineClicked)="onFineClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      />
+    </div>
+  </section>
 
   <app-candidate-update-dialog
     #updateDialog
