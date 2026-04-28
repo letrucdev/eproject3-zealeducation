@@ -21,6 +21,7 @@ import AssetTable from './components/asset-table';
 import AssetFormDialog, { AssetFormSubmit } from './components/asset-form-dialog';
 import AssetConditionDialog, { AssetConditionSubmit } from './components/asset-condition-dialog';
 import AssetDetailDialog from './components/asset-detail-dialog';
+import AssetDeleteDialog from './components/asset-delete-dialog';
 
 @Component({
   selector: 'app-maintenance-page',
@@ -31,6 +32,7 @@ import AssetDetailDialog from './components/asset-detail-dialog';
     AssetFormDialog,
     AssetConditionDialog,
     AssetDetailDialog,
+    AssetDeleteDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'maintenance-page.html',
@@ -41,6 +43,7 @@ export default class MaintenancePage {
   protected readonly formDialog = viewChild.required<AssetFormDialog>('formDialog');
   protected readonly conditionDialog = viewChild.required<AssetConditionDialog>('conditionDialog');
   protected readonly detailDialog = viewChild.required<AssetDetailDialog>('detailDialog');
+  protected readonly deleteDialog = viewChild.required<AssetDeleteDialog>('deleteDialog');
 
   // ── Filter state ────────────────────────────────────────────────────────────
   protected readonly search = signal('');
@@ -198,6 +201,10 @@ export default class MaintenancePage {
   }
 
   onDeleteClicked(item: SystemAssetListItem): void {
+    this.deleteDialog().open(item);
+  }
+
+  onDeleteConfirmed(item: SystemAssetListItem): void {
     // Hard delete: permanently removes the asset via DELETE endpoint
     this.deleteMutation.mutate(item.id, {
       onSuccess: () => toast.success(`"${item.assetName}" has been deleted.`),
@@ -205,20 +212,17 @@ export default class MaintenancePage {
   }
 
   onFormSubmitted(event: AssetFormSubmit): void {
-    const sn = event.payload.serialNumber.trim().toLowerCase();
-    const isDuplicate = this.listQuery
-      .data()
-      ?.some(
-        (a) =>
-          a.serialNumber.toLowerCase() === sn && (event.mode === 'create' || a.id !== event.id),
-      );
-
-    if (isDuplicate) {
-      toast.error(`Serial Number "${event.payload.serialNumber}" already exists.`);
-      return;
-    }
-
     if (event.mode === 'create') {
+      const sn = event.payload.serialNumber.trim().toLowerCase();
+      const isDuplicate = this.listQuery
+        .data()
+        ?.some((a) => a.serialNumber.toLowerCase() === sn);
+
+      if (isDuplicate) {
+        toast.error(`Serial Number "${event.payload.serialNumber}" already exists.`);
+        return;
+      }
+
       this.createMutation.mutate(event.payload, {
         onSuccess: () => {
           toast.success('Asset created successfully.');

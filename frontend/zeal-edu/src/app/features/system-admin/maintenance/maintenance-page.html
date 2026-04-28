@@ -48,4 +48,9 @@
   />
 
   <app-asset-detail-dialog #detailDialog />
+
+  <app-asset-delete-dialog
+    #deleteDialog
+    (confirmed)="onDeleteConfirmed($event)"
+  />
 </section>

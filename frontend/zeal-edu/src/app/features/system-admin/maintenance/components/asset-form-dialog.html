@@ -25,7 +25,7 @@
 
         <hlm-field>
           <label hlmFieldLabel>Serial Number</label>
-          <input hlmInput formControlName="serialNumber" type="text" placeholder="e.g. SN-12345" class="w-full" />
+          <input hlmInput formControlName="serialNumber" type="text" placeholder="e.g. SN-12345" class="w-full" [readOnly]="mode() === 'edit'" [class.opacity-50]="mode() === 'edit'" />
           <hlm-field-error validator="required">Serial Number is required.</hlm-field-error>
         </hlm-field>
 
@@ -37,7 +37,7 @@
 
         <hlm-field>
           <label hlmFieldLabel>Purchase Date</label>
-          <input hlmInput formControlName="purchaseDate" type="date" class="w-full" />
+          <input hlmInput formControlName="purchaseDate" type="date" class="w-full" [readOnly]="mode() === 'edit'" [class.opacity-50]="mode() === 'edit'" />
           <hlm-field-error validator="required">Purchase Date is required.</hlm-field-error>
         </hlm-field>
       </div>

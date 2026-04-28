@@ -61,9 +61,7 @@ public class SystemAssetsController : ControllerBase
             id,
             body.AssetName,
             body.AssetType,
-            body.SerialNumber,
             body.Location,
-            body.PurchaseDate,
             body.Notes);
 
         await _sender.Send(command);
@@ -87,9 +85,7 @@ public class SystemAssetsController : ControllerBase
     public record UpdateSystemAssetRequest(
         string AssetName,
         string AssetType,
-        string SerialNumber,
         string Location,
-        DateTime PurchaseDate,
         string? Notes);
 
     public record UpdateConditionRequest(ConditionStatus ConditionStatus);
