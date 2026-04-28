@@ -73,6 +73,36 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideUsers',
         roles: [UserRole.Incharge],
       },
+      {
+        label: 'Materials',
+        route: '/app/incharge/materials',
+        icon: 'lucideFolderOpen',
+        roles: [UserRole.Incharge],
+      },
+    ],
+  },
+  {
+    title: 'Faculty',
+    roles: [UserRole.Faculty],
+    items: [
+      {
+        label: 'Schedule',
+        route: '/app/faculty/schedule',
+        icon: 'lucideCalendarDays',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'My Batches',
+        route: '/app/faculty/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'Examinations',
+        route: '/app/faculty/examinations',
+        icon: 'lucideClipboardCheck',
+        roles: [UserRole.Faculty],
+      },
     ],
   },
   {

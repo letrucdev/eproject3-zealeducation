@@ -23,5 +23,6 @@ public class AttendanceRowDto
     public string CandidateCode { get; set; } = default!;
     public string FullName { get; set; } = default!;
     public AttendanceStatus? Status { get; set; }
+    public decimal? PracticalHours { get; set; }
     public string? Remarks { get; set; }
 }

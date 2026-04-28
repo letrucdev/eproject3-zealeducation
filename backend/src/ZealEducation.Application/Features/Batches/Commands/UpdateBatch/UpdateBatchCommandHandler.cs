@@ -47,6 +47,25 @@ public class UpdateBatchCommandHandler(
         if (request.Status == BatchStatus.Active && batch.FacultyId == null && request.Status != batch.Status)
             throw new ConflictException("Cannot activate a batch without an assigned faculty.");
 
+        if (batch.FacultyId.HasValue
+            && (request.StartDate != batch.StartDate || request.EndDate != batch.EndDate)
+            && request.Status != BatchStatus.Completed
+            && request.Status != BatchStatus.Cancelled)
+        {
+            var facultyId = batch.FacultyId.Value;
+            var conflicts = await batchRepository.FindAsync(
+                b => b.Id != batch.Id
+                    && b.FacultyId == facultyId
+                    && b.Status != BatchStatus.Completed
+                    && b.Status != BatchStatus.Cancelled
+                    && b.StartDate <= request.EndDate
+                    && request.StartDate <= b.EndDate,
+                cancellationToken);
+
+            if (conflicts.Count > 0)
+                throw new ConflictException("Faculty already has another batch scheduled within this date range.");
+        }
+
         batch.BatchCode = batchCode;
         batch.CourseId = request.CourseId;
         batch.StartDate = request.StartDate;

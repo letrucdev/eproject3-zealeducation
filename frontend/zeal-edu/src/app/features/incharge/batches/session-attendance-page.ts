@@ -28,6 +28,7 @@ import { ATTENDANCE_STATUS_LABELS } from './components/session-labels';
 
 interface AttendanceFormRow {
   status: AttendanceStatus;
+  practicalHours: string;
   remarks: string;
 }
 
@@ -93,6 +94,7 @@ export default class SessionAttendancePage {
         for (const row of data.rows) {
           next.set(row.enrollmentId, {
             status: row.status ?? AttendanceStatus.Present,
+            practicalHours: row.practicalHours != null ? String(row.practicalHours) : '',
             remarks: row.remarks ?? '',
           });
         }
@@ -109,11 +111,15 @@ export default class SessionAttendancePage {
     return this._formState().get(enrollmentId)?.remarks ?? '';
   }
 
+  protected getPracticalHours(enrollmentId: string): string {
+    return this._formState().get(enrollmentId)?.practicalHours ?? '';
+  }
+
   protected onStatusChanged(enrollmentId: string, status: AttendanceStatus | null): void {
     if (!status) return;
     this._formState.update((prev) => {
       const next = new Map(prev);
-      const current = next.get(enrollmentId) ?? { status, remarks: '' };
+      const current = next.get(enrollmentId) ?? { status, practicalHours: '', remarks: '' };
       next.set(enrollmentId, { ...current, status });
       return next;
     });
@@ -124,9 +130,23 @@ export default class SessionAttendancePage {
       const next = new Map(prev);
       const current = next.get(enrollmentId) ?? {
         status: AttendanceStatus.Present,
+        practicalHours: '',
         remarks,
       };
       next.set(enrollmentId, { ...current, remarks });
+      return next;
+    });
+  }
+
+  protected onPracticalHoursChanged(enrollmentId: string, practicalHours: string): void {
+    this._formState.update((prev) => {
+      const next = new Map(prev);
+      const current = next.get(enrollmentId) ?? {
+        status: AttendanceStatus.Present,
+        practicalHours,
+        remarks: '',
+      };
+      next.set(enrollmentId, { ...current, practicalHours });
       return next;
     });
   }
@@ -139,9 +159,12 @@ export default class SessionAttendancePage {
 
     const entries: MarkAttendanceEntry[] = data.rows.map((row) => {
       const formRow = this._formState().get(row.enrollmentId);
+      const hoursRaw = formRow?.practicalHours?.trim() ?? '';
+      const hoursParsed = hoursRaw === '' ? Number.NaN : Number(hoursRaw);
       return {
         enrollmentId: row.enrollmentId,
         status: formRow?.status ?? AttendanceStatus.Present,
+        practicalHours: Number.isFinite(hoursParsed) ? hoursParsed : null,
         remarks: formRow?.remarks?.trim() ? formRow.remarks.trim() : null,
       };
     });

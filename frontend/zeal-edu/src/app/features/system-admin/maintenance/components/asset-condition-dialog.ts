@@ -4,6 +4,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { SystemAssetListItem } from '../../../../core/models/system-asset-list-item';
 import { UpdateAssetConditionPayload } from '../models/asset-payload';
 import { AssetConditionStatus } from '../../../../core/models/asset-condition-status';
@@ -16,7 +17,7 @@ export interface AssetConditionSubmit {
 @Component({
   selector: 'app-asset-condition-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, HlmDialogImports, HlmFieldImports, HlmSelectImports, HlmButtonImports],
+  imports: [ReactiveFormsModule, HlmDialogImports, HlmFieldImports, HlmSelectImports, HlmButtonImports, HlmSpinnerImports],
   templateUrl: './asset-condition-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -20,6 +20,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import {
   CreateExaminationPayload,
   Examination,
@@ -59,6 +60,7 @@ const passWithinMaxValidator: ValidatorFn = (control: AbstractControl): Validati
     HlmFieldImports,
     HlmInputImports,
     HlmButtonImports,
+    HlmSpinnerImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'examination-form-dialog.html',

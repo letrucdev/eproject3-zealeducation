@@ -37,5 +37,11 @@ export const INCHARGE_ROUTES: Routes = [
     data: { breadcrumb: 'Detail' },
     loadComponent: () => import('./candidates/candidate-detail-page'),
   },
+  {
+    path: 'materials',
+    title: 'Materials',
+    data: { breadcrumb: 'Materials' },
+    loadComponent: () => import('./materials/materials-management-page'),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'courses' },
 ];

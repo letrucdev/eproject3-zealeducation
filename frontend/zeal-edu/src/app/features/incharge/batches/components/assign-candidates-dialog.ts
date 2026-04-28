@@ -18,6 +18,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { BatchesService } from '../batches.service';
 import { AssignableCandidatesQuery } from '../models/batch-payload';
 
@@ -37,6 +38,7 @@ export interface AssignCandidatesSubmit {
     HlmCheckboxImports,
     HlmButtonImports,
     HlmSkeletonImports,
+    HlmSpinnerImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'assign-candidates-dialog.html',

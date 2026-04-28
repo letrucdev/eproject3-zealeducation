@@ -15,6 +15,9 @@ public class MarkAttendanceCommandValidator : AbstractValidator<MarkAttendanceCo
         {
             entry.RuleFor(e => e.EnrollmentId).NotEmpty();
             entry.RuleFor(e => e.Status).IsInEnum();
+            entry.RuleFor(e => e.PracticalHours)
+                .InclusiveBetween(0m, 999.99m)
+                .When(e => e.PracticalHours.HasValue);
             entry.RuleFor(e => e.Remarks).MaximumLength(500);
         });
     }

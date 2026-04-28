@@ -1,0 +1,99 @@
+@let m = material();
+<div
+  role="button"
+  tabindex="0"
+  (click)="onCardClick()"
+  (keydown.enter)="onCardClick()"
+  (keydown.space)="onCardClick(); $event.preventDefault()"
+  class="group bg-card hover:bg-accent/40 focus-visible:ring-ring relative flex flex-col gap-2 rounded-lg border p-3 text-left transition-colors outline-none focus-visible:ring-2"
+  [class.opacity-60]="!m.isActive"
+  [attr.aria-label]="'Open ' + m.title"
+>
+  <div class="flex items-start gap-3">
+    <div
+      class="bg-muted text-muted-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
+    >
+      <ng-icon [name]="fileIconName()" class="text-[20px]" />
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-sm font-medium mb-0!" [title]="m.title">{{ m.title }}</p>
+      <p class="text-muted-foreground truncate text-xs" [title]="m.fileName">{{ m.fileName }}</p>
+    </div>
+  </div>
+
+  @if (!m.isActive) {
+    <span
+      class="bg-muted text-muted-foreground absolute inset-e-2 top-2 rounded-sm px-1.5 py-0.5 text-[10px] font-medium"
+      title="Hidden from candidates"
+    >
+      Hidden
+    </span>
+  }
+
+  <div class="mt-1 flex items-center justify-center gap-2">
+    <p class="text-muted-foreground min-w-0 flex-1 truncate text-xs mb-0!">
+      {{ m.fileSizeMb }} MB · {{ m.fileType.toUpperCase() }} · {{ uploadedAtLabel() }}
+    </p>
+
+    <div
+      class="flex shrink-0 items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+    >
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      type="button"
+      title="Download"
+      aria-label="Download"
+      (click)="onAction('download', $event)"
+    >
+      <ng-icon name="lucideDownload" class="text-[16px]" />
+    </button>
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      type="button"
+      title="Edit title"
+      aria-label="Edit title"
+      (click)="onAction('edit-title', $event)"
+    >
+      <ng-icon name="lucidePencil" class="text-[16px]" />
+    </button>
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      type="button"
+      title="Replace file"
+      aria-label="Replace file"
+      (click)="onAction('replace-file', $event)"
+    >
+      <ng-icon name="lucideRefreshCcw" class="text-[16px]" />
+    </button>
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      type="button"
+      [title]="m.isActive ? 'Hide from candidates' : 'Show to candidates'"
+      [attr.aria-label]="m.isActive ? 'Hide' : 'Show'"
+      (click)="onAction('toggle-active', $event)"
+    >
+      <ng-icon [name]="m.isActive ? 'lucideEyeOff' : 'lucideEye'" class="text-[16px]" />
+    </button>
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      type="button"
+      title="Delete"
+      aria-label="Delete"
+      class="text-destructive hover:text-destructive"
+      (click)="onAction('delete', $event)"
+    >
+      <ng-icon name="lucideTrash2" class="text-[16px]" />
+    </button>
+    </div>
+  </div>
+</div>

@@ -26,6 +26,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
     public DbSet<Examination> Examinations => Set<Examination>();
     public DbSet<ExamResult> ExamResults => Set<ExamResult>();
+    public DbSet<StudyMaterial> StudyMaterials => Set<StudyMaterial>();
+    public DbSet<MaterialDownloadLog> MaterialDownloadLogs => Set<MaterialDownloadLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

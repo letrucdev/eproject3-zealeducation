@@ -21,6 +21,7 @@ import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { BatchDetail } from '@core/models/batch-detail';
 import { CreateBulkSessionsPayload } from '../models/batch-payload';
 
@@ -69,6 +70,7 @@ const minOneDayValidator: ValidatorFn = (control: AbstractControl): ValidationEr
     HlmInputImports,
     HlmButtonImports,
     HlmCheckboxImports,
+    HlmSpinnerImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'bulk-session-form-dialog.html',
