@@ -82,6 +82,30 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
     ],
   },
   {
+    title: 'Faculty',
+    roles: [UserRole.Faculty],
+    items: [
+      {
+        label: 'Schedule',
+        route: '/app/faculty/schedule',
+        icon: 'lucideCalendarDays',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'My Batches',
+        route: '/app/faculty/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'Examinations',
+        route: '/app/faculty/examinations',
+        icon: 'lucideClipboardCheck',
+        roles: [UserRole.Faculty],
+      },
+    ],
+  },
+  {
     title: 'Finance',
     roles: [UserRole.AccountsStaff],
     items: [

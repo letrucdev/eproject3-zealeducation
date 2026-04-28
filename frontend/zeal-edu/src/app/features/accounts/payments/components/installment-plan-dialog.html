@@ -81,6 +81,9 @@
           type="submit"
           [disabled]="availableOptions().length === 0 || form.invalid || submitting()"
         >
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
           {{ submitting() ? 'Saving...' : 'Confirm Plan' }}
         </button>
       </div>

@@ -14,6 +14,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
 import { InstallmentPlanItem } from '../models/fee-structure';
 import { PaymentMethod } from '../models/payment-enums';
@@ -46,6 +47,7 @@ const PROOF_ACCEPT = ALLOWED_PROOF_TYPES.join(',');
     HlmButtonImports,
     HlmFieldImports,
     HlmRadioGroupImports,
+    HlmSpinnerImports,
     VndPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

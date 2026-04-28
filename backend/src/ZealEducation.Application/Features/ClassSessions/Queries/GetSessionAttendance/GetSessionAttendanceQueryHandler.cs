@@ -46,7 +46,7 @@ public class GetSessionAttendanceQueryHandler(
             Topic = session.Topic,
             Location = session.Location,
             Status = session.Status,
-            Rows = rows.Select(r =>
+            Rows = [.. rows.Select(r =>
             {
                 existingRecords.TryGetValue(r.enrollment.Id, out var record);
                 return new AttendanceRowDto
@@ -56,9 +56,10 @@ public class GetSessionAttendanceQueryHandler(
                     CandidateCode = r.candidate.CandidateCode,
                     FullName = r.user.FullName,
                     Status = record?.Status,
+                    PracticalHours = record?.PracticalHours,
                     Remarks = record?.Remarks
                 };
-            }).ToList()
+            })]
         };
 
         return dto;

@@ -85,7 +85,11 @@
         <div hlmDialogFooter class="shrink-0">
           <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
           <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
-            <ng-icon hlm name="lucideUserCheck" size="sm" />
+            @if (submitting()) {
+              <hlm-spinner class="mr-2" />
+            } @else {
+              <ng-icon hlm name="lucideUserCheck" size="sm" />
+            }
             {{ submitting() ? 'Converting...' : 'Convert to Candidate' }}
           </button>
         </div>

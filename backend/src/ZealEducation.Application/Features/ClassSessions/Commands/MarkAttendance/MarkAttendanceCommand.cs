@@ -10,4 +10,5 @@ public record MarkAttendanceCommand(
 public record AttendanceEntry(
     Guid EnrollmentId,
     AttendanceStatus Status,
+    decimal? PracticalHours,
     string? Remarks);

@@ -124,6 +124,9 @@
         (click)="submit()"
         [disabled]="!hasSelection() || submitting()"
       >
+        @if (submitting()) {
+          <hlm-spinner class="mr-2" />
+        }
         {{ submitting() ? 'Adding...' : 'Add to Batch' }}
       </button>
     </div>

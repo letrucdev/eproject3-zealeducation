@@ -4,6 +4,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { SystemAssetDetail } from '../../../../core/models/system-asset-detail';
 import { CreateAssetPayload, UpdateAssetPayload } from '../models/asset-payload';
 
@@ -14,7 +15,7 @@ export type AssetFormSubmit = AssetFormSubmitCreate | AssetFormSubmitEdit;
 @Component({
   selector: 'app-asset-form-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, HlmDialogImports, HlmFieldImports, HlmInputImports, HlmButtonImports],
+  imports: [ReactiveFormsModule, HlmDialogImports, HlmFieldImports, HlmInputImports, HlmButtonImports, HlmSpinnerImports],
   templateUrl: './asset-form-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -13,6 +13,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { CandidateStatus } from '@core/models/candidate-status';
 import { CandidateDetail } from '../models/candidate-detail';
 import { CANDIDATE_STATUS_LABELS } from '../models/candidate-labels';
@@ -34,6 +35,7 @@ export interface CandidateUpdateSubmit {
     HlmSelectImports,
     HlmButtonImports,
     HlmTextareaImports,
+    HlmSpinnerImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'candidate-update-dialog.html',

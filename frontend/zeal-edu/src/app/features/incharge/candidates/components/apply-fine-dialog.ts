@@ -12,6 +12,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
 import { ApplyFinePayload } from '../models/candidate-payload';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
@@ -37,6 +38,7 @@ interface FineTarget {
     HlmInputImports,
     HlmButtonImports,
     HlmTextareaImports,
+    HlmSpinnerImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'apply-fine-dialog.html',

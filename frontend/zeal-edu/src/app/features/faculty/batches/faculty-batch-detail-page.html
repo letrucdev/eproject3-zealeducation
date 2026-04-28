@@ -1,0 +1,155 @@
+<div class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <a hlmBtn variant="ghost" size="sm" routerLink="/app/faculty/batches" class="self-start">
+      <ng-icon hlm name="lucideArrowLeft" size="sm" />
+      Back to batches
+    </a>
+    <h1 class="text-2xl font-semibold tracking-tight">Batch Detail</h1>
+  </header>
+
+  @if (detailQuery.isPending()) {
+    <hlm-skeleton class="h-32 w-full" />
+    <hlm-skeleton class="h-64 w-full" />
+  } @else if (detailQuery.isError()) {
+    <p class="text-destructive text-sm">Batch not found or you do not have access.</p>
+  } @else if (detailQuery.data(); as detail) {
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle class="font-mono">{{ detail.batchCode }}</h2>
+        <p hlmCardDescription>{{ detail.courseName }}</p>
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+          @switch (detail.status) {
+            @case (statuses.NeedsInstructor) {
+              <span hlmBadge class="bg-amber-100 text-amber-800">Needs Instructor</span>
+            }
+            @case (statuses.Active) {
+              <span hlmBadge class="bg-emerald-100 text-emerald-800">Active</span>
+            }
+            @case (statuses.Completed) {
+              <span hlmBadge class="bg-slate-100 text-slate-800">Completed</span>
+            }
+            @case (statuses.Cancelled) {
+              <span hlmBadge class="bg-rose-100 text-rose-800">Cancelled</span>
+            }
+          }
+        </div>
+      </div>
+      <div hlmCardContent class="grid gap-4 md:grid-cols-2">
+        <div class="flex flex-col">
+          <span class="text-muted-foreground text-xs uppercase">Faculty</span>
+          @if (detail.facultyName) {
+            <span class="font-medium">{{ detail.facultyName }}</span>
+            <span class="text-muted-foreground text-xs">{{ detail.facultyCode }}</span>
+          } @else {
+            <span class="text-muted-foreground font-medium italic">Not assigned</span>
+          }
+        </div>
+        <div class="flex flex-col">
+          <span class="text-muted-foreground text-xs uppercase">Capacity</span>
+          <span class="font-medium"> {{ detail.enrolledCount }} / {{ detail.maxCapacity }} </span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-muted-foreground text-xs uppercase">Start Date</span>
+          <span class="font-medium">{{ detail.startDate | date: 'dd MMM yyyy' }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-muted-foreground text-xs uppercase">End Date</span>
+          <span class="font-medium">{{ detail.endDate | date: 'dd MMM yyyy' }}</span>
+        </div>
+        <div class="flex flex-col md:col-span-2">
+          <span class="text-muted-foreground text-xs uppercase">Location</span>
+          <span class="font-medium">{{ detail.location || '-' }}</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-muted-foreground text-xs uppercase">Created At</span>
+          <span class="font-medium">{{ detail.createdAt | date: 'dd MMM yyyy' }}</span>
+        </div>
+        @if (detail.updatedAt) {
+          <div class="flex flex-col">
+            <span class="text-muted-foreground text-xs uppercase">Updated At</span>
+            <span class="font-medium">{{ detail.updatedAt | date: 'dd MMM yyyy' }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h3 hlmCardTitle>Exams</h3>
+        <p hlmCardDescription>
+          @if (examsQuery.data(); as p) {
+            {{ p.totalCount }} exam(s) scheduled for this batch.
+          } @else {
+            Exams scheduled for this batch.
+          }
+        </p>
+      </div>
+      <div hlmCardContent>
+        <app-faculty-exam-table
+          [page]="examsQuery.data()"
+          [isLoading]="examsQuery.isPending()"
+          [pageSize]="examsPageSize()"
+          [sortBy]="examsSortBy()"
+          [sortDirection]="examsSortDirection()"
+          (enterScoresClicked)="onEnterScores($event)"
+          (pageChanged)="onExamsPageChanged($event)"
+          (pageSizeChanged)="onExamsPageSizeChanged($event)"
+          (sortChanged)="onExamsSortChanged($event)"
+        />
+      </div>
+    </section>
+
+    <app-faculty-batch-enrollments-table
+      [page]="enrollmentsQuery.data()"
+      [isLoading]="enrollmentsQuery.isPending()"
+      [pageSize]="enrollmentsPageSize()"
+      [search]="enrollmentsSearch()"
+      [sortBy]="enrollmentsSortBy()"
+      [sortDirection]="enrollmentsSortDirection()"
+      (searchChanged)="onEnrollmentsSearchChanged($event)"
+      (pageChanged)="onEnrollmentsPageChanged($event)"
+      (pageSizeChanged)="onEnrollmentsPageSizeChanged($event)"
+      (sortChanged)="onEnrollmentsSortChanged($event)"
+    />
+
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h3 hlmCardTitle>Class Schedule</h3>
+        <p hlmCardDescription>
+          @if (sessionsQuery.data(); as p) {
+            {{ p.totalCount }} session(s) scheduled for this batch.
+          } @else {
+            Sessions scheduled for this batch.
+          }
+        </p>
+      </div>
+      <div hlmCardContent>
+        <app-faculty-sessions-table
+          [page]="sessionsQuery.data()"
+          [isLoading]="sessionsQuery.isPending()"
+          [pageSize]="sessionsPageSize()"
+          [sortBy]="sessionsSortBy()"
+          [sortDirection]="sessionsSortDirection()"
+          (attendanceClicked)="onTakeAttendance($event)"
+          (pageChanged)="onSessionsPageChanged($event)"
+          (pageSizeChanged)="onSessionsPageSizeChanged($event)"
+          (sortChanged)="onSessionsSortChanged($event)"
+        />
+      </div>
+    </section>
+  }
+</div>
+
+<app-faculty-exam-candidates-dialog
+  #candidatesDialog
+  [examination]="activeExamination()"
+  [candidates]="candidatesQuery.data()"
+  [isLoading]="candidatesQuery.isPending() || candidatesQuery.isFetching()"
+  (rowSelected)="onCandidateSelected($event)"
+/>
+
+<app-faculty-exam-score-form-dialog
+  #scoreDialog
+  [submitting]="createExamResultMutation.isPending() || updateExamResultMutation.isPending()"
+  (submitted)="onScoreSubmitted($event)"
+/>

@@ -92,6 +92,9 @@
       <div hlmDialogFooter class="mt-2">
         <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
         <button hlmBtn type="submit" [disabled]="!canSubmit()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
           {{ submitting() ? 'Confirming...' : 'Confirm' }}
         </button>
       </div>

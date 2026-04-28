@@ -14,6 +14,7 @@ import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { DigitsOnlyDirective } from '@shared/directives/digits-only.directive';
 import { CourseListItem } from '@core/models/course-list-item';
 import { CreateCoursePayload, UpdateCoursePayload } from '@core/services/courses.service';
@@ -42,6 +43,7 @@ export type CourseFormSubmit = CourseFormSubmitCreate | CourseFormSubmitUpdate;
     HlmCheckboxImports,
     HlmButtonImports,
     HlmTextareaImports,
+    HlmSpinnerImports,
     DigitsOnlyDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

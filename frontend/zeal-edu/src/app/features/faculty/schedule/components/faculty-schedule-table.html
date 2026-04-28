@@ -1,0 +1,65 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
+  [trackBy]="trackById"
+  itemLabel="sessions"
+  emptyMessage="No schedule in this date range."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
+>
+  <ng-template scheduleCell="sessionDate" let-row>
+    <span class="font-medium">{{ row.sessionDate | date: 'EEE, dd MMM yyyy' }}</span>
+  </ng-template>
+
+  <ng-template scheduleCell="time" let-row>
+    <span class="font-mono text-xs">
+      {{ row.startTime.slice(0, 5) }} - {{ row.endTime.slice(0, 5) }}
+    </span>
+  </ng-template>
+
+  <ng-template scheduleCell="batchCode" let-row>
+    <span class="font-medium">{{ row.batchCode }}</span>
+  </ng-template>
+
+  <ng-template scheduleCell="topic" let-row>
+    {{ row.topic ?? '—' }}
+  </ng-template>
+
+  <ng-template scheduleCell="location" let-row>
+    {{ row.location ?? '—' }}
+  </ng-template>
+
+  <ng-template scheduleCell="status" let-row>
+    @switch (row.status) {
+      @case (sessionStatuses.Scheduled) {
+        <span hlmBadge class="bg-amber-100 text-amber-800">{{ statusLabel(row.status) }}</span>
+      }
+      @case (sessionStatuses.Completed) {
+        <span hlmBadge class="bg-emerald-100 text-emerald-800">{{ statusLabel(row.status) }}</span>
+      }
+      @case (sessionStatuses.Cancelled) {
+        <span hlmBadge class="bg-rose-100 text-rose-800">{{ statusLabel(row.status) }}</span>
+      }
+    }
+  </ng-template>
+
+  <ng-template scheduleCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="outline"
+        size="sm"
+        type="button"
+        [disabled]="row.status === sessionStatuses.Cancelled"
+        (click)="markAttendanceClicked.emit({ batchId: row.batchId, sessionId: row.sessionId })"
+      >
+        Take Attendance
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

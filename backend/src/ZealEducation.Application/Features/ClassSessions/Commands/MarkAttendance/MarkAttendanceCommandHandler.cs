@@ -45,6 +45,7 @@ public class MarkAttendanceCommandHandler(
             if (existingByEnrollment.TryGetValue(entry.EnrollmentId, out var record))
             {
                 record.Status = entry.Status;
+                record.PracticalHours = entry.PracticalHours;
                 record.Remarks = remarks;
                 attendanceRepository.Update(record);
             }
@@ -56,6 +57,7 @@ public class MarkAttendanceCommandHandler(
                     ClassSessionId = session.Id,
                     EnrollmentId = entry.EnrollmentId,
                     Status = entry.Status,
+                    PracticalHours = entry.PracticalHours,
                     Remarks = remarks
                 };
                 await attendanceRepository.AddAsync(newRecord, cancellationToken);

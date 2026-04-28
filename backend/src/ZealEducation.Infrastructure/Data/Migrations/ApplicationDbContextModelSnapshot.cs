@@ -40,6 +40,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<Guid>("EnrollmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal?>("PracticalHours")
+                        .HasColumnType("decimal(5,2)");
+
                     b.Property<string>("Remarks")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
