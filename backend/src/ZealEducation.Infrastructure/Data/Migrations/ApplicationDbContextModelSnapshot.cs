@@ -40,6 +40,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<Guid>("EnrollmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal?>("PracticalHours")
+                        .HasColumnType("decimal(5,2)");
+
                     b.Property<string>("Remarks")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -873,6 +876,42 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("installment_plan", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.MaterialDownloadLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DownloadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("MaterialId", "DownloadedAt");
+
+                    b.ToTable("material_download_log", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.PaymentTransaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -987,6 +1026,76 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("staff", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.StudyMaterial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("FileSizeMb")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UploadedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FilePath");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UploadedByStaffId");
+
+                    b.HasIndex("CourseId", "IsActive");
+
+                    b.ToTable("study_material", (string)null);
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.SystemAsset", b =>
@@ -1416,6 +1525,25 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("FeeStructure");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.MaterialDownloadLog", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.StudyMaterial", "Material")
+                        .WithMany("DownloadLogs")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.PaymentTransaction", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
@@ -1453,6 +1581,25 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("UserAccount");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.StudyMaterial", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Course", "Course")
+                        .WithMany("StudyMaterials")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "UploadedByStaff")
+                        .WithMany()
+                        .HasForeignKey("UploadedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("UploadedByStaff");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.SystemAsset", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.Staff", null)
@@ -1481,6 +1628,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("Batches");
 
                     b.Navigation("Enquiries");
+
+                    b.Navigation("StudyMaterials");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
@@ -1514,6 +1663,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
                 {
                     b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.StudyMaterial", b =>
+                {
+                    b.Navigation("DownloadLogs");
                 });
 #pragma warning restore 612, 618
         }

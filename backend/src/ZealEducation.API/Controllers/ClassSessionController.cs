@@ -49,7 +49,7 @@ public class ClassSessionController(ISender sender) : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> MarkAttendance(Guid id, [FromBody] MarkAttendanceRequest body)
     {
         var entries = body.Entries
-            .Select(e => new AttendanceEntry(e.EnrollmentId, e.Status, e.Remarks))
+            .Select(e => new AttendanceEntry(e.EnrollmentId, e.Status, e.PracticalHours, e.Remarks))
             .ToList();
 
         await sender.Send(new MarkAttendanceCommand(id, entries));
@@ -69,5 +69,6 @@ public class ClassSessionController(ISender sender) : ControllerBase
     public record AttendanceEntryRequest(
         Guid EnrollmentId,
         AttendanceStatus Status,
+        decimal? PracticalHours,
         string? Remarks);
 }

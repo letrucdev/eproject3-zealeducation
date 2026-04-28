@@ -1,0 +1,152 @@
+@let m = editingMaterial();
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="flex max-h-[90dvh] w-2xl flex-col sm:max-w-2xl"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>{{ isCreate() ? 'Upload material' : 'Edit material title' }}</h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isCreate()
+            ? 'Upload a file (max 50 MB) and assign it to one or more courses.'
+            : 'Rename this material. The file and course assignment stay the same.'
+        }}
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <hlm-field>
+          <label hlmFieldLabel for="material-title">Title</label>
+          <input
+            hlmInput
+            id="material-title"
+            type="text"
+            formControlName="title"
+            maxlength="200"
+            class="w-full"
+            placeholder="e.g. Week 1 lecture notes"
+          />
+          <hlm-field-error validator="required">Title is required.</hlm-field-error>
+          <hlm-field-error validator="maxlength">Max 200 characters.</hlm-field-error>
+        </hlm-field>
+
+        @if (isCreate()) {
+          <hlm-field>
+            <label hlmFieldLabel>Courses</label>
+            <hlm-combobox-multiple
+              formControlName="courses"
+              [(search)]="courseSearch"
+              [itemToString]="courseItemToString"
+              [isItemEqualToValue]="courseEqualsValue"
+              class="w-full"
+            >
+              <hlm-combobox-chips>
+                <ng-container *hlmComboboxValues="let selectedCourses">
+                  @for (c of selectedCourses; track c.courseId) {
+                    <hlm-combobox-chip [value]="c">
+                      {{ c.courseName }}
+                    </hlm-combobox-chip>
+                  }
+                </ng-container>
+                <input hlmComboboxChipInput />
+              </hlm-combobox-chips>
+              <hlm-combobox-content *hlmComboboxPortal>
+                @if (courses.isError()) {
+                  <hlm-combobox-status>Failed to load courses.</hlm-combobox-status>
+                } @else if (courses.isPending()) {
+                  <hlm-combobox-status>
+                    <hlm-spinner />
+                    Loading...
+                  </hlm-combobox-status>
+                } @else {
+                  @let items = courses.data()?.items ?? [];
+                  @if (items.length === 0) {
+                    <hlm-combobox-empty>No courses found.</hlm-combobox-empty>
+                  }
+                  <div hlmComboboxList>
+                    @for (course of items; track course.courseId) {
+                      <hlm-combobox-item [value]="course">
+                        {{ course.courseName }}
+                      </hlm-combobox-item>
+                    }
+                  </div>
+                }
+              </hlm-combobox-content>
+            </hlm-combobox-multiple>
+            <hlm-field-error validator="required">Select at least one course.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel>File</label>
+            @let fileValue = form.controls.file.value;
+            @if (!fileValue) {
+              <label
+                for="material-file-input"
+                (dragover)="onDragOver($event)"
+                (drop)="onFileDrop($event)"
+                class="border-input bg-muted/30 hover:bg-accent/40 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed py-8 text-sm transition-colors"
+              >
+                <ng-icon name="lucideUpload" class="text-muted-foreground text-[24px]" />
+                <span class="text-foreground font-medium">Click to upload or drag &amp; drop</span>
+                <span class="text-muted-foreground text-xs">
+                  PDF, Office docs, MP4/MOV, JPG/PNG up to 50 MB
+                </span>
+              </label>
+              <input
+                id="material-file-input"
+                type="file"
+                hidden
+                [accept]="'.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp4,.mov,.jpg,.jpeg,.png'"
+                (change)="onFileChange($event)"
+              />
+            } @else {
+              <div
+                class="border-input bg-muted/30 flex items-center gap-3 rounded-md border px-3 py-2 text-sm"
+              >
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-medium" [title]="fileValue.name">{{ fileValue.name }}</p>
+                  <p class="text-muted-foreground text-xs">
+                    {{ formatFileSize(fileValue.size) }} MB
+                  </p>
+                </div>
+                <button
+                  hlmBtn
+                  variant="ghost"
+                  size="icon-sm"
+                  type="button"
+                  aria-label="Remove file"
+                  (click)="clearFile()"
+                >
+                  <ng-icon name="lucideX" class="text-[16px]" />
+                </button>
+              </div>
+            }
+            <hlm-field-error validator="required">A file is required.</hlm-field-error>
+            <hlm-field-error validator="fileTooLarge">File exceeds 50 MB.</hlm-field-error>
+            <hlm-field-error validator="fileTypeInvalid"> Unsupported file type. </hlm-field-error>
+          </hlm-field>
+        } @else if (m) {
+          <p class="text-muted-foreground text-sm">
+            File: <span class="text-foreground font-medium">{{ m.fileName }}</span> ({{
+              m.fileSizeMb
+            }}
+            MB)
+          </p>
+        }
+      </hlm-field-group>
+
+      <div hlmDialogFooter>
+        <button hlmBtn variant="ghost" type="button" (click)="close()">Cancel</button>
+        <button hlmBtn type="submit" [disabled]="submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ isCreate() ? 'Upload' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

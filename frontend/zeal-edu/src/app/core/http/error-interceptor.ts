@@ -10,6 +10,7 @@ import { ApiResponse } from './api-response';
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authToken = inject(AuthToken);
   const currentUser = inject(CurrentUser);
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
@@ -18,7 +19,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (err.status === HttpStatusCode.Unauthorized && !isLoginRequest) {
         authToken.clear();
         currentUser.clear();
-        inject(Router).navigateByUrl('/login');
+        router.navigateByUrl('/login', { replaceUrl: true });
       } else if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {
         toast.error(resolveMessage(err));
       }
@@ -45,7 +46,7 @@ export function resolveMessage(err: HttpErrorResponse): string {
   } */
 
   const body = err.error as ApiResponse<{ errors: [] }>;
-  if (body) {
+  if (body.data) {
     return body.data?.errors.join('\n') ?? body.message;
   }
 

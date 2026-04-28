@@ -1,6 +1,26 @@
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+## Language for UI text
+
+**ALL user-facing text in the frontend MUST be in English** — including:
+- Labels, placeholders, button text, headings, table column titles
+- Toast messages, dialog titles/content, validation/error messages
+- Empty-state copy, tooltips, aria-labels
+- Any string rendered into the DOM or shown via `toast.*`, `MatSnackBar`, etc.
+
+Do NOT use Vietnamese (with or without diacritics) in user-facing text. Code comments and internal docs (CLAUDE.md...) may still use Vietnamese.
+
+```html
+<!-- OK -->
+<button hlmBtn>Save</button>
+<p>No records found.</p>
+
+<!-- NOT OK -->
+<button hlmBtn>Luu</button>
+<p>Khong co du lieu.</p>
+```
+
 ## TypeScript Best Practices
 
 - Use strict type checking
@@ -77,3 +97,20 @@ Rules:
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Form Dialogs
+
+Dialogs that emit a `submitted` event for the parent to mutate MUST surface the parent's pending state — never own a local `submitting` signal that nothing writes to.
+
+- Declare `readonly submitting = input<boolean>(false)` on the dialog component (do NOT use `signal(false)` for this — the parent controls it).
+- Parent binds the matching mutation: `<app-x-dialog [submitting]="someMutation.isPending()" (submitted)="..." />`. For multi-mutation dialogs, OR the relevant `isPending()` flags.
+- Submit button MUST be disabled and show a spinner while pending. Import `HlmSpinnerImports` from `@spartan-ng/helm/spinner` and follow this pattern:
+  ```html
+  <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+    @if (submitting()) {
+      <hlm-spinner class="mr-2" />
+    }
+    {{ submitting() ? 'Saving...' : 'Save' }}
+  </button>
+  ```
+- Guard the submit handler too: `if (this.submitting()) return;` at the top of `submit()` to prevent re-entry from rapid clicks.

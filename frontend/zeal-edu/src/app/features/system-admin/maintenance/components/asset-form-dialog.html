@@ -50,7 +50,12 @@
       <div hlmDialogFooter class="mt-4">
         <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
         <button hlmBtn type="submit" [disabled]="submitting() || form.invalid">
-          @if (submitting()) { Saving... } @else { Save }
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+            Saving...
+          } @else {
+            Save
+          }
         </button>
       </div>
     </form>

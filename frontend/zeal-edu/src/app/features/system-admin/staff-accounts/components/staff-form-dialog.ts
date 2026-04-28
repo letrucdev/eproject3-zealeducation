@@ -16,6 +16,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { DigitsOnlyDirective } from '@shared/directives/digits-only.directive';
 import { Gender } from '@core/models/gender';
 import { StaffDetail } from '@core/models/staff-detail';
@@ -67,6 +68,7 @@ export type StaffFormSubmit =
     HlmInputImports,
     HlmSelectImports,
     HlmButtonImports,
+    HlmSpinnerImports,
     DigitsOnlyDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

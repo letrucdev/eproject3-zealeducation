@@ -197,6 +197,27 @@ Khi them Behavior moi:
 
 ---
 
+## Ngon ngu cho message
+
+**TAT CA text tra ve cho client phai bang tieng Anh** — bao gom:
+- Message trong exception (`NotFoundException`, `ConflictException`, `ForbiddenException`, custom domain exception...)
+- Message cua FluentValidation (`.WithMessage("...")`)
+- Bat ky string nao xuat hien trong response body (loi, thong bao, status...)
+
+KHONG dung tieng Viet (co dau hay khong dau) trong cac message tra ve API. Comment trong code va tai lieu noi bo (CLAUDE.md...) van co the dung tieng Viet.
+
+```csharp
+// DUNG
+throw new ConflictException("Faculty already has another batch scheduled within this date range.");
+RuleFor(x => x.Email).EmailAddress().WithMessage("Email is invalid.");
+
+// SAI
+throw new ConflictException("Faculty da co lich o batch khac.");
+RuleFor(x => x.Email).EmailAddress().WithMessage("Email khong hop le.");
+```
+
+---
+
 ## DUOC THEM VAO LAYER NAY
 
 - Commands + Handlers (hanh dong thay doi du lieu)

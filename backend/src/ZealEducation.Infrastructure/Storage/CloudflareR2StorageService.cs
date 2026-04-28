@@ -40,4 +40,15 @@ public class CloudflareR2StorageService(IAmazonS3 s3Client, IOptions<R2Options> 
         await response.ResponseStream.CopyToAsync(memoryStream, cancellationToken);
         return memoryStream.ToArray();
     }
+
+    public async Task DeleteAsync(string objectKey, CancellationToken cancellationToken)
+    {
+        var request = new DeleteObjectRequest
+        {
+            BucketName = _bucketName,
+            Key = objectKey
+        };
+
+        await s3Client.DeleteObjectAsync(request, cancellationToken);
+    }
 }

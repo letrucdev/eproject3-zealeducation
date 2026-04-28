@@ -24,6 +24,18 @@ public class AssignFacultyCommandHandler(
             var facultyExists = await facultyRepository.ExistsAsync(request.FacultyId.Value, cancellationToken);
             if (!facultyExists)
                 throw new NotFoundException(nameof(Faculty), request.FacultyId.Value);
+
+            var conflicts = await batchRepository.FindAsync(
+                b => b.Id != batch.Id
+                    && b.FacultyId == request.FacultyId.Value
+                    && b.Status != BatchStatus.Completed
+                    && b.Status != BatchStatus.Cancelled
+                    && b.StartDate <= batch.EndDate
+                    && batch.StartDate <= b.EndDate,
+                cancellationToken);
+
+            if (conflicts.Count > 0)
+                throw new ConflictException("Faculty already has another batch scheduled within this date range.");
         }
 
         batch.FacultyId = request.FacultyId;

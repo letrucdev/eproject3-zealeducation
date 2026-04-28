@@ -37,6 +37,13 @@ export const routes: Routes = [
           import('@features/incharge/incharge.routes').then((m) => m.INCHARGE_ROUTES),
       },
       {
+        path: 'faculty',
+        canMatch: [hasRole(UserRole.Faculty)],
+        data: { breadcrumb: 'Faculty' },
+        loadChildren: () =>
+          import('@features/faculty/faculty.routes').then((m) => m.FACULTY_ROUTES),
+      },
+      {
         path: 'accounts',
         canMatch: [hasRole(UserRole.AccountsStaff)],
         data: { breadcrumb: 'Accounts' },

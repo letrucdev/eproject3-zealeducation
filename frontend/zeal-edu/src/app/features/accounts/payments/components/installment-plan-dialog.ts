@@ -5,6 +5,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   output,
   signal,
   viewChild,
@@ -13,6 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { InstallmentFrequency } from '../models/payment-enums';
 import {
   PlannedInstallment,
@@ -39,6 +41,7 @@ export interface InstallmentPlanDialogSubmit {
     HlmDialogImports,
     HlmButtonImports,
     HlmRadioGroupImports,
+    HlmSpinnerImports,
     VndPipe,
     DatePipe,
   ],
@@ -49,6 +52,7 @@ export class InstallmentPlanDialog {
   private readonly _fb = inject(FormBuilder);
 
   readonly submitted = output<InstallmentPlanDialogSubmit>();
+  readonly submitting = input(false);
 
   protected readonly dlg = viewChild.required<HlmDialog>('dlg');
 
@@ -109,6 +113,7 @@ export class InstallmentPlanDialog {
   }
 
   protected onSubmit(): void {
+    if (this.submitting()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

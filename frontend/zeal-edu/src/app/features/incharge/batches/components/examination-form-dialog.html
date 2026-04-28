@@ -96,6 +96,9 @@
       <div hlmDialogFooter class="shrink-0">
         <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
         <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
           {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create exam' }}
         </button>
       </div>

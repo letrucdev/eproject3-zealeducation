@@ -13,6 +13,7 @@ export interface AttendanceRow {
   candidateCode: string;
   fullName: string;
   status: AttendanceStatus | null;
+  practicalHours: number | null;
   remarks: string | null;
 }
 
@@ -32,6 +33,7 @@ export interface SessionAttendance {
 export interface MarkAttendanceEntry {
   enrollmentId: string;
   status: AttendanceStatus;
+  practicalHours: number | null;
   remarks: string | null;
 }
 

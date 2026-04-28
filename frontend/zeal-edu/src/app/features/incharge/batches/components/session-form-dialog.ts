@@ -22,6 +22,7 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import {
   ClassSession,
   ClassSessionStatus,
@@ -66,6 +67,7 @@ const trimSeconds = (time: string): string => (time?.length > 5 ? time.substring
     HlmInputImports,
     HlmSelectImports,
     HlmButtonImports,
+    HlmSpinnerImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'session-form-dialog.html',

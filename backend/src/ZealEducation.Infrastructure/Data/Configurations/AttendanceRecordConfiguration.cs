@@ -17,6 +17,9 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
             .HasMaxLength(20)
             .HasConversion<string>();
 
+        builder.Property(a => a.PracticalHours)
+            .HasColumnType("decimal(5,2)");
+
         builder.Property(a => a.Remarks)
             .HasMaxLength(500);
 
