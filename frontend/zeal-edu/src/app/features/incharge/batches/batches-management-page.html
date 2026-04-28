@@ -1,0 +1,56 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Batches</h1>
+      <p class="text-muted-foreground mt-1 max-w-2xl text-sm">
+        Manage batches: create, schedule, link courses, and assign faculty.
+      </p>
+    </div>
+  </header>
+
+  <app-batch-stats-cards [stats]="statsQuery.data()" [isLoading]="statsQuery.isPending()" />
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <app-batch-filter-bar
+        [initial]="initialFilter"
+        (filterChanged)="onFilterChanged($event)"
+        (createClicked)="onCreateClicked()"
+      />
+    </div>
+    <div hlmCardContent>
+      <app-batch-table
+        [page]="listQuery.data()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        (viewClicked)="onViewClicked($event)"
+        (editClicked)="onEditClicked($event)"
+        (assignFacultyClicked)="onAssignFacultyClicked($event)"
+        (deleteClicked)="onDeleteClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      />
+    </div>
+  </section>
+
+  <app-batch-form-dialog
+    #formDialog
+    [submitting]="isSubmittingForm()"
+    (submitted)="onFormSubmitted($event)"
+  />
+
+  <app-batch-assign-faculty-dialog
+    #assignDialog
+    [submitting]="assignFacultyMutation.isPending()"
+    (submitted)="onAssignFacultySubmitted($event)"
+  />
+
+  <app-confirm-dialog
+    #confirmDialog
+    (confirmed)="onDeleteConfirmed()"
+    (cancelled)="onDeleteCancelled()"
+  />
+</section>

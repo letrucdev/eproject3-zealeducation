@@ -1,11 +1,23 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
 using ZealEducation.Application;
 using ZealEducation.Infrastructure;
-using ZealEducation.Infrastructure.Data;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Allow uploads up to ~60 MB (50 MB for files + multipart overhead).
+const long MaxRequestBytes = 60L * 1024 * 1024;
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = MaxRequestBytes);
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = MaxRequestBytes;
+    options.ValueLengthLimit = int.MaxValue;
+});
 
 // Add services to the container.
 builder.Services.AddApplicationServices();
@@ -27,7 +39,8 @@ builder.Services.AddCors(options =>
 
         policy.WithOrigins("*")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .WithExposedHeaders("Content-Disposition");
     });
 });
 
@@ -62,7 +75,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.InitialiseDatabaseAsync();
+//await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<GlobalExceptionHandler>();
@@ -76,6 +89,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(CorsPolicyName);
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<PasswordResetTokenGuardMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

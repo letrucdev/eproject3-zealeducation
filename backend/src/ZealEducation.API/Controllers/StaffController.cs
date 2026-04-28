@@ -24,9 +24,11 @@ public class StaffController(ISender sender) : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null,
         [FromQuery] UserRole? role = null,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetStaffsQuery(page, pageSize, search, role, isActive));
+        var result = await sender.Send(new GetStaffsQuery(page, pageSize, search, role, isActive, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<StaffListItemDto>>.Success(result));
     }
 

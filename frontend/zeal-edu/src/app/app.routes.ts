@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/auth/auth.guard';
+import { mustChangePasswordGuard } from '@core/auth/must-change-password.guard';
 import { defaultRoleRedirect } from '@core/layout/default-redirect';
 import { UserRole } from '@core/models/user-role';
 import { hasRole } from '@core/auth/role.guard';
@@ -11,7 +12,7 @@ export const routes: Routes = [
   },
   {
     path: 'app',
-    canMatch: [authGuard],
+    canMatch: [authGuard, mustChangePasswordGuard],
     loadComponent: () => import('@core/layout/app-shell').then((m) => m.AppShell),
     data: { breadcrumb: 'Home' },
     children: [
@@ -29,9 +30,30 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@features/counselor/counselor.routes').then((m) => m.COUNSELOR_ROUTES),
       },
+      {
+        path: 'incharge',
+        canMatch: [hasRole(UserRole.Incharge)],
+        data: { breadcrumb: 'InCharge' },
+        loadChildren: () =>
+          import('@features/incharge/incharge.routes').then((m) => m.INCHARGE_ROUTES),
+      },
+      {
+        path: 'faculty',
+        canMatch: [hasRole(UserRole.Faculty)],
+        data: { breadcrumb: 'Faculty' },
+        loadChildren: () =>
+          import('@features/faculty/faculty.routes').then((m) => m.FACULTY_ROUTES),
+      },
+      {
+        path: 'accounts',
+        canMatch: [hasRole(UserRole.AccountsStaff)],
+        data: { breadcrumb: 'Accounts' },
+        loadChildren: () =>
+          import('@features/accounts/accounts.routes').then((m) => m.ACCOUNTS_ROUTES),
+      },
       { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },
-  { path: '', pathMatch: 'full', redirectTo: 'app' },
-  { path: '**', redirectTo: 'app' },
+  { path: '', pathMatch: 'full', redirectTo: '/app' },
+  { path: '**', redirectTo: '/app' },
 ];

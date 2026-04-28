@@ -51,6 +51,72 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
       },
     ],
   },
+  {
+    title: 'Manages',
+    roles: [UserRole.Incharge],
+    items: [
+      {
+        label: 'Courses',
+        route: '/app/incharge/courses',
+        icon: 'lucideBookOpen',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Batches',
+        route: '/app/incharge/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Candidates',
+        route: '/app/incharge/candidates',
+        icon: 'lucideUsers',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Materials',
+        route: '/app/incharge/materials',
+        icon: 'lucideFolderOpen',
+        roles: [UserRole.Incharge],
+      },
+    ],
+  },
+  {
+    title: 'Faculty',
+    roles: [UserRole.Faculty],
+    items: [
+      {
+        label: 'Schedule',
+        route: '/app/faculty/schedule',
+        icon: 'lucideCalendarDays',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'My Batches',
+        route: '/app/faculty/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'Examinations',
+        route: '/app/faculty/examinations',
+        icon: 'lucideClipboardCheck',
+        roles: [UserRole.Faculty],
+      },
+    ],
+  },
+  {
+    title: 'Finance',
+    roles: [UserRole.AccountsStaff],
+    items: [
+      {
+        label: 'Payments',
+        route: '/app/accounts/payments',
+        icon: 'lucideWallet',
+        roles: [UserRole.AccountsStaff],
+      },
+    ],
+  },
 ];
 
 function filterNavItemsForRole(items: readonly NavItem[], role: UserRole): NavItem[] {

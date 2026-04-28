@@ -8,6 +8,7 @@ import { LoginResponse } from '@features/auth/models/login-response';
 import { ApiResponse } from '@core/http/api-response';
 import { AuthToken } from './auth-token';
 import { CurrentUser } from './current-user';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -24,6 +25,19 @@ export class AuthService {
   >(() => ({
     mutationFn: (payload) =>
       firstValueFrom(this._http.post<ApiResponse<LoginResponse>>('/auth/login', payload)),
+  }));
+
+  readonly changePasswordMutation = injectMutation<
+    ApiResponse<null>,
+    HttpErrorResponse,
+    { currentPassword: string; newPassword: string }
+  >(() => ({
+    mutationFn: (payload) =>
+      firstValueFrom(this._http.post<ApiResponse<null>>('/auth/change-password', payload)),
+    onSuccess: () => {
+      toast.success('Password updated. Please sign in again with your new password.');
+      this.signOut();
+    },
   }));
 
   signOut(): void {

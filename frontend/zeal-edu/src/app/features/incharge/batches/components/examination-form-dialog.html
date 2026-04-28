@@ -1,0 +1,107 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isEdit() ? 'Edit Exam' : 'New Exam' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isEdit()
+            ? 'Update details for this exam. Only allowed before any results are recorded.'
+            : 'Schedule a new exam for this batch.'
+        }}
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <hlm-field>
+          <label hlmFieldLabel for="exam-name">Exam name</label>
+          <input
+            hlmInput
+            id="exam-name"
+            type="text"
+            formControlName="examName"
+            class="w-full"
+            maxlength="100"
+            placeholder="e.g. Midterm"
+          />
+          <hlm-field-error validator="required">Exam name is required.</hlm-field-error>
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="exam-date">Date</label>
+          <input
+            hlmInput
+            id="exam-date"
+            type="date"
+            formControlName="examDate"
+            class="w-full"
+          />
+          <hlm-field-error validator="required">Exam date is required.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="exam-location">Location (optional)</label>
+          <input
+            hlmInput
+            id="exam-location"
+            type="text"
+            formControlName="location"
+            class="w-full"
+            maxlength="100"
+            placeholder="e.g. Room 201"
+          />
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="exam-max-score">Max score</label>
+            <input
+              hlmInput
+              id="exam-max-score"
+              type="number"
+              formControlName="maxScore"
+              class="w-full"
+              min="1"
+            />
+            <hlm-field-error validator="required">Max score is required.</hlm-field-error>
+            <hlm-field-error validator="min">Max score must be greater than 0.</hlm-field-error>
+          </hlm-field>
+          <hlm-field>
+            <label hlmFieldLabel for="exam-pass-score">Pass score</label>
+            <input
+              hlmInput
+              id="exam-pass-score"
+              type="number"
+              formControlName="passScore"
+              class="w-full"
+              min="0"
+            />
+            <hlm-field-error validator="required">Pass score is required.</hlm-field-error>
+            <hlm-field-error validator="min">Pass score cannot be negative.</hlm-field-error>
+            <hlm-field-error validator="passExceedsMax">
+              Pass score cannot exceed max score.
+            </hlm-field-error>
+          </hlm-field>
+        </div>
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create exam' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

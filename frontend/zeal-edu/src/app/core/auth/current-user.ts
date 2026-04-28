@@ -9,6 +9,7 @@ export class CurrentUser {
 
   readonly user = this._user.asReadonly();
   readonly role = computed(() => this._user()?.role);
+  readonly mustChangePassword = computed(() => this._user()?.mustChangePassword === true);
 
   set(user: UserAccount): void {
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));

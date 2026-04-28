@@ -9,6 +9,7 @@ namespace ZealEducation.Application.Features.CourseEnquiries.Commands.CreateEnqu
 public class CreateEnquiryCommandHandler(
     IRepository<CourseEnquiry> enquiryRepository,
     IRepository<Staff> staffRepository,
+    IRepository<Course> courseRepository,
     IUnitOfWork unitOfWork,
     ICurrentUser currentUser) : IRequestHandler<CreateEnquiryCommand, CreateEnquiryResponse>
 {
@@ -21,13 +22,24 @@ public class CreateEnquiryCommandHandler(
         var staff = staffs[0]
             ?? throw new UnauthorizedException("Current user is not linked to a staff profile.");
 
+        var course = await courseRepository.GetByIdAsync(request.CourseInterestedId, cancellationToken)
+            ?? throw new NotFoundException(nameof(Course), request.CourseInterestedId);
+
+        if (!course.IsActive)
+            throw new ConflictException("The selected course is inactive and no longer accepting enquiries.");
+
+        var phone = request.Phone.Trim();
+        var phoneDuplicates = await enquiryRepository.FindAsync(e => e.Phone == phone, cancellationToken);
+        if (phoneDuplicates.Count > 0)
+            throw new ConflictException("An enquiry with this phone number already exists.");
+
         var enquiry = new CourseEnquiry
         {
             Id = Guid.NewGuid(),
             FullName = request.FullName.Trim(),
-            Phone = request.Phone.Trim(),
+            Phone = phone,
             Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
-            CourseInterested = request.CourseInterested.Trim(),
+            CourseInterestedId = course.Id,
             Source = request.Source,
             Status = request.Status,
             NextFollowUpDate = request.NextFollowUpDate,
@@ -42,7 +54,8 @@ public class CreateEnquiryCommandHandler(
             EnquiryId = enquiry.Id,
             FullName = enquiry.FullName,
             Phone = enquiry.Phone,
-            CourseInterested = enquiry.CourseInterested
+            CourseInterestedId = course.Id,
+            CourseInterestedName = course.CourseName
         };
     }
 }

@@ -12,4 +12,6 @@ public record GetAuditLogsQuery(
     Guid? UserId = null,
     string? TableName = null,
     DateTime? FromDate = null,
-    DateTime? ToDate = null) : IRequest<PaginatedList<AuditLogListItemDto>>;
+    DateTime? ToDate = null,
+    string? SortBy = null,
+    string? SortDirection = null) : IRequest<PaginatedList<AuditLogListItemDto>>;

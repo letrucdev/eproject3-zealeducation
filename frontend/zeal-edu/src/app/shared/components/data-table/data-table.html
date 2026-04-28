@@ -11,7 +11,18 @@
               [style.width]="widthStyle(col)"
               [style.min-width]="minWidthStyle(col)"
             >
-              {{ col.header }}
+              @if (col.sortable) {
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 select-none hover:text-foreground transition-colors"
+                  (click)="onSort(col)"
+                >
+                  <span>{{ col.header }}</span>
+                  <ng-icon hlm [name]="sortIcon(col)" size="sm" class="opacity-70" />
+                </button>
+              } @else {
+                {{ col.header }}
+              }
             </th>
           }
         </tr>

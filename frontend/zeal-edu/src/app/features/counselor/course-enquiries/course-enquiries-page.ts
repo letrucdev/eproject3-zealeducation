@@ -20,6 +20,7 @@ import { EnquirySource } from '@core/models/enquiry-source';
 import { EnquiryStatus } from '@core/models/enquiry-status';
 import { CourseEnquiriesService } from './course-enquiries.service';
 import { EnquiryListQuery } from './models/course-enquiry-payload';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 type DialogIntent = 'none' | 'edit' | 'view' | 'convert';
 
@@ -49,6 +50,8 @@ export default class CourseEnquiriesPage {
   protected readonly statusFilter = signal<EnquiryStatus | ''>('');
   protected readonly sourceFilter = signal<EnquirySource | ''>('');
   protected readonly dueFollowUpOnly = signal(false);
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('asc');
 
   protected readonly initialFilter: EnquiryFilterValue = {
     search: '',
@@ -67,6 +70,8 @@ export default class CourseEnquiriesPage {
     status: this.statusFilter() || undefined,
     source: this.sourceFilter() || undefined,
     dueFollowUpOnly: this.dueFollowUpOnly() || undefined,
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -131,6 +136,12 @@ export default class CourseEnquiriesPage {
     this.page.set(1);
   }
 
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
+    this.page.set(1);
+  }
+
   onCreateClicked(): void {
     this.formDialog().openCreate();
   }
@@ -159,18 +170,22 @@ export default class CourseEnquiriesPage {
   onFormSubmitted(event: EnquiryFormSubmit): void {
     if (event.mode === 'create') {
       this.createMutation.mutate(event.payload, {
-        onSuccess: () => {
-          toast.success('Enquiry created successfully.');
-          this.formDialog().close();
+        onSuccess: () => this.formDialog().close(),
+        onError: (err) => {
+          if (err.status === 409) {
+            this.formDialog().markPhoneTaken(event.payload.phone);
+          }
         },
       });
     } else {
       this.updateMutation.mutate(
         { enquiryId: event.enquiryId, payload: event.payload },
         {
-          onSuccess: () => {
-            toast.success('Enquiry updated successfully.');
-            this.formDialog().close();
+          onSuccess: () => this.formDialog().close(),
+          onError: (err) => {
+            if (err.status === 409) {
+              this.formDialog().markPhoneTaken(event.payload.phone);
+            }
           },
         },
       );
@@ -182,7 +197,6 @@ export default class CourseEnquiriesPage {
       { enquiryId: event.enquiryId, payload: { content: event.content } },
       {
         onSuccess: () => {
-          toast.success('Note added.');
           // re-open detail by retriggering focusedEnquiryId
           const id = event.enquiryId;
           this._dialogIntent.set('view');
@@ -197,10 +211,7 @@ export default class CourseEnquiriesPage {
     this.convertMutation.mutate(
       { enquiryId: event.enquiryId, payload: event.payload },
       {
-        onSuccess: (result) => {
-          toast.success('Enquiry converted successfully.');
-          this.convertDialog().showCredentials(result);
-        },
+        onSuccess: (result) => this.convertDialog().showCredentials(result),
       },
     );
   }

@@ -1,0 +1,43 @@
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideBookOpen" size="sm" />
+        Total
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl">{{ stats()?.total ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideCircleCheck" size="sm" class="text-emerald-600" />
+        Active
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl text-emerald-700">{{ stats()?.active ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideCircleOff" size="sm" class="text-muted-foreground" />
+        Inactive
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-7 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-3xl text-muted-foreground">{{ stats()?.inactive ?? 0 }}</h3>
+      }
+    </div>
+  </section>
+</div>

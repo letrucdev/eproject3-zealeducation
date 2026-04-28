@@ -44,6 +44,7 @@ public class CreateStaffCommandHandler(
             Gender = request.Gender,
             Role = request.Role,
             IsActive = true,
+            MustChangePassword = true,
             FailedLoginCount = 0
         };
 

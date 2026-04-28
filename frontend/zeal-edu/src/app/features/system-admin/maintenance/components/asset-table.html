@@ -1,0 +1,97 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [trackBy]="trackById"
+  itemLabel="assets"
+  emptyMessage="No assets found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+>
+  <ng-template assetCell="assetName" let-row>
+    <span class="font-medium">{{ row.assetName }}</span>
+  </ng-template>
+
+  <ng-template assetCell="assetType" let-row>
+    {{ row.assetType }}
+  </ng-template>
+
+  <ng-template assetCell="serialNumber" let-row>
+    <span class="font-mono text-xs">{{ row.serialNumber }}</span>
+  </ng-template>
+
+  <ng-template assetCell="location" let-row>
+    {{ row.location }}
+  </ng-template>
+
+  <ng-template assetCell="conditionStatus" let-row>
+    <span hlmBadge [variant]="conditionVariant(row.conditionStatus)">
+      {{ conditionLabel(row.conditionStatus) }}
+    </span>
+  </ng-template>
+
+  <ng-template assetCell="purchaseDate" let-row>
+    {{ row.purchaseDate | date: 'dd MMM yyyy' }}
+  </ng-template>
+
+  <ng-template assetCell="lastMaintenance" let-row>
+    @if (row.lastMaintenance) {
+      {{ row.lastMaintenance | date: 'dd MMM yyyy' }}
+    } @else {
+      &mdash;
+    }
+  </ng-template>
+
+  <ng-template assetCell="managedByName" let-row>
+    {{ row.managedByName }}
+  </ng-template>
+
+  <ng-template assetCell="actions" let-row>
+    @if (!showingDecommissioned()) {
+      <div class="flex items-center justify-end gap-1">
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          type="button"
+          (click)="viewClicked.emit(row)"
+          hlmTooltip="View Detail"
+        >
+          <ng-icon hlm name="lucideEye" size="sm" />
+        </button>
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          type="button"
+          (click)="editClicked.emit(row)"
+          hlmTooltip="Edit"
+        >
+          <ng-icon hlm name="lucidePencil" size="sm" />
+        </button>
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          type="button"
+          (click)="conditionChangeClicked.emit(row)"
+          hlmTooltip="Update Condition"
+        >
+          <ng-icon hlm name="lucideActivity" size="sm" />
+        </button>
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          type="button"
+          class="text-destructive hover:text-destructive hover:bg-destructive/10"
+          (click)="deleteClicked.emit(row)"
+          hlmTooltip="Delete"
+        >
+          <ng-icon hlm name="lucideTrash2" size="sm" />
+        </button>
+      </div>
+    }
+  </ng-template>
+</app-data-table>

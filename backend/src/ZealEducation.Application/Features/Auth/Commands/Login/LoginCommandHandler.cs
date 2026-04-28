@@ -37,7 +37,9 @@ public class LoginCommandHandler(
         userRepository.Update(user);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var tokenResult = jwtTokenService.GenerateToken(user);
+        var tokenResult = user.MustChangePassword
+            ? jwtTokenService.GeneratePasswordResetToken(user)
+            : jwtTokenService.GenerateToken(user);
 
         var response = new LoginResponse
         {
@@ -46,7 +48,10 @@ public class LoginCommandHandler(
             User = MapUser(user)
         };
 
-        await PopulateRoleInfoAsync(response, user, cancellationToken);
+        if (!user.MustChangePassword)
+        {
+            await PopulateRoleInfoAsync(response, user, cancellationToken);
+        }
 
         return response;
     }
@@ -99,6 +104,7 @@ public class LoginCommandHandler(
         Gender = user.Gender,
         Role = user.Role,
         IsActive = user.IsActive,
+        MustChangePassword = user.MustChangePassword,
         LastLogin = user.LastLogin
     };
 

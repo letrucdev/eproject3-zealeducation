@@ -18,7 +18,7 @@ export const authPersistenceInterceptor: HttpInterceptorFn = (req, next) => {
       const body = event.body as ApiResponse<LoginResponse> | null;
       if (!body?.data) return;
 
-      authToken.set(body.data.token);
+      authToken.set(body.data.token, body.data.expiresAt);
       currentUser.set(body.data.user);
     }),
   );

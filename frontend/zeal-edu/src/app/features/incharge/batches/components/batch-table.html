@@ -1,0 +1,113 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
+  [trackBy]="trackById"
+  itemLabel="batches"
+  emptyMessage="No batches found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
+>
+  <ng-template batchCell="batchCode" let-row>
+    <span class="font-mono font-medium">{{ row.batchCode }}</span>
+  </ng-template>
+
+  <ng-template batchCell="courseName" let-row>
+    <span class="font-medium">{{ row.courseName }}</span>
+  </ng-template>
+
+  <ng-template batchCell="facultyName" let-row>
+    @if (row.facultyName) {
+      <div class="flex flex-col">
+        <span>{{ row.facultyName }}</span>
+        <span class="text-muted-foreground text-xs">{{ row.facultyCode }}</span>
+      </div>
+    } @else {
+      <span class="text-muted-foreground italic text-sm">Not assigned</span>
+    }
+  </ng-template>
+
+  <ng-template batchCell="schedule" let-row>
+    <div class="flex flex-col text-xs">
+      <span
+        >{{ row.startDate | date: 'dd MMM yyyy' }} -> {{ row.endDate | date: 'dd MMM yyyy' }}</span
+      >
+      @if (row.location) {
+        <span class="text-muted-foreground">{{ row.location }}</span>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template batchCell="capacity" let-row>
+    {{ row.enrolledCount }} / {{ row.maxCapacity }}
+  </ng-template>
+
+  <ng-template batchCell="status" let-row>
+    @switch (row.status) {
+      @case (statuses.NeedsInstructor) {
+        <span hlmBadge class="bg-amber-100 text-amber-800">Needs Instructor</span>
+      }
+      @case (statuses.Active) {
+        <span hlmBadge class="bg-emerald-100 text-emerald-800">Active</span>
+      }
+      @case (statuses.Completed) {
+        <span hlmBadge class="bg-slate-100 text-slate-800">Completed</span>
+      }
+      @case (statuses.Cancelled) {
+        <span hlmBadge class="bg-rose-100 text-rose-800">Cancelled</span>
+      }
+    }
+  </ng-template>
+
+  <ng-template batchCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="viewClicked.emit(row)"
+        [attr.aria-label]="'View ' + row.batchCode"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="assignFacultyClicked.emit(row)"
+        [attr.aria-label]="'Assign faculty to ' + row.batchCode"
+        [disabled]="row.status === statuses.Cancelled || row.status === statuses.Completed"
+      >
+        <ng-icon hlm name="lucideUserPlus" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="editClicked.emit(row)"
+        [attr.aria-label]="'Edit ' + row.batchCode"
+        [disabled]="row.status === statuses.Cancelled || row.status === statuses.Completed"
+      >
+        <ng-icon hlm name="lucidePencil" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="deleteClicked.emit(row)"
+        [attr.aria-label]="'Delete ' + row.batchCode"
+        [disabled]="row.facultyId !== null || row.enrolledCount > 0"
+      >
+        <ng-icon hlm name="lucideTrash2" size="sm" />
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

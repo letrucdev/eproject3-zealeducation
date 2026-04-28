@@ -1,0 +1,122 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isEdit() ? 'Edit Session' : 'New Session' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isEdit()
+            ? 'Update the date, time, or status of this session.'
+            : 'Schedule a new class session for this batch.'
+        }}
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <hlm-field>
+          <label hlmFieldLabel for="session-date">Date</label>
+          <input
+            hlmInput
+            id="session-date"
+            type="date"
+            formControlName="sessionDate"
+            class="w-full"
+          />
+          <hlm-field-error validator="required">Session date is required.</hlm-field-error>
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="session-start">Start Time</label>
+            <input
+              hlmInput
+              id="session-start"
+              type="time"
+              formControlName="startTime"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Start time is required.</hlm-field-error>
+          </hlm-field>
+          <hlm-field>
+            <label hlmFieldLabel for="session-end">End Time</label>
+            <input
+              hlmInput
+              id="session-end"
+              type="time"
+              formControlName="endTime"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">End time is required.</hlm-field-error>
+            <hlm-field-error validator="endBeforeStart">
+              End time must be after start time.
+            </hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label hlmFieldLabel for="session-topic">Topic (optional)</label>
+          <input
+            hlmInput
+            id="session-topic"
+            type="text"
+            formControlName="topic"
+            class="w-full"
+            maxlength="200"
+            placeholder="e.g. Introduction to Components"
+          />
+          <hlm-field-error validator="maxlength">Max 200 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="session-location">Location (optional)</label>
+          <input
+            hlmInput
+            id="session-location"
+            type="text"
+            formControlName="location"
+            class="w-full"
+            maxlength="100"
+            placeholder="e.g. Room 101"
+          />
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        @if (isEdit()) {
+          <hlm-field>
+            <label hlmFieldLabel for="session-status">Status</label>
+            <hlm-select
+              formControlName="status"
+              class="w-full"
+              [itemToString]="statusLabel"
+            >
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value placeholder="Select status" />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                <hlm-select-item [value]="statuses.Scheduled">Scheduled</hlm-select-item>
+                <hlm-select-item [value]="statuses.Completed">Completed</hlm-select-item>
+                <hlm-select-item [value]="statuses.Cancelled">Cancelled</hlm-select-item>
+              </hlm-select-content>
+            </hlm-select>
+          </hlm-field>
+        }
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create session' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

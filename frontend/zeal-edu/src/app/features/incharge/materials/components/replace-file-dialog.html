@@ -1,0 +1,82 @@
+@let t = target();
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="flex max-h-[90dvh] w-xl flex-col sm:max-w-xl"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Replace file</h2>
+      <p class="text-muted-foreground text-sm">
+        @if (t) {
+          The current file <span class="font-medium">{{ t.fileName }}</span> ({{ t.fileSizeMb }} MB)
+          will be replaced.
+        }
+      </p>
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
+    >
+      <hlm-field-group class="min-h-0 flex-1">
+        <hlm-field>
+          <label hlmFieldLabel>New file</label>
+          @let fileValue = form.controls.file.value;
+          @if (!fileValue) {
+            <label
+              for="replace-file-input"
+              (dragover)="onDragOver($event)"
+              (drop)="onFileDrop($event)"
+              class="border-input bg-muted/30 hover:bg-accent/40 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed py-8 text-sm transition-colors"
+            >
+              <ng-icon name="lucideUpload" class="text-muted-foreground text-[24px]" />
+              <span class="text-foreground font-medium">Click to upload or drag &amp; drop</span>
+              <span class="text-muted-foreground text-xs">Up to 50 MB</span>
+            </label>
+            <input
+              id="replace-file-input"
+              type="file"
+              hidden
+              [accept]="'.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp4,.mov,.jpg,.jpeg,.png'"
+              (change)="onFileChange($event)"
+            />
+          } @else {
+            <div
+              class="border-input bg-muted/30 flex items-center gap-3 rounded-md border px-3 py-2 text-sm"
+            >
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-medium" [title]="fileValue.name">{{ fileValue.name }}</p>
+                <p class="text-muted-foreground text-xs">{{ formatFileSize(fileValue.size) }} MB</p>
+              </div>
+              <button
+                hlmBtn
+                variant="ghost"
+                size="icon-sm"
+                type="button"
+                aria-label="Remove file"
+                (click)="clearFile()"
+              >
+                <ng-icon name="lucideX" class="text-[16px]" />
+              </button>
+            </div>
+          }
+          <hlm-field-error validator="required">A file is required.</hlm-field-error>
+          <hlm-field-error validator="fileTooLarge">File exceeds 50 MB.</hlm-field-error>
+          <hlm-field-error validator="fileTypeInvalid">Unsupported file type.</hlm-field-error>
+        </hlm-field>
+      </hlm-field-group>
+
+      <div hlmDialogFooter>
+        <button hlmBtn variant="ghost" type="button" (click)="close()">Cancel</button>
+        <button hlmBtn type="submit" [disabled]="submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          Replace
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

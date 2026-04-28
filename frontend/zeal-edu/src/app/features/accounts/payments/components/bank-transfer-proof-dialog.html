@@ -1,0 +1,42 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-[92vw] flex flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h3 hlmDialogTitle>Bank Transfer Proof</h3>
+      @if (receiptNumber(); as rn) {
+        <p class="text-muted-foreground text-sm">Receipt {{ rn }}</p>
+      }
+    </div>
+
+    <div class="flex min-h-[200px] items-center justify-center py-2">
+      @if (loading()) {
+        <hlm-spinner />
+      } @else if (errorMessage()) {
+        <p class="text-sm text-rose-600">{{ errorMessage() }}</p>
+      } @else if (imageUrl(); as url) {
+        <img
+          [src]="url"
+          alt="Bank transfer proof"
+          class="max-h-[70vh] w-full rounded-md border object-contain"
+        />
+      }
+    </div>
+
+    <div hlmDialogFooter class="mt-2">
+      @if (imageUrl(); as url) {
+        <a
+          hlmBtn
+          variant="outline"
+          [href]="url"
+          [download]="(receiptNumber() ?? 'bank-transfer-proof') + '-proof'"
+        >
+          Download
+        </a>
+      }
+      <button hlmBtn type="button" (click)="onClose()">Close</button>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

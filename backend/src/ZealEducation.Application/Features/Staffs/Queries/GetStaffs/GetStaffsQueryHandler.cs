@@ -52,8 +52,24 @@ public class GetStaffsQueryHandler(
             query = query.Where(x => x.User.IsActive == isActive);
         }
 
-        var projected = query
-            .OrderBy(x => x.User.FullName)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("email", "desc") => query.OrderByDescending(x => x.User.Email),
+            ("email", _) => query.OrderBy(x => x.User.Email),
+            ("phone", "desc") => query.OrderByDescending(x => x.User.Phone),
+            ("phone", _) => query.OrderBy(x => x.User.Phone),
+            ("dob", "desc") => query.OrderByDescending(x => x.User.Dob),
+            ("dob", _) => query.OrderBy(x => x.User.Dob),
+            ("joineddate", "desc") => query.OrderByDescending(x => x.Staff.JoinedDate),
+            ("joineddate", _) => query.OrderBy(x => x.Staff.JoinedDate),
+            ("fullname", "desc") => query.OrderByDescending(x => x.User.FullName),
+            _ => query.OrderBy(x => x.User.FullName),
+        };
+
+        var projected = ordered
             .Select(x => new StaffListItemDto
             {
                 StaffId = x.Staff.Id,

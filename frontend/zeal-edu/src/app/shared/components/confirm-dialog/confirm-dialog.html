@@ -1,0 +1,22 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content *hlmDialogPortal class="sm:max-w-md" [showCloseButton]="false">
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>{{ title() }}</h2>
+      <p class="text-muted-foreground text-sm whitespace-pre-line">{{ message() }}</p>
+    </div>
+
+    <div hlmDialogFooter class="shrink-0">
+      <button hlmBtn variant="outline" type="button" (click)="onCancel()">
+        {{ cancelLabel() }}
+      </button>
+      <button
+        hlmBtn
+        [variant]="destructive() ? 'destructive' : 'default'"
+        type="button"
+        (click)="onConfirm()"
+      >
+        {{ confirmLabel() }}
+      </button>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

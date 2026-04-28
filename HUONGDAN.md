@@ -87,18 +87,12 @@ cp .env.example .env
 
 Mở file `.env` vừa tạo và **sửa lại port** thành port của backend.
 
-Sau đó chạy:
-
-```bash
-npm run set-env && ng build
-```
-
 ---
 
 ### 3. Khởi động Frontend
 
 ```bash
-ng serve
+npm run start
 ```
 
 ---
@@ -108,4 +102,4 @@ ng serve
 | Thành phần | Lệnh |
 |------------|------|
 | Backend    | `dotnet run build --project ./src/ZealEducation.API` |
-| Frontend   | `ng serve` |
+| Frontend   | `npm run start` |
