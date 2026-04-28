@@ -49,6 +49,10 @@ public class UserAccountConfiguration : IEntityTypeConfiguration<UserAccount>
             .IsRequired()
             .HasDefaultValue(true);
 
+        builder.Property(u => u.MustChangePassword)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.Property(u => u.FailedLoginCount)
             .IsRequired()
             .HasDefaultValue(0);

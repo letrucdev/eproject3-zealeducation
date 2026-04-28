@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Directive, input, output } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
-import { lucideEye, lucidePencil, lucideScale } from '@ng-icons/lucide';
+import { lucideEye, lucideKeyRound, lucidePencil, lucideScale } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
@@ -40,7 +40,7 @@ export class CandidateCellDef extends DataTableCellDef<CandidateListItem> {
     HlmButtonImports,
     HlmIconImports,
   ],
-  providers: [provideIcons({ lucideEye, lucidePencil, lucideScale })],
+  providers: [provideIcons({ lucideEye, lucidePencil, lucideScale, lucideKeyRound })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'candidate-table.html',
 })
@@ -54,6 +54,7 @@ export class CandidateTable {
   readonly viewClicked = output<CandidateListItem>();
   readonly editClicked = output<CandidateListItem>();
   readonly fineClicked = output<CandidateListItem>();
+  readonly resetPasswordClicked = output<CandidateListItem>();
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
   readonly sortChanged = output<DataTableSortChange>();
@@ -67,7 +68,7 @@ export class CandidateTable {
     { key: 'currentCourse', header: 'Course', width: 'w-56' },
     { key: 'currentBatch', header: 'Batch', width: 'w-36' },
     { key: 'status', header: 'Status', sortable: true, width: 'w-32', align: 'center' },
-    { key: 'actions', header: 'Actions', width: 'w-36', align: 'right' },
+    { key: 'actions', header: 'Actions', width: 'w-44', align: 'right' },
   ];
 
   protected readonly trackById = (row: CandidateListItem): string => row.candidateId;

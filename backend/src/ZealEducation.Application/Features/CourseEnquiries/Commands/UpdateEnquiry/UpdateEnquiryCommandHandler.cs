@@ -32,8 +32,17 @@ public class UpdateEnquiryCommandHandler(
             enquiry.CourseInterestedId = course.Id;
         }
 
+        var phone = request.Phone.Trim();
+        if (enquiry.Phone != phone)
+        {
+            var phoneDuplicates = await enquiryRepository.FindAsync(
+                e => e.Phone == phone && e.Id != enquiry.Id, cancellationToken);
+            if (phoneDuplicates.Count > 0)
+                throw new ConflictException("An enquiry with this phone number already exists.");
+        }
+
         enquiry.FullName = request.FullName.Trim();
-        enquiry.Phone = request.Phone.Trim();
+        enquiry.Phone = phone;
         enquiry.Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim();
         enquiry.Source = request.Source;
         enquiry.Status = request.Status;

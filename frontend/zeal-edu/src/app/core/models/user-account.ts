@@ -14,6 +14,7 @@ export interface UserAccount {
   gender: Gender;
   role: UserRole;
   isActive: boolean;
+  mustChangePassword: boolean;
   lastLogin: string | null;
   staff?: StaffInfo;
   faculty?: FacultyInfo;

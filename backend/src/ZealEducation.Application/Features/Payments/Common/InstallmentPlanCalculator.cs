@@ -38,7 +38,7 @@ public static class InstallmentPlanCalculator
         var count = (int)Math.Ceiling(months / (double)interval);
         if (count < 1) count = 1;
 
-        var amountPer = Math.Round(totalFee / count, 2, MidpointRounding.AwayFromZero);
+        var amountPer = Math.Floor(totalFee / count);
         var distributed = amountPer * (count - 1);
         var lastAmount = totalFee - distributed;
 

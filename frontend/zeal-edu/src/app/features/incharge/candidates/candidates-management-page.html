@@ -25,6 +25,7 @@
         (viewClicked)="onViewClicked($event)"
         (editClicked)="onEditClicked($event)"
         (fineClicked)="onFineClicked($event)"
+        (resetPasswordClicked)="onResetPasswordClicked($event)"
         (pageChanged)="onPageChanged($event)"
         (pageSizeChanged)="onPageSizeChanged($event)"
         (sortChanged)="onSortChanged($event)"
@@ -43,4 +44,12 @@
     [submitting]="applyFineMutation.isPending()"
     (submitted)="onApplyFineSubmitted($event)"
   />
+
+  <app-confirm-dialog
+    #resetConfirm
+    (confirmed)="onResetConfirmed()"
+    (cancelled)="onResetCancelled()"
+  />
+
+  <app-reset-password-result-dialog #resetResultDialog />
 </section>

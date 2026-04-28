@@ -61,7 +61,7 @@ public class CourseEnquiryConfiguration : IEntityTypeConfiguration<CourseEnquiry
         builder.HasIndex(e => e.AssignedCounselorId);
         builder.HasIndex(e => e.Status);
         builder.HasIndex(e => e.NextFollowUpDate);
-        builder.HasIndex(e => e.Phone);
+        builder.HasIndex(e => e.Phone).IsUnique();
         builder.HasIndex(e => e.CourseInterestedId);
 
         builder.Ignore(e => e.DomainEvents);

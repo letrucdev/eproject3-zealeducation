@@ -117,10 +117,15 @@ export class LoginForm {
       this.form.controls.password.setErrors({
         incorrectPassword: resolveMessage(error) || 'Invalid username or password.',
       });
+      this.form.controls.password.markAsTouched();
     });
 
     effect(() => {
       if (!this.auth.loginMutation.isSuccess()) return;
+      if (this._currentUser.mustChangePassword()) {
+        void this._router.navigateByUrl('/change-password');
+        return;
+      }
       const role = this._currentUser.role();
       const first = role !== undefined ? navMenusForRole(role)[0].items[0] : undefined;
       void this._router.navigateByUrl(first?.route ?? '/app');

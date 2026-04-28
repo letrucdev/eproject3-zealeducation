@@ -28,7 +28,14 @@
         <ng-icon hlm name="lucidePencil" size="sm" />
         Edit
       </button>
-      <button hlmBtn size="sm" type="button" (click)="fineClicked.emit()">
+      <button
+        hlmBtn
+        size="sm"
+        type="button"
+        [disabled]="!detail().isActive"
+        [attr.title]="!detail().isActive ? 'Cannot apply fine to an inactive account' : null"
+        (click)="fineClicked.emit()"
+      >
         <ng-icon hlm name="lucideScale" size="sm" />
         Apply Fine
       </button>

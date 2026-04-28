@@ -16,9 +16,11 @@ import { ApplyFineDialog, ApplyFineSubmit } from './components/apply-fine-dialog
 import { CandidateFilterBar, CandidateFilterValue } from './components/candidate-filter-bar';
 import { CandidateTable } from './components/candidate-table';
 import { CandidateUpdateDialog, CandidateUpdateSubmit } from './components/candidate-update-dialog';
+import { ResetPasswordResultDialog } from './components/reset-password-result-dialog';
 import { CandidateListItem } from './models/candidate-list-item';
 import { CandidateListQuery } from './models/candidate-payload';
 import { DataTableSortChange } from '@shared/components/data-table';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-candidates-management-page',
@@ -28,6 +30,8 @@ import { DataTableSortChange } from '@shared/components/data-table';
     CandidateTable,
     CandidateUpdateDialog,
     ApplyFineDialog,
+    ConfirmDialog,
+    ResetPasswordResultDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'candidates-management-page.html',
@@ -38,6 +42,8 @@ export default class CandidatesManagementPage {
 
   protected readonly updateDialog = viewChild.required<CandidateUpdateDialog>('updateDialog');
   protected readonly fineDialog = viewChild.required<ApplyFineDialog>('fineDialog');
+  protected readonly resetConfirm = viewChild.required<ConfirmDialog>('resetConfirm');
+  protected readonly resetResultDialog = viewChild.required<ResetPasswordResultDialog>('resetResultDialog');
 
   protected readonly page = signal(1);
   protected readonly pageSize = signal(10);
@@ -72,6 +78,9 @@ export default class CandidatesManagementPage {
   protected readonly detailQuery = this._service.detailQuery(this.focusedCandidateId);
   protected readonly updateMutation = this._service.updateMutation();
   protected readonly applyFineMutation = this._service.applyFineMutation();
+  protected readonly resetPasswordMutation = this._service.resetPasswordMutation();
+
+  private _pendingResetTarget: CandidateListItem | null = null;
 
   constructor() {
     effect(() => {
@@ -130,6 +139,38 @@ export default class CandidatesManagementPage {
       candidateCode: row.candidateCode,
       candidateName: row.fullName,
     });
+  }
+
+  onResetPasswordClicked(row: CandidateListItem): void {
+    this._pendingResetTarget = row;
+    this.resetConfirm().open({
+      title: 'Reset password?',
+      message: `A new temporary password will be generated for ${row.fullName} (${row.candidateCode}). The candidate will be required to change it on next login.`,
+      confirmLabel: 'Reset password',
+    });
+  }
+
+  onResetConfirmed(): void {
+    const target = this._pendingResetTarget;
+    if (!target) return;
+    this._pendingResetTarget = null;
+    this.resetPasswordMutation.mutate(
+      { candidateId: target.candidateId },
+      {
+        onSuccess: (result) => {
+          toast.success('Password reset successfully.');
+          this.resetResultDialog().open({
+            ...result,
+            candidateName: target.fullName,
+            candidateCode: target.candidateCode,
+          });
+        },
+      },
+    );
+  }
+
+  onResetCancelled(): void {
+    this._pendingResetTarget = null;
   }
 
   onUpdateSubmitted(event: CandidateUpdateSubmit): void {

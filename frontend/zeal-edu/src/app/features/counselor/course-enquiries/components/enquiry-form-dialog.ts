@@ -8,7 +8,13 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmComboboxImports } from '@spartan-ng/helm/combobox';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
@@ -79,6 +85,14 @@ export class EnquiryFormDialog {
 
   readonly isEdit = computed(() => this.mode() === 'edit');
 
+  private readonly _takenPhones = signal<ReadonlySet<string>>(new Set());
+
+  private readonly _phoneTakenValidator: ValidatorFn = (control: AbstractControl) => {
+    const value = (control.value as string | null)?.trim();
+    if (!value) return null;
+    return this._takenPhones().has(value) ? { phoneTaken: true } : null;
+  };
+
   readonly form = this._fb.group({
     fullName: this._fb.nonNullable.control('', [Validators.required, Validators.maxLength(100)]),
     phone: this._fb.nonNullable.control('', [
@@ -86,6 +100,7 @@ export class EnquiryFormDialog {
       Validators.minLength(10),
       Validators.maxLength(10),
       Validators.pattern(/^\d+$/),
+      this._phoneTakenValidator,
     ]),
     email: this._fb.nonNullable.control('', [Validators.email, Validators.maxLength(100)]),
     courseInterested: this._fb.control<CourseListItem | null>(null, [Validators.required]),
@@ -108,10 +123,21 @@ export class EnquiryFormDialog {
   protected readonly courseItemToString = (course: CourseListItem | null): string =>
     course?.courseName ?? '';
 
+  markPhoneTaken(phone: string): void {
+    const trimmed = phone.trim();
+    if (!trimmed) return;
+    const next = new Set(this._takenPhones());
+    next.add(trimmed);
+    this._takenPhones.set(next);
+    this.form.controls.phone.updateValueAndValidity();
+    this.form.controls.phone.markAsTouched();
+  }
+
   openCreate(): void {
     this.mode.set('create');
     this.initial.set(null);
     this.courseSearch.set('');
+    this._takenPhones.set(new Set());
     this.form.reset({
       fullName: '',
       phone: '',
@@ -128,6 +154,7 @@ export class EnquiryFormDialog {
     this.mode.set('edit');
     this.initial.set(detail);
     this.courseSearch.set('');
+    this._takenPhones.set(new Set());
     this.form.reset({
       fullName: detail.fullName,
       phone: detail.phone,

@@ -30,3 +30,8 @@ export interface ApplyFineResponse {
   fineId: string;
   feeId: string;
 }
+
+export interface ResetCandidatePasswordResponse {
+  username: string;
+  temporaryPassword: string;
+}

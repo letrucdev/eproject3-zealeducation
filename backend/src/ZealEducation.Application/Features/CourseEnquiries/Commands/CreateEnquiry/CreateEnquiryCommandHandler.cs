@@ -28,11 +28,16 @@ public class CreateEnquiryCommandHandler(
         if (!course.IsActive)
             throw new ConflictException("The selected course is inactive and no longer accepting enquiries.");
 
+        var phone = request.Phone.Trim();
+        var phoneDuplicates = await enquiryRepository.FindAsync(e => e.Phone == phone, cancellationToken);
+        if (phoneDuplicates.Count > 0)
+            throw new ConflictException("An enquiry with this phone number already exists.");
+
         var enquiry = new CourseEnquiry
         {
             Id = Guid.NewGuid(),
             FullName = request.FullName.Trim(),
-            Phone = request.Phone.Trim(),
+            Phone = phone,
             Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
             CourseInterestedId = course.Id,
             Source = request.Source,

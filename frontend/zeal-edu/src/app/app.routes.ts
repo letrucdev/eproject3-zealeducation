@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/auth/auth.guard';
+import { mustChangePasswordGuard } from '@core/auth/must-change-password.guard';
 import { defaultRoleRedirect } from '@core/layout/default-redirect';
 import { UserRole } from '@core/models/user-role';
 import { hasRole } from '@core/auth/role.guard';
@@ -11,7 +12,7 @@ export const routes: Routes = [
   },
   {
     path: 'app',
-    canMatch: [authGuard],
+    canMatch: [authGuard, mustChangePasswordGuard],
     loadComponent: () => import('@core/layout/app-shell').then((m) => m.AppShell),
     data: { breadcrumb: 'Home' },
     children: [

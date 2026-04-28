@@ -15,6 +15,7 @@ import {
   ApplyFinePayload,
   ApplyFineResponse,
   CandidateListQuery,
+  ResetCandidatePasswordResponse,
   UpdateCandidatePayload,
 } from './models/candidate-payload';
 
@@ -53,6 +54,23 @@ export class CandidatesService {
         firstValueFrom(this._http.put<ApiResponse<unknown>>(`/candidates/${candidateId}`, payload)),
       onSuccess: () => this._invalidateAll(),
     }));
+  }
+
+  resetPasswordMutation() {
+    return injectMutation<ResetCandidatePasswordResponse, HttpErrorResponse, { candidateId: string }>(
+      () => ({
+        mutationFn: async ({ candidateId }) => {
+          const response = await firstValueFrom(
+            this._http.post<ApiResponse<ResetCandidatePasswordResponse>>(
+              `/candidates/${candidateId}/reset-password`,
+              {},
+            ),
+          );
+          if (!response.data) throw new Error(response.message || 'Failed to reset password');
+          return response.data;
+        },
+      }),
+    );
   }
 
   applyFineMutation() {

@@ -170,18 +170,22 @@ export default class CourseEnquiriesPage {
   onFormSubmitted(event: EnquiryFormSubmit): void {
     if (event.mode === 'create') {
       this.createMutation.mutate(event.payload, {
-        onSuccess: () => {
-          toast.success('Enquiry created successfully.');
-          this.formDialog().close();
+        onSuccess: () => this.formDialog().close(),
+        onError: (err) => {
+          if (err.status === 409) {
+            this.formDialog().markPhoneTaken(event.payload.phone);
+          }
         },
       });
     } else {
       this.updateMutation.mutate(
         { enquiryId: event.enquiryId, payload: event.payload },
         {
-          onSuccess: () => {
-            toast.success('Enquiry updated successfully.');
-            this.formDialog().close();
+          onSuccess: () => this.formDialog().close(),
+          onError: (err) => {
+            if (err.status === 409) {
+              this.formDialog().markPhoneTaken(event.payload.phone);
+            }
           },
         },
       );
@@ -193,7 +197,6 @@ export default class CourseEnquiriesPage {
       { enquiryId: event.enquiryId, payload: { content: event.content } },
       {
         onSuccess: () => {
-          toast.success('Note added.');
           // re-open detail by retriggering focusedEnquiryId
           const id = event.enquiryId;
           this._dialogIntent.set('view');
@@ -208,10 +211,7 @@ export default class CourseEnquiriesPage {
     this.convertMutation.mutate(
       { enquiryId: event.enquiryId, payload: event.payload },
       {
-        onSuccess: (result) => {
-          toast.success('Enquiry converted successfully.');
-          this.convertDialog().showCredentials(result);
-        },
+        onSuccess: (result) => this.convertDialog().showCredentials(result),
       },
     );
   }

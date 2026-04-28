@@ -9,6 +9,7 @@ namespace ZealEducation.Application.Features.Candidates.Commands.ApplyFine;
 
 public class ApplyFineCommandHandler(
     IRepository<Candidate> candidateRepository,
+    IRepository<UserAccount> userRepository,
     IRepository<Staff> staffRepository,
     IRepository<FeeStructure> feeRepository,
     IRepository<Fine> fineRepository,
@@ -22,6 +23,12 @@ public class ApplyFineCommandHandler(
 
         var candidate = await candidateRepository.GetByIdAsync(request.CandidateId, cancellationToken)
             ?? throw new NotFoundException(nameof(Candidate), request.CandidateId);
+
+        var candidateUser = await userRepository.GetByIdAsync(candidate.UserAccountId, cancellationToken)
+            ?? throw new NotFoundException(nameof(UserAccount), candidate.UserAccountId);
+
+        if (!candidateUser.IsActive)
+            throw new ConflictException("Cannot apply a fine to a candidate with an inactive account.");
 
         var staffMatches = await staffRepository.FindAsync(
             s => s.UserAccountId == currentUser.UserId.Value,

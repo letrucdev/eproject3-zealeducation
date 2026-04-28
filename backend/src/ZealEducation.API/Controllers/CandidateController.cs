@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ZealEducation.API.Common.Models;
 using ZealEducation.Application.Common.Models;
 using ZealEducation.Application.Features.Candidates.Commands.ApplyFine;
+using ZealEducation.Application.Features.Candidates.Commands.ResetCandidatePassword;
 using ZealEducation.Application.Features.Candidates.Commands.UpdateCandidate;
 using ZealEducation.Application.Features.Candidates.Queries.GetCandidateDetail;
 using ZealEducation.Application.Features.Candidates.Queries.GetCandidates;
@@ -60,6 +61,13 @@ public class CandidateController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(new ApplyFineCommand(id, body.ViolationReason, body.PenaltyAmount));
         return Ok(ApiResponse<ApplyFineResponse>.Success(result, "Fine applied successfully"));
+    }
+
+    [HttpPost("{id:guid}/reset-password")]
+    public async Task<ActionResult<ApiResponse<ResetCandidatePasswordResponse>>> ResetPassword(Guid id)
+    {
+        var result = await sender.Send(new ResetCandidatePasswordCommand(id));
+        return Ok(ApiResponse<ResetCandidatePasswordResponse>.Success(result, "Candidate password reset successfully"));
     }
 
     public record UpdateCandidateRequest(

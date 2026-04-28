@@ -92,10 +92,23 @@
         variant="ghost"
         size="sm"
         type="button"
+        [disabled]="!row.isActive"
+        [attr.title]="!row.isActive ? 'Cannot apply fine to an inactive account' : null"
         (click)="fineClicked.emit(row)"
         [attr.aria-label]="'Apply fine to ' + row.candidateCode"
       >
         <ng-icon hlm name="lucideScale" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        title="Reset password"
+        (click)="resetPasswordClicked.emit(row)"
+        [attr.aria-label]="'Reset password for ' + row.candidateCode"
+      >
+        <ng-icon hlm name="lucideKeyRound" size="sm" />
       </button>
     </div>
   </ng-template>

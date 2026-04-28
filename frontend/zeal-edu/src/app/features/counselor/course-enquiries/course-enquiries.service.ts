@@ -17,6 +17,7 @@ import {
   EnquiryListQuery,
   UpdateEnquiryPayload,
 } from './models/course-enquiry-payload';
+import { toast } from '@spartan-ng/brain/sonner';
 
 export const ENQUIRY_QUERY_KEY = ['course-enquiries'] as const;
 export const ENQUIRY_STATS_QUERY_KEY = ['course-enquiry-statistics'] as const;
@@ -53,7 +54,10 @@ export class CourseEnquiriesService {
     return injectMutation<unknown, HttpErrorResponse, CreateEnquiryPayload>(() => ({
       mutationFn: (payload) =>
         firstValueFrom(this._http.post<ApiResponse<unknown>>('/course-enquiries', payload)),
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Enquiry updated successfully.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -67,7 +71,10 @@ export class CourseEnquiriesService {
         firstValueFrom(
           this._http.put<ApiResponse<unknown>>(`/course-enquiries/${enquiryId}`, payload),
         ),
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Enquiry created successfully.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -87,7 +94,10 @@ export class CourseEnquiriesService {
         if (!response.data) throw new Error(response.message || 'Failed to add note');
         return response.data;
       },
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Note added.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -107,7 +117,10 @@ export class CourseEnquiriesService {
         if (!response.data) throw new Error(response.message || 'Failed to convert');
         return response.data;
       },
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Enquiry converted successfully.');
+        this._invalidateAll();
+      },
     }));
   }
 

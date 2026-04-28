@@ -89,6 +89,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(CorsPolicyName);
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<PasswordResetTokenGuardMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

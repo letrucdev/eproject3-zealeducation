@@ -62,6 +62,7 @@ public class ConvertEnquiryCommandHandler(
             Gender = request.Gender,
             Role = UserRole.Candidate,
             IsActive = false,
+            MustChangePassword = true,
             FailedLoginCount = 0
         };
 
