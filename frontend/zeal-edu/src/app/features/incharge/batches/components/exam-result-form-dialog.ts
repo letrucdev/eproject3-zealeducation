@@ -23,6 +23,7 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ExamResult, OverrideExamResultPayload } from '@core/models/exam-result';
 import { Examination } from '@core/models/examination';
+import { HlmTextarea, HlmTextareaImports } from '@spartan-ng/helm/textarea';
 
 export interface ExamResultFormSubmit {
   resultId: string;
@@ -47,6 +48,7 @@ const scoreWithinMaxValidator =
     HlmInputImports,
     HlmButtonImports,
     HlmSpinnerImports,
+    HlmTextareaImports,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'exam-result-form-dialog.html',

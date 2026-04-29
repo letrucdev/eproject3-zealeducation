@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Directive, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import { lucideEye, lucidePencil, lucideTrash2, lucideUserPlus } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
@@ -34,7 +35,15 @@ export class BatchCellDef extends DataTableCellDef<BatchListItem> {
 
 @Component({
   selector: 'app-batch-table',
-  imports: [DataTable, BatchCellDef, DatePipe, HlmBadgeImports, HlmButtonImports, HlmIconImports],
+  imports: [
+    DataTable,
+    BatchCellDef,
+    DatePipe,
+    RouterLink,
+    HlmBadgeImports,
+    HlmButtonImports,
+    HlmIconImports,
+  ],
   providers: [provideIcons({ lucideEye, lucidePencil, lucideTrash2, lucideUserPlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'batch-table.html',

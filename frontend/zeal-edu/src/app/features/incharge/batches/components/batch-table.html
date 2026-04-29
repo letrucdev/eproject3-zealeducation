@@ -13,7 +13,15 @@
   (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template batchCell="batchCode" let-row>
-    <span class="font-mono font-medium">{{ row.batchCode }}</span>
+    <a
+      hlmBtn
+      variant="link"
+      class="pl-0"
+      [routerLink]="['/app/incharge/batches', row.batchId]"
+      [attr.aria-label]="'View ' + row.batchCode"
+    >
+      {{ row.batchCode }}
+    </a>
   </ng-template>
 
   <ng-template batchCell="courseName" let-row>

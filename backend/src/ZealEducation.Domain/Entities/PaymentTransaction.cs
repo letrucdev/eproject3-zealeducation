@@ -9,6 +9,7 @@ public class PaymentTransaction : BaseAuditableEntity
     public Guid ProcessedByStaffId { get; set; }
     public Guid? InstallmentPlanId { get; set; }
     public decimal Amount { get; set; }
+    public decimal OutstandingBalanceAfter { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public string ReceiptNumber { get; set; } = default!;
     public DateTime PaymentDate { get; set; }

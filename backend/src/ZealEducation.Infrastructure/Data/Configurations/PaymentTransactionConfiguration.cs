@@ -16,6 +16,10 @@ public class PaymentTransactionConfiguration : IEntityTypeConfiguration<PaymentT
             .IsRequired()
             .HasColumnType("decimal(12,2)");
 
+        builder.Property(t => t.OutstandingBalanceAfter)
+            .IsRequired()
+            .HasColumnType("decimal(12,2)");
+
         builder.Property(t => t.PaymentMethod)
             .IsRequired()
             .HasMaxLength(30)
