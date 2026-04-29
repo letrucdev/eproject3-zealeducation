@@ -16,6 +16,8 @@ public class GetMyStudyMaterialFileQueryHandler(
     IRepository<Enrollment> enrollmentRepository,
     IRepository<Course> courseRepository,
     IRepository<StudyMaterial> materialRepository,
+    IRepository<MaterialDownloadLog> downloadLogRepository,
+    IUnitOfWork unitOfWork,
     IFileStorageService fileStorage) : IRequestHandler<GetMyStudyMaterialFileQuery, StudyMaterialFileResult>
 {
     public async Task<StudyMaterialFileResult> Handle(GetMyStudyMaterialFileQuery request, CancellationToken cancellationToken)
@@ -39,6 +41,17 @@ public class GetMyStudyMaterialFileQueryHandler(
             throw new NotFoundException(nameof(StudyMaterial), request.MaterialId);
 
         var bytes = await fileStorage.DownloadAsync(material.FilePath, cancellationToken);
+
+        var log = new MaterialDownloadLog
+        {
+            Id = Guid.NewGuid(),
+            MaterialId = material.Id,
+            CandidateId = candidate.Id,
+            DownloadedAt = DateTime.UtcNow
+        };
+        await downloadLogRepository.AddAsync(log, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
         var contentType = MaterialFileRules.ResolveContentType(material.FileName);
         return new StudyMaterialFileResult(bytes, contentType, material.FileName);
     }
