@@ -13,7 +13,13 @@
   (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template candidateCell="candidateCode" let-row>
-    <span class="font-mono font-medium">{{ row.candidateCode }}</span>
+    <a
+      hlmBtn
+      variant="link"
+      class="pl-0"
+      [routerLink]="row.candidateId"
+      >{{ row.candidateCode }}</a
+    >
   </ng-template>
 
   <ng-template candidateCell="fullName" let-row>

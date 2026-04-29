@@ -9,6 +9,7 @@ namespace ZealEducation.Application.Features.ClassSessions.Commands.UpdateClassS
 public class UpdateClassSessionCommandHandler(
     IRepository<ClassSession> sessionRepository,
     IRepository<Batch> batchRepository,
+    IRepository<AttendanceRecord> attendanceRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<UpdateClassSessionCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateClassSessionCommand request, CancellationToken cancellationToken)
@@ -19,9 +20,19 @@ public class UpdateClassSessionCommandHandler(
         var batch = await batchRepository.GetByIdAsync(session.BatchId, cancellationToken)
             ?? throw new NotFoundException(nameof(Batch), session.BatchId);
 
-        if (request.SessionDate < batch.StartDate || request.SessionDate > batch.EndDate)
-            throw new ConflictException(
-                $"Session date must fall within the batch period ({batch.StartDate:yyyy-MM-dd} to {batch.EndDate:yyyy-MM-dd}).");
+        if (request.SessionDate != session.SessionDate)
+        {
+            var hasAttendance = await attendanceRepository.Query()
+                .AnyAsync(a => a.ClassSessionId == session.Id, cancellationToken);
+
+            if (hasAttendance)
+                throw new ConflictException(
+                    "Session date cannot be changed because attendance has already been recorded for this session.");
+
+            if (request.SessionDate < batch.StartDate || request.SessionDate > batch.EndDate)
+                throw new ConflictException(
+                    $"Session date must fall within the batch period ({batch.StartDate:yyyy-MM-dd} to {batch.EndDate:yyyy-MM-dd}).");
+        }
 
         var hasOverlap = await sessionRepository.Query()
             .AnyAsync(s => s.BatchId == batch.Id

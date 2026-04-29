@@ -28,6 +28,11 @@
             formControlName="sessionDate"
             class="w-full"
           />
+          @if (dateLocked()) {
+            <p class="text-muted-foreground text-xs">
+              Session date cannot be changed because attendance has already been recorded.
+            </p>
+          }
           <hlm-field-error validator="required">Session date is required.</hlm-field-error>
         </hlm-field>
 

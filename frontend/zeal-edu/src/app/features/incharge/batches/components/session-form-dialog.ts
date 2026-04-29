@@ -85,6 +85,9 @@ export class SessionFormDialog {
   private readonly _editingSession = signal<ClassSession | null>(null);
 
   readonly isEdit = computed(() => this.mode() === 'edit');
+  readonly dateLocked = computed(
+    () => this.isEdit() && (this._editingSession()?.attendanceMarkedCount ?? 0) > 0,
+  );
 
   protected readonly statuses = ClassSessionStatus;
   protected readonly statusLabel = (v: ClassSessionStatus): string =>
@@ -117,6 +120,7 @@ export class SessionFormDialog {
       location: '',
       status: ClassSessionStatus.Scheduled,
     });
+    this.form.controls.sessionDate.enable({ emitEvent: false });
     this.dlg()?.open();
   }
 
@@ -132,6 +136,11 @@ export class SessionFormDialog {
       location: session.location ?? '',
       status: session.status,
     });
+    if (this.dateLocked()) {
+      this.form.controls.sessionDate.disable({ emitEvent: false });
+    } else {
+      this.form.controls.sessionDate.enable({ emitEvent: false });
+    }
     this.dlg()?.open();
   }
 

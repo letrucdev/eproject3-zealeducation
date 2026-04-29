@@ -55,10 +55,7 @@
       (sortChanged)="sortChanged.emit($event)"
     >
       <ng-template enrollmentCell="candidateCode" let-row>
-        <a
-          [routerLink]="['/app/incharge/candidates', row.candidateId]"
-          class="font-mono text-primary underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-        >
+        <a hlmBtn variant="link" class="pl-0" [routerLink]="['/app/incharge/candidates', row.candidateId]">
           {{ row.candidateCode }}
         </a>
       </ng-template>

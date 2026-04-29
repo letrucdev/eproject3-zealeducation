@@ -37,6 +37,53 @@ Chạy lệnh sau để tạo bảng và database:
 dotnet ef database update --project src/ZealEducation.Infrastructure --startup-project src/ZealEducation.API
 ```
 
+#### 2.1. Sử dụng script migrate (khuyến nghị)
+
+Để tiện cho việc migrate, project có sẵn script tại `backend/scripts/migrate.sh` (Linux/macOS/WSL) và `backend/scripts/migrate.ps1` (Windows). Script tự động trỏ đúng `--project` và `--startup-project`.
+
+Chạy từ thư mục `backend/`:
+
+```bash
+# Linux / macOS / WSL
+./scripts/migrate.sh <command> [args]
+
+# Windows PowerShell
+./scripts/migrate.ps1 <command> [args]
+```
+
+**Các lệnh hỗ trợ:**
+
+| Lệnh | Chức năng |
+|------|-----------|
+| `update [target]` | Apply migration tới `target` (mặc định: migration mới nhất) |
+| `add <Name>` | Tạo migration mới với tên `<Name>` |
+| `remove` | Xóa migration cuối cùng (chỉ khi chưa apply) |
+| `list` | Liệt kê tất cả migration và trạng thái |
+| `script [from] [to]` | Sinh SQL script idempotent từ `from` đến `to` |
+| `drop` | Xóa toàn bộ database |
+| `reset` | Drop database rồi apply lại từ đầu |
+
+**Ví dụ:**
+
+```bash
+# Apply tất cả migration mới nhất
+./scripts/migrate.sh update
+
+# Tạo migration mới
+./scripts/migrate.sh add AddStudentTable
+
+# Rollback về migration cụ thể
+./scripts/migrate.sh update 20260421120952_AddUserAccount
+
+# Xuất SQL toàn bộ schema
+./scripts/migrate.sh script 0 > migration.sql
+
+# Reset database (drop + update)
+./scripts/migrate.sh reset
+```
+
+> Nếu lần đầu chạy trên Linux/macOS, cấp quyền thực thi: `chmod +x scripts/migrate.sh`
+
 ---
 
 ### 3. Seed dữ liệu mẫu
@@ -54,8 +101,52 @@ eproject3-zealeducation/backend/scripts/seed-staffs.sql
 Từ thư mục `eproject3-zealeducation/backend/`, chạy:
 
 ```bash
-dotnet run build --project ./src/ZealEducation.API
+dotnet run --project ./src/ZealEducation.API
 ```
+
+#### 4.1. Sử dụng script run (khuyến nghị)
+
+Script khởi động sẵn tại `backend/scripts/run.sh` (Linux/macOS/WSL) và `backend/scripts/run.ps1` (Windows).
+
+Chạy từ thư mục `backend/`:
+
+```bash
+# Linux / macOS / WSL
+./scripts/run.sh [command] [-- <extra dotnet args>]
+
+# Windows PowerShell
+./scripts/run.ps1 [command] [extra dotnet args]
+```
+
+**Các lệnh hỗ trợ:**
+
+| Lệnh | Chức năng |
+|------|-----------|
+| `dev` *(mặc định)* | Chạy API ở môi trường Development |
+| `prod` | Chạy API ở môi trường Production (Release) |
+| `watch` | Chạy với hot reload (`dotnet watch`) |
+| `build` | Build solution (Debug) |
+| `publish [dir]` | Publish bản Release (mặc định thư mục: `./publish`) |
+| `restore` | Restore NuGet packages |
+| `clean` | Xóa build artifacts |
+
+**Ví dụ:**
+
+```bash
+# Chạy backend ở Development
+./scripts/run.sh
+
+# Chạy với hot reload
+./scripts/run.sh watch
+
+# Chạy với launch profile https
+./scripts/run.sh dev -- --launch-profile https
+
+# Publish ra thư mục ./out
+./scripts/run.sh publish ./out
+```
+
+> Nếu lần đầu chạy trên Linux/macOS, cấp quyền thực thi: `chmod +x scripts/run.sh`
 
 ---
 
