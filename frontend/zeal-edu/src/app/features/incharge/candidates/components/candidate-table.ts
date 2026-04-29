@@ -15,6 +15,7 @@ import {
   SortDirection,
 } from '@shared/components/data-table';
 import { CandidateListItem } from '../models/candidate-list-item';
+import { RouterLink } from "@angular/router";
 
 @Directive({
   selector: '[candidateCell]',
@@ -39,7 +40,8 @@ export class CandidateCellDef extends DataTableCellDef<CandidateListItem> {
     HlmBadgeImports,
     HlmButtonImports,
     HlmIconImports,
-  ],
+    RouterLink
+],
   providers: [provideIcons({ lucideEye, lucidePencil, lucideScale, lucideKeyRound })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'candidate-table.html',

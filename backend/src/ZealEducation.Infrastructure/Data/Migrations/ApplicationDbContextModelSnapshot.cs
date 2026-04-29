@@ -762,6 +762,64 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("fee_structure", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("TargetFacultyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("TargetFacultyId");
+
+                    b.HasIndex("CandidateId", "BatchId", "Type")
+                        .IsUnique()
+                        .HasDatabaseName("ix_feedback_unique_no_target")
+                        .HasFilter("[TargetFacultyId] IS NULL");
+
+                    b.HasIndex("CandidateId", "BatchId", "Type", "TargetFacultyId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_feedback_unique_target")
+                        .HasFilter("[TargetFacultyId] IS NOT NULL");
+
+                    b.ToTable("feedback", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Fine", b =>
                 {
                     b.Property<Guid>("Id")
@@ -937,6 +995,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
 
                     b.Property<Guid?>("InstallmentPlanId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("OutstandingBalanceAfter")
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<DateTime>("PaymentDate")
                         .ValueGeneratedOnAdd()
@@ -1491,6 +1552,32 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Candidate");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Feedback", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Batch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Faculty", "TargetFaculty")
+                        .WithMany()
+                        .HasForeignKey("TargetFacultyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("TargetFaculty");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.Fine", b =>

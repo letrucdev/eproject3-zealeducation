@@ -28,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ExamResult> ExamResults => Set<ExamResult>();
     public DbSet<StudyMaterial> StudyMaterials => Set<StudyMaterial>();
     public DbSet<MaterialDownloadLog> MaterialDownloadLogs => Set<MaterialDownloadLog>();
+    public DbSet<Feedback> Feedbacks => Set<Feedback>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

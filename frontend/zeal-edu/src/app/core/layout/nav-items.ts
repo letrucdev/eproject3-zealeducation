@@ -117,6 +117,24 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
       },
     ],
   },
+  {
+    title: 'My Learning',
+    roles: [UserRole.Candidate],
+    items: [
+      {
+        label: 'My Batches',
+        route: '/app/candidate/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Candidate],
+      },
+      {
+        label: 'Profile',
+        route: '/app/candidate/profile',
+        icon: 'lucideUser',
+        roles: [UserRole.Candidate],
+      },
+    ],
+  },
 ];
 
 function filterNavItemsForRole(items: readonly NavItem[], role: UserRole): NavItem[] {

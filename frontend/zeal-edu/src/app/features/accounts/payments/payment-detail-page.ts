@@ -292,10 +292,4 @@ export default class PaymentDetailPage {
       this._downloadingReceiptId.set(null);
     }
   }
-
-  private _extractErrorMessage(error: unknown): string | null {
-    if (!error || typeof error !== 'object') return null;
-    const e = error as { error?: { message?: string }; message?: string };
-    return e.error?.message ?? e.message ?? null;
-  }
 }

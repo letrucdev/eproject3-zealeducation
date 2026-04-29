@@ -51,6 +51,13 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@features/accounts/accounts.routes').then((m) => m.ACCOUNTS_ROUTES),
       },
+      {
+        path: 'candidate',
+        canMatch: [hasRole(UserRole.Candidate)],
+        data: { breadcrumb: 'My Learning' },
+        loadChildren: () =>
+          import('@features/candidate/candidate.routes').then((m) => m.CANDIDATE_ROUTES),
+      },
       { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },

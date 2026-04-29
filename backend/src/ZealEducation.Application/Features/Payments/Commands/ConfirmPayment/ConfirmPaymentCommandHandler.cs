@@ -114,6 +114,8 @@ public class ConfirmPaymentCommandHandler(
             installmentRepository.Update(installment);
         }
 
+        transaction.OutstandingBalanceAfter = fee.TotalFee - fee.AmountPaid;
+
         var newStatus = fee.AmountPaid >= fee.TotalFee
             ? PaymentStatus.Paid
             : (fee.AmountPaid > 0 ? PaymentStatus.Partial : PaymentStatus.Unpaid);

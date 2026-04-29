@@ -5,10 +5,11 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { CandidateEnrollmentItem, EnrollmentStatus } from '../models/candidate-detail';
 import { ENROLLMENT_STATUS_LABELS } from '../models/candidate-labels';
+import { HlmButton, HlmButtonImports } from '@spartan-ng/helm/button';
 
 @Component({
   selector: 'app-candidate-enrollments-card',
-  imports: [DatePipe, RouterLink, HlmCardImports, HlmBadgeImports],
+  imports: [DatePipe, RouterLink, HlmCardImports, HlmBadgeImports, HlmButtonImports],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'candidate-enrollments-card.html',
 })
