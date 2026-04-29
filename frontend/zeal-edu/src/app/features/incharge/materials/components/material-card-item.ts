@@ -53,6 +53,7 @@ export interface MaterialCardAction {
 })
 export class MaterialCardItem {
   readonly material = input.required<StudyMaterialListItem>();
+  readonly readOnly = input<boolean>(false);
   readonly action = output<MaterialCardAction>();
 
   protected readonly fileIconName = computed(() => mapFileIcon(this.material().fileType));
@@ -60,6 +61,7 @@ export class MaterialCardItem {
 
   protected onAction(kind: MaterialCardActionKind, event: Event): void {
     event.stopPropagation();
+    if (this.readOnly() && kind !== 'download') return;
     this.action.emit({ kind, material: this.material() });
   }
 
