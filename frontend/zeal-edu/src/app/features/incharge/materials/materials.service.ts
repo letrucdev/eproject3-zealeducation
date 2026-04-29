@@ -4,6 +4,7 @@ import { injectMutation, injectQuery } from '@tanstack/angular-query-experimenta
 import { QueryClient, keepPreviousData } from '@tanstack/query-core';
 import { firstValueFrom } from 'rxjs';
 import { ApiResponse } from '@core/http/api-response';
+import { parseFileNameFromContentDisposition } from '@core/http/content-disposition';
 import { PaginatedList } from '@core/models/paginated-list';
 import {
   CourseListQuery,
@@ -202,18 +203,4 @@ function emptyPage<T>(pageNumber: number): PaginatedList<T> {
     hasPreviousPage: false,
     hasNextPage: false,
   };
-}
-
-function parseFileNameFromContentDisposition(header: string | null): string | null {
-  if (!header) return null;
-  const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(header);
-  if (utf8Match?.[1]) {
-    try {
-      return decodeURIComponent(utf8Match[1]);
-    } catch {
-      // ignore decode errors and fall through
-    }
-  }
-  const asciiMatch = /filename="?([^";]+)"?/i.exec(header);
-  return asciiMatch?.[1] ?? null;
 }
