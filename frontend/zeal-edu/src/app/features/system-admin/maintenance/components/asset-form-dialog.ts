@@ -43,6 +43,8 @@ export default class AssetFormDialog {
     this.mode.set('create');
     this.assetId.set(null);
     this.assetNameLabel.set('');
+    this.form.controls.serialNumber.enable();
+    this.form.controls.purchaseDate.enable();
     this.form.reset();
     this.dlg().open();
   }
@@ -59,6 +61,8 @@ export default class AssetFormDialog {
       purchaseDate: detail.purchaseDate.substring(0, 10),
       notes: detail.notes || '',
     });
+    this.form.controls.serialNumber.disable();
+    this.form.controls.purchaseDate.disable();
     this.dlg().open();
   }
 
@@ -72,13 +76,19 @@ export default class AssetFormDialog {
       return;
     }
     const val = this.form.getRawValue();
-    const payload = {
-      ...val,
-      purchaseDate: new Date(val.purchaseDate).toISOString()
-    };
     if (this.mode() === 'create') {
+      const payload: CreateAssetPayload = {
+        ...val,
+        purchaseDate: new Date(val.purchaseDate).toISOString()
+      };
       this.submitted.emit({ mode: 'create', payload });
     } else {
+      const payload: UpdateAssetPayload = {
+        assetName: val.assetName,
+        assetType: val.assetType,
+        location: val.location,
+        notes: val.notes
+      };
       this.submitted.emit({ mode: 'edit', id: this.assetId()!, payload });
     }
   }
