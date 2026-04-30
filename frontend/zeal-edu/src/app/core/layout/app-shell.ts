@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
 import {
+  lucideAward,
   lucideBookOpen,
   lucideCalendarDays,
   lucideClipboardCheck,
@@ -57,6 +58,7 @@ import { environment } from '@/environments/environment';
       lucideCalendarDays,
       lucideClipboardCheck,
       lucideMessageSquare,
+      lucideAward,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

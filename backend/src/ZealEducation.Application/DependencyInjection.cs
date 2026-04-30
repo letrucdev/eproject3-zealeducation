@@ -22,6 +22,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IPaymentReceiptArchiver, PaymentReceiptArchiver>();
+        services.AddScoped<ICertificateArchiver, CertificateArchiver>();
 
         return services;
     }

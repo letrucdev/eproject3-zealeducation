@@ -49,5 +49,11 @@ export const INCHARGE_ROUTES: Routes = [
     data: { breadcrumb: 'Feedback' },
     loadComponent: () => import('./feedback/feedback-management-page'),
   },
+  {
+    path: 'certificates',
+    title: 'Certificate Applications',
+    data: { breadcrumb: 'Certificates' },
+    loadComponent: () => import('./certificates/certificates-management-page'),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'courses' },
 ];

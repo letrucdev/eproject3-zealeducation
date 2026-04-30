@@ -1,0 +1,134 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2">
+    <a hlmBtn variant="ghost" size="sm" routerLink="/app/candidate/batches" class="self-start">
+      <ng-icon hlm name="lucideArrowLeft" size="sm" />
+      Back to My Batches
+    </a>
+    <h1 class="text-2xl font-semibold tracking-tight">Batch Detail</h1>
+  </header>
+
+  @if (detailQuery.isPending()) {
+    <div class="grid gap-4">
+      <hlm-skeleton class="h-40" />
+      <hlm-skeleton class="h-32" />
+      <hlm-skeleton class="h-40" />
+    </div>
+  } @else if (detailQuery.isError()) {
+    <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      Failed to load batch.
+    </div>
+  } @else if (detailQuery.data(); as detail) {
+    @if (eligibilityQuery.data(); as eligibility) {
+      @if (eligibility.existingApplicationStatus === 'Approved') {
+        <hlm-alert
+          class="border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-400/30 dark:bg-emerald-950/40 dark:text-emerald-100"
+        >
+          <ng-icon hlm name="lucideGraduationCap" />
+          <h4 hlmAlertTitle>Congratulations — you have completed this course!</h4>
+          <p hlmAlertDescription class="text-emerald-800/90 dark:text-emerald-200/80">
+            Your certificate has been issued. You can download it any time from the
+            <a routerLink="/app/candidate/certificates">My Certificates</a> page.
+          </p>
+        </hlm-alert>
+      } @else if (eligibility.existingApplicationStatus === 'Pending') {
+        <hlm-alert
+          class="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/40 dark:text-amber-100"
+        >
+          <ng-icon hlm name="lucideHourglass" />
+          <h4 hlmAlertTitle>Certificate application under review</h4>
+          <p hlmAlertDescription class="text-amber-800/90 dark:text-amber-200/80">
+            The incharge is reviewing your application. You will be able to download the
+            certificate from the
+            <a routerLink="/app/candidate/certificates"> My Certificates</a> page once it is
+            approved.
+          </p>
+        </hlm-alert>
+      } @else if (eligibility.isEligible) {
+        <hlm-alert>
+          <ng-icon hlm name="lucideAward" />
+          <h4 hlmAlertTitle>You are eligible for a certificate</h4>
+          <p hlmAlertDescription>
+            Fees are fully paid, attendance is {{ eligibility.attendancePercent }}%, and all
+            exams have been passed. Submit your application for the incharge to review.
+          </p>
+          <div hlmAlertAction>
+            <button hlmBtn size="sm" type="button" (click)="onApplyForCertificateClick()">
+              <ng-icon hlm name="lucideAward" size="sm" class="mr-1" />
+              Apply for certificate
+            </button>
+          </div>
+        </hlm-alert>
+      }
+    }
+
+    <app-candidate-batch-info-card [detail]="detail" />
+
+    <app-candidate-batch-schedule-card
+      [page]="sessionsQuery.data()"
+      [isLoading]="sessionsQuery.isPending()"
+      [pageSize]="sessionsPageSize()"
+      [sortBy]="sessionsSortBy()"
+      [sortDirection]="sessionsSortDirection()"
+      [fromDate]="sessionsFromDate()"
+      [toDate]="sessionsToDate()"
+      (pageChanged)="onSessionsPageChanged($event)"
+      (pageSizeChanged)="onSessionsPageSizeChanged($event)"
+      (sortChanged)="onSessionsSortChanged($event)"
+      (dateRangeChanged)="onSessionsDateRangeChanged($event)"
+    />
+
+    <app-candidate-batch-attendance-card
+      [data]="attendanceQuery.data()"
+      [isLoading]="attendanceQuery.isPending()"
+      [pageSize]="attendancePageSize()"
+      [sortBy]="attendanceSortBy()"
+      [sortDirection]="attendanceSortDirection()"
+      [fromDate]="attendanceFromDate()"
+      [toDate]="attendanceToDate()"
+      (pageChanged)="onAttendancePageChanged($event)"
+      (pageSizeChanged)="onAttendancePageSizeChanged($event)"
+      (sortChanged)="onAttendanceSortChanged($event)"
+      (dateRangeChanged)="onAttendanceDateRangeChanged($event)"
+    />
+
+    <app-candidate-batch-tests-card
+      [data]="examResultsQuery.data()"
+      [isLoading]="examResultsQuery.isPending()"
+    />
+
+    <app-candidate-batch-materials-card
+      [data]="materialsQuery.data()"
+      [isLoading]="materialsQuery.isPending()"
+      (pageChanged)="onMaterialsPageChanged($event)"
+      (downloadClicked)="onMaterialDownload($event)"
+    />
+
+    <app-candidate-batch-feedback-card
+      [detail]="detail"
+      (facultyClicked)="onFacultyFeedbackClick()"
+      (courseClicked)="onCourseFeedbackClick()"
+      (generalClicked)="onGeneralFeedbackClick()"
+    />
+  }
+</section>
+
+<app-faculty-feedback-dialog
+  #facultyDialog
+  [submitting]="facultyMutation.isPending()"
+  (submitted)="onFacultySubmitted($event)"
+/>
+<app-course-feedback-dialog
+  #courseDialog
+  [submitting]="courseMutation.isPending()"
+  (submitted)="onCourseSubmitted($event)"
+/>
+<app-general-feedback-dialog
+  #generalDialog
+  [submitting]="generalMutation.isPending()"
+  (submitted)="onGeneralSubmitted($event)"
+/>
+<app-apply-certificate-dialog
+  #applyCertificateDialog
+  [submitting]="applyCertificateMutation.isPending()"
+  (submitted)="onApplyCertificateSubmitted($event)"
+/>
