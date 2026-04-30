@@ -43,5 +43,11 @@ export const INCHARGE_ROUTES: Routes = [
     data: { breadcrumb: 'Materials' },
     loadComponent: () => import('./materials/materials-management-page'),
   },
+  {
+    path: 'feedback',
+    title: 'Feedback',
+    data: { breadcrumb: 'Feedback' },
+    loadComponent: () => import('./feedback/feedback-management-page'),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'courses' },
 ];

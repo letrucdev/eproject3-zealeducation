@@ -1,0 +1,92 @@
+<form
+  [formGroup]="form"
+  class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center"
+>
+  <div class="relative w-full md:w-72">
+    <ng-icon
+      hlm
+      name="lucideSearch"
+      size="sm"
+      class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+    />
+    <input
+      hlmInput
+      type="search"
+      class="w-full ps-9"
+      placeholder="Search by candidate, code or comment..."
+      formControlName="search"
+      aria-label="Search feedback"
+    />
+  </div>
+
+  <hlm-select formControlName="processedView" [itemToString]="processedLabel" class="w-full md:w-48">
+    <hlm-select-trigger>
+      <hlm-select-value placeholder="View: Unprocessed" />
+    </hlm-select-trigger>
+    <hlm-select-content *hlmSelectPortal>
+      <hlm-select-item value="unprocessed">Unprocessed only</hlm-select-item>
+      <hlm-select-item value="processed">Processed only</hlm-select-item>
+      <hlm-select-item value="all">All</hlm-select-item>
+    </hlm-select-content>
+  </hlm-select>
+
+  <hlm-select formControlName="type" [itemToString]="typeLabel" class="w-full md:w-40">
+    <hlm-select-trigger>
+      <hlm-select-value placeholder="Type: All" />
+    </hlm-select-trigger>
+    <hlm-select-content *hlmSelectPortal>
+      <hlm-select-item value="all">All Types</hlm-select-item>
+      <hlm-select-item value="Faculty">Faculty</hlm-select-item>
+      <hlm-select-item value="Course">Course</hlm-select-item>
+      <hlm-select-item value="General">General</hlm-select-item>
+    </hlm-select-content>
+  </hlm-select>
+
+  <hlm-select formControlName="rating" [itemToString]="ratingLabel" class="w-full md:w-36">
+    <hlm-select-trigger>
+      <hlm-select-value placeholder="Rating: All" />
+    </hlm-select-trigger>
+    <hlm-select-content *hlmSelectPortal>
+      <hlm-select-item value="all">All Ratings</hlm-select-item>
+      <hlm-select-item [value]="5">5 ★</hlm-select-item>
+      <hlm-select-item [value]="4">4 ★</hlm-select-item>
+      <hlm-select-item [value]="3">3 ★</hlm-select-item>
+      <hlm-select-item [value]="2">2 ★</hlm-select-item>
+      <hlm-select-item [value]="1">1 ★</hlm-select-item>
+    </hlm-select-content>
+  </hlm-select>
+
+  <hlm-combobox
+    formControlName="batch"
+    [(search)]="batchSearch"
+    [itemToString]="batchItemToString"
+    class="w-full md:w-64"
+  >
+    <hlm-combobox-input placeholder="Filter by batch..." showClear />
+    <hlm-combobox-content *hlmComboboxPortal>
+      @if (batches.isError()) {
+        <hlm-combobox-status>Failed to load batches.</hlm-combobox-status>
+      } @else if (batches.isPending()) {
+        <hlm-combobox-status>
+          <hlm-spinner />
+          Loading...
+        </hlm-combobox-status>
+      } @else {
+        @let items = batches.data()?.items ?? [];
+        @if (items.length === 0) {
+          <hlm-combobox-empty>No batches found.</hlm-combobox-empty>
+        }
+        <div hlmComboboxList>
+          @for (batch of items; track batch.batchId) {
+            <hlm-combobox-item [value]="batch">
+              <div class="flex flex-col">
+                <span>{{ batch.batchCode }}</span>
+                <span class="text-muted-foreground text-xs">{{ batch.courseName }}</span>
+              </div>
+            </hlm-combobox-item>
+          }
+        </div>
+      }
+    </hlm-combobox-content>
+  </hlm-combobox>
+</form>

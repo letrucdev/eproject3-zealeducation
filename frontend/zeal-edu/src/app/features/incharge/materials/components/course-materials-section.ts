@@ -13,10 +13,14 @@ import { lucideChevronLeft, lucideChevronRight, lucideInbox } from '@ng-icons/lu
 import { HlmAccordionImports } from '@spartan-ng/helm/accordion';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
+import { MaterialCardAction, MaterialCardItem } from '@shared/components/material-card-item/material-card-item';
 import { MaterialsService } from '../materials.service';
-import { CourseMaterialsQuery, MaterialCourseListItem } from '../models/material-payload';
+import {
+  CourseMaterialsQuery,
+  MaterialCourseListItem,
+  StudyMaterialListItem,
+} from '../models/material-payload';
 import { AutoSizeAccordionContent } from './auto-size-accordion-content';
-import { MaterialCardAction, MaterialCardItem } from './material-card-item';
 
 @Component({
   selector: 'hlm-accordion-item[appCourseMaterialsSection]',
@@ -41,7 +45,7 @@ export class CourseMaterialsSection {
   readonly course = input.required<MaterialCourseListItem>();
   readonly search = input<string>('');
   readonly includeInactive = input<boolean>(true);
-  readonly action = output<MaterialCardAction>();
+  readonly action = output<MaterialCardAction<StudyMaterialListItem>>();
 
   protected readonly isOpened = signal(false);
   protected readonly page = signal(1);
@@ -76,6 +80,10 @@ export class CourseMaterialsSection {
 
   protected onOpenedChange(opened: boolean): void {
     this.isOpened.set(opened);
+  }
+
+  protected onCardAction(event: MaterialCardAction): void {
+    this.action.emit(event as MaterialCardAction<StudyMaterialListItem>);
   }
 
   protected goPrev(): void {

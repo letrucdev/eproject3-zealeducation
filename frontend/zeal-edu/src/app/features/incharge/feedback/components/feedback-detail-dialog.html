@@ -1,0 +1,95 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    @let item = current();
+    @if (item) {
+      <div hlmDialogHeader>
+        <div class="flex items-center gap-2">
+          <h2 hlmDialogTitle>Feedback Detail</h2>
+          <span hlmBadge [class]="typeBadgeClass()">{{ item.type }}</span>
+        </div>
+        <p class="text-muted-foreground text-sm">
+          Submitted on {{ item.createdAt | date: 'medium' }}
+        </p>
+      </div>
+
+      <div class="mt-2 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+        <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <dt class="text-muted-foreground text-xs font-medium uppercase">Candidate</dt>
+            <dd class="mt-1 text-sm">
+              <span class="font-medium">{{ item.candidateName }}</span>
+              <span class="text-muted-foreground"> ({{ item.candidateCode }})</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-muted-foreground text-xs font-medium uppercase">Batch</dt>
+            <dd class="mt-1 text-sm">
+              <span class="font-mono">{{ item.batchCode }}</span>
+              <span class="text-muted-foreground"> · {{ item.courseName }}</span>
+            </dd>
+          </div>
+          @if (item.type === 'Faculty') {
+            <div>
+              <dt class="text-muted-foreground text-xs font-medium uppercase">About Faculty</dt>
+              <dd class="mt-1 text-sm">{{ item.targetFacultyName || '—' }}</dd>
+            </div>
+          }
+          <div>
+            <dt class="text-muted-foreground text-xs font-medium uppercase">Rating</dt>
+            <dd class="mt-1 inline-flex items-center gap-1 text-sm font-medium">
+              <ng-icon hlm name="lucideStar" size="sm" class="text-amber-500" />
+              {{ item.rating }}/5
+            </dd>
+          </div>
+        </dl>
+
+        <div>
+          <dt class="text-muted-foreground text-xs font-medium uppercase">Comment</dt>
+          @if (item.comment) {
+            <p class="mt-2 text-sm whitespace-pre-wrap">{{ item.comment }}</p>
+          } @else {
+            <p class="text-muted-foreground mt-2 text-sm italic">No comment provided.</p>
+          }
+        </div>
+
+        @if (item.isProcessed) {
+          <div class="bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2 text-sm text-emerald-900">
+            Processed by
+            <span class="font-medium">{{ item.processedByName || 'unknown' }}</span>
+            on {{ item.processedAt | date: 'medium' }}.
+          </div>
+        }
+      </div>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Close</button>
+        <button
+          hlmBtn
+          type="button"
+          [disabled]="submitting()"
+          (click)="onToggleClick()"
+          [variant]="item.isProcessed ? 'outline' : 'default'"
+        >
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          } @else if (item.isProcessed) {
+            <ng-icon hlm name="lucideUndo2" size="sm" class="mr-2" />
+          } @else {
+            <ng-icon hlm name="lucideCheckCheck" size="sm" class="mr-2" />
+          }
+          {{
+            submitting()
+              ? 'Saving...'
+              : item.isProcessed
+                ? 'Mark as unprocessed'
+                : 'Mark as processed'
+          }}
+        </button>
+      </div>
+    }
+  </hlm-dialog-content>
+</hlm-dialog>

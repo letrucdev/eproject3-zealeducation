@@ -27,9 +27,9 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { MaterialCardAction } from '@shared/components/material-card-item/material-card-item';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { CourseMaterialsSection } from './components/course-materials-section';
-import { MaterialCardAction } from './components/material-card-item';
 import { MaterialFormDialog, MaterialFormSubmit } from './components/material-form-dialog';
 import { ReplaceFileDialog, ReplaceFileSubmit } from './components/replace-file-dialog';
 import { MaterialsService } from './materials.service';
@@ -124,7 +124,7 @@ export default class MaterialsManagementPage implements OnInit {
     this.formDialog().openCreate();
   }
 
-  protected onCardAction(event: MaterialCardAction): void {
+  protected onCardAction(event: MaterialCardAction<StudyMaterialListItem>): void {
     switch (event.kind) {
       case 'download':
         void this._download(event.material);
