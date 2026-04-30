@@ -15,7 +15,7 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { CandidateStatus } from '@core/models/candidate-status';
-import { CandidateDetail } from '../models/candidate-detail';
+import { CandidateDetail } from '@core/models/candidate-detail';
 import { CANDIDATE_STATUS_LABELS } from '../models/candidate-labels';
 import { UpdateCandidatePayload } from '../models/candidate-payload';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';

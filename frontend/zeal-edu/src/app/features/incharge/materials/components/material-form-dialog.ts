@@ -27,9 +27,9 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { CourseListItem } from '@core/models/course-list-item';
 import { CoursesService } from '@core/services/courses.service';
+import { StudyMaterialListItem } from '@core/models/study-material';
 import {
   CreateMaterialsPayload,
-  StudyMaterialListItem,
   UpdateMaterialTitlePayload,
 } from '../models/material-payload';
 

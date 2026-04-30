@@ -4,7 +4,7 @@ import {
   PaymentMethod,
   PaymentStatus,
   PaymentType,
-} from './payment-enums';
+} from '@core/models/payment-enums';
 
 export interface FeeStructureListItem {
   feeId: string;

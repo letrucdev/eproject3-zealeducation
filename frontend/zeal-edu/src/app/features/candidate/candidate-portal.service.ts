@@ -7,11 +7,8 @@ import { ApiResponse } from '@core/http/api-response';
 import { parseFileNameFromContentDisposition } from '@core/http/content-disposition';
 import { ClassSession } from '@core/models/class-session';
 import { PaginatedList } from '@core/models/paginated-list';
-import { CandidateDetail } from '@features/incharge/candidates/models/candidate-detail';
-import {
-  CourseMaterialsQuery,
-  StudyMaterialListItem,
-} from '@features/incharge/materials/models/material-payload';
+import { CandidateDetail } from '@core/models/candidate-detail';
+import { CourseMaterialsQuery, StudyMaterialListItem } from '@core/models/study-material';
 import {
   MyBatchAttendance,
   MyBatchAttendanceQuery,

@@ -7,7 +7,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { CandidateStatus } from '@core/models/candidate-status';
-import { CandidateDetail } from '../models/candidate-detail';
+import { CandidateDetail } from '@core/models/candidate-detail';
 import { CANDIDATE_STATUS_LABELS } from '../models/candidate-labels';
 
 @Component({

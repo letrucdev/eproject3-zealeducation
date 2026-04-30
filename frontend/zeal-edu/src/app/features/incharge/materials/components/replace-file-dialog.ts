@@ -21,7 +21,8 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
-import { ReplaceMaterialFilePayload, StudyMaterialListItem } from '../models/material-payload';
+import { StudyMaterialListItem } from '@core/models/study-material';
+import { ReplaceMaterialFilePayload } from '../models/material-payload';
 
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
 

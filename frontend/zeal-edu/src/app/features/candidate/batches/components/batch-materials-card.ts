@@ -9,7 +9,7 @@ import {
   MaterialCardAction,
   MaterialCardItem,
 } from '@shared/components/material-card-item/material-card-item';
-import { StudyMaterialListItem } from '@features/incharge/materials/models/material-payload';
+import { StudyMaterialListItem } from '@core/models/study-material';
 
 @Component({
   selector: 'app-candidate-batch-materials-card',

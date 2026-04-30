@@ -51,7 +51,7 @@
 
   <ng-template feedbackCell="comment" let-row>
     @if (row.comment) {
-      <span class="block max-w-[28rem] truncate text-sm" [title]="row.comment">{{ row.comment }}</span>
+      <span class="block max-w-md truncate text-sm" [title]="row.comment">{{ row.comment }}</span>
     } @else {
       <span class="text-muted-foreground italic text-sm">No comment</span>
     }

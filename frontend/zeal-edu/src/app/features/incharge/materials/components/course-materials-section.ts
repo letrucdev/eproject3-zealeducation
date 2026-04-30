@@ -15,11 +15,8 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { MaterialCardAction, MaterialCardItem } from '@shared/components/material-card-item/material-card-item';
 import { MaterialsService } from '../materials.service';
-import {
-  CourseMaterialsQuery,
-  MaterialCourseListItem,
-  StudyMaterialListItem,
-} from '../models/material-payload';
+import { CourseMaterialsQuery, StudyMaterialListItem } from '@core/models/study-material';
+import { MaterialCourseListItem } from '../models/material-payload';
 import { AutoSizeAccordionContent } from './auto-size-accordion-content';
 
 @Component({

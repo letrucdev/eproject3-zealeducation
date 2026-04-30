@@ -8,19 +8,19 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
-import { BankTransferProofDialog } from '@features/accounts/payments/components/bank-transfer-proof-dialog';
-import { PaymentTransactionItem } from '@features/accounts/payments/models/fee-structure';
+import { BankTransferProofDialog } from '@shared/components/bank-transfer-proof-dialog/bank-transfer-proof-dialog';
+import { PaymentTransactionItem } from '@core/models/fee-structure';
 import {
   InstallmentStatus,
   PaymentMethod,
   PaymentStatus,
   PaymentType,
-} from '@features/accounts/payments/models/payment-enums';
+} from '@core/models/payment-enums';
 import {
   paymentMethodLabels,
   paymentTypeLabels,
-} from '@features/accounts/payments/models/payment-labels';
-import { PaymentsService } from '@features/accounts/payments/payments.service';
+} from '@core/models/payment-labels';
+import { PaymentsService } from '@core/services/payments.service';
 
 @Component({
   selector: 'app-fee-detail-dialog',

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { BatchStatus } from '@core/models/batch-status';
-import { EnrollmentStatus } from '@features/incharge/candidates/models/candidate-detail';
+import { EnrollmentStatus } from '@core/models/candidate-detail';
 import { MyBatchDetail } from '../../models/candidate-portal-models';
 
 @Component({

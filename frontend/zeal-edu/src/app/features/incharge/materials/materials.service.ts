@@ -6,15 +6,14 @@ import { firstValueFrom } from 'rxjs';
 import { ApiResponse } from '@core/http/api-response';
 import { parseFileNameFromContentDisposition } from '@core/http/content-disposition';
 import { PaginatedList } from '@core/models/paginated-list';
+import { CourseMaterialsQuery, StudyMaterialListItem } from '@core/models/study-material';
 import {
   CourseListQuery,
-  CourseMaterialsQuery,
   CreateMaterialsPayload,
   CreateMaterialsResponse,
   MaterialCourseListItem,
   MaterialSiblingCourse,
   ReplaceMaterialFilePayload,
-  StudyMaterialListItem,
   ToggleMaterialActivePayload,
   UpdateMaterialTitlePayload,
 } from './models/material-payload';

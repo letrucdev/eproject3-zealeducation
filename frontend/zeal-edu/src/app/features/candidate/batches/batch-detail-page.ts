@@ -23,10 +23,7 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { BatchStatus } from '@core/models/batch-status';
 import { DataTableSortChange } from '@shared/components/data-table';
-import {
-  CourseMaterialsQuery,
-  StudyMaterialListItem,
-} from '@features/incharge/materials/models/material-payload';
+import { CourseMaterialsQuery, StudyMaterialListItem } from '@core/models/study-material';
 import { CandidatePortalService } from '../candidate-portal.service';
 import { CertificateService } from '../certificates/certificate.service';
 import { ApplyCertificateDialog } from '../certificates/components/apply-certificate-dialog';
