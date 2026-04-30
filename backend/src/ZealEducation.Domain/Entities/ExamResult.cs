@@ -9,6 +9,7 @@ public class ExamResult : BaseAuditableEntity
     public decimal Score { get; set; }
     public string? Grade { get; set; }
     public bool IsPassed { get; set; }
+    public bool IsFinalized { get; set; }
     public Guid GradedById { get; set; }
     public bool IsOverridden { get; set; }
     public Guid? OverrideById { get; set; }

@@ -149,7 +149,7 @@ export default class CandidateBatchDetailPage {
   protected readonly batchId = signal<string | null>(this._route.snapshot.paramMap.get('id'));
 
   protected readonly sessionsPage = signal(1);
-  protected readonly sessionsPageSize = signal(20);
+  protected readonly sessionsPageSize = signal(10);
   protected readonly sessionsSortBy = signal<string | null>(null);
   protected readonly sessionsSortDirection = signal<'asc' | 'desc'>('asc');
   protected readonly sessionsFromDate = signal('');

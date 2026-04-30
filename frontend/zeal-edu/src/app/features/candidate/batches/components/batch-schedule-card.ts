@@ -144,7 +144,7 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
 export class CandidateBatchScheduleCard {
   readonly page = input<PaginatedList<ClassSession> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
-  readonly pageSize = input<number>(20);
+  readonly pageSize = input<number>(10);
   readonly sortBy = input<string | null>(null);
   readonly sortDirection = input<SortDirection | null>(null);
   readonly fromDate = input<string>('');

@@ -79,6 +79,12 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideFolderOpen',
         roles: [UserRole.Incharge],
       },
+      {
+        label: 'Feedback',
+        route: '/app/incharge/feedback',
+        icon: 'lucideMessageSquare',
+        roles: [UserRole.Incharge],
+      },
     ],
   },
   {

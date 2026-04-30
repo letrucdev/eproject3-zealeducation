@@ -23,6 +23,20 @@ public class FeedbackConfiguration : IEntityTypeConfiguration<Feedback>
         builder.Property(f => f.Comment)
             .HasMaxLength(1000);
 
+        builder.Property(f => f.IsProcessed)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(f => f.ProcessedAt);
+
+        builder.HasOne(f => f.ProcessedBy)
+            .WithMany()
+            .HasForeignKey(f => f.ProcessedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(f => f.IsProcessed)
+            .HasDatabaseName("ix_feedback_is_processed");
+
         builder.HasOne(f => f.Candidate)
             .WithMany()
             .HasForeignKey(f => f.CandidateId)

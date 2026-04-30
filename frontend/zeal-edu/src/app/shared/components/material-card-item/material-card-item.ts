@@ -15,7 +15,16 @@ import {
   lucideTrash2,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { StudyMaterialListItem } from '../models/material-payload';
+
+export interface MaterialCardData {
+  materialId: string;
+  title: string;
+  fileName: string;
+  fileType: string;
+  fileSizeMb: number;
+  isActive: boolean;
+  uploadedAt: string;
+}
 
 export type MaterialCardActionKind =
   | 'download'
@@ -24,9 +33,9 @@ export type MaterialCardActionKind =
   | 'toggle-active'
   | 'delete';
 
-export interface MaterialCardAction {
+export interface MaterialCardAction<T extends MaterialCardData = MaterialCardData> {
   kind: MaterialCardActionKind;
-  material: StudyMaterialListItem;
+  material: T;
 }
 
 @Component({
@@ -52,7 +61,7 @@ export interface MaterialCardAction {
   templateUrl: 'material-card-item.html',
 })
 export class MaterialCardItem {
-  readonly material = input.required<StudyMaterialListItem>();
+  readonly material = input.required<MaterialCardData>();
   readonly readOnly = input<boolean>(false);
   readonly action = output<MaterialCardAction>();
 

@@ -12,6 +12,7 @@ import { DataTableSortChange } from '@shared/components/data-table';
 import { FacultyService } from '../faculty.service';
 import {
   FacultyExaminationCandidate,
+  FacultyExaminationCandidatesQuery,
   FacultyExaminationSummary,
   FacultyExaminationsQuery,
 } from '../models/faculty-models';
@@ -83,9 +84,15 @@ import { FacultyExamTable } from './components/faculty-exam-table';
     <app-faculty-exam-candidates-dialog
       #candidatesDialog
       [examination]="activeExamination()"
-      [candidates]="candidatesQuery.data()"
+      [page]="candidatesQuery.data()"
       [isLoading]="candidatesQuery.isPending() || candidatesQuery.isFetching()"
+      [pageSize]="candidatesPageSize()"
+      [sortBy]="candidatesSortBy()"
+      [sortDirection]="candidatesSortDirection()"
       (rowSelected)="onCandidateSelected($event)"
+      (pageChanged)="onCandidatesPageChanged($event)"
+      (pageSizeChanged)="onCandidatesPageSizeChanged($event)"
+      (sortChanged)="onCandidatesSortChanged($event)"
     />
 
     <app-faculty-exam-score-form-dialog
@@ -117,6 +124,11 @@ export default class FacultyExaminationsPage {
   );
   private readonly _candidatesEnabled = computed(() => this._activeExaminationId() !== null);
 
+  protected readonly candidatesPage = signal(1);
+  protected readonly candidatesPageSize = signal(10);
+  protected readonly candidatesSortBy = signal<string | null>(null);
+  protected readonly candidatesSortDirection = signal<'asc' | 'desc'>('asc');
+
   private readonly _params = computed<FacultyExaminationsQuery>(() => ({
     page: this.page(),
     pageSize: this.pageSize(),
@@ -125,9 +137,17 @@ export default class FacultyExaminationsPage {
     sortDirection: this.sortDirection(),
   }));
 
+  private readonly _candidatesParams = computed<FacultyExaminationCandidatesQuery>(() => ({
+    page: this.candidatesPage(),
+    pageSize: this.candidatesPageSize(),
+    sortBy: this.candidatesSortBy() ?? undefined,
+    sortDirection: this.candidatesSortDirection(),
+  }));
+
   protected readonly listQuery = this._service.examinationsQuery(this._params);
   protected readonly candidatesQuery = this._service.examCandidatesQuery(
     this._activeExaminationId,
+    this._candidatesParams,
     this._candidatesEnabled,
   );
 
@@ -160,7 +180,25 @@ export default class FacultyExaminationsPage {
 
   protected onEnterScores(exam: FacultyExaminationSummary): void {
     this.activeExamination.set(exam);
+    this.candidatesPage.set(1);
+    this.candidatesSortBy.set(null);
+    this.candidatesSortDirection.set('asc');
     this.candidatesDialog().open();
+  }
+
+  protected onCandidatesPageChanged(p: number): void {
+    this.candidatesPage.set(p);
+  }
+
+  protected onCandidatesPageSizeChanged(size: number): void {
+    this.candidatesPageSize.set(size);
+    this.candidatesPage.set(1);
+  }
+
+  protected onCandidatesSortChanged(change: DataTableSortChange): void {
+    this.candidatesSortBy.set(change.sortBy);
+    this.candidatesSortDirection.set(change.sortDirection);
+    this.candidatesPage.set(1);
   }
 
   protected onCandidateSelected(candidate: FacultyExaminationCandidate): void {
@@ -170,15 +208,16 @@ export default class FacultyExaminationsPage {
   }
 
   protected onScoreSubmitted(event: FacultyExamScoreSubmit): void {
+    const successMessage = event.isFinalized ? 'Score finalized.' : 'Score saved as draft.';
     if (event.candidate.resultId) {
       this.updateExamResultMutation.mutate(
         {
           resultId: event.candidate.resultId,
-          payload: { score: event.score, grade: event.grade },
+          payload: { score: event.score, isFinalized: event.isFinalized },
         },
         {
           onSuccess: () => {
-            toast.success('Score updated successfully.');
+            toast.success(successMessage);
             this.scoreDialog().close();
           },
         },
@@ -190,12 +229,12 @@ export default class FacultyExaminationsPage {
           payload: {
             enrollmentId: event.candidate.enrollmentId,
             score: event.score,
-            grade: event.grade,
+            isFinalized: event.isFinalized,
           },
         },
         {
           onSuccess: () => {
-            toast.success('Score entered successfully.');
+            toast.success(successMessage);
             this.scoreDialog().close();
           },
         },

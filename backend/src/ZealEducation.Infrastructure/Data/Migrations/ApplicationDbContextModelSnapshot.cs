@@ -551,6 +551,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<Guid>("GradedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsFinalized")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsOverridden")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -784,6 +787,17 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsProcessed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ProcessedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -804,6 +818,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BatchId");
+
+                    b.HasIndex("IsProcessed")
+                        .HasDatabaseName("ix_feedback_is_processed");
+
+                    b.HasIndex("ProcessedById");
 
                     b.HasIndex("TargetFacultyId");
 
@@ -1568,6 +1587,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ZealEducation.Domain.Entities.UserAccount", "ProcessedBy")
+                        .WithMany()
+                        .HasForeignKey("ProcessedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ZealEducation.Domain.Entities.Faculty", "TargetFaculty")
                         .WithMany()
                         .HasForeignKey("TargetFacultyId")
@@ -1576,6 +1600,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("Batch");
 
                     b.Navigation("Candidate");
+
+                    b.Navigation("ProcessedBy");
 
                     b.Navigation("TargetFaculty");
                 });
