@@ -6,4 +6,4 @@ public record CreateExamResultCommand(
     Guid ExaminationId,
     Guid EnrollmentId,
     decimal Score,
-    string? Grade) : IRequest<Guid>;
+    bool IsFinalized) : IRequest<Guid>;

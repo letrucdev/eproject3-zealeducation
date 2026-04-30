@@ -5,5 +5,4 @@ namespace ZealEducation.Application.Features.ExamResults.Commands.OverrideExamRe
 public record OverrideExamResultCommand(
     Guid ResultId,
     decimal Score,
-    string? Grade,
     string OverrideReason) : IRequest<Unit>;

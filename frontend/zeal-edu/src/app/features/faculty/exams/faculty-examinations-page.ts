@@ -170,15 +170,16 @@ export default class FacultyExaminationsPage {
   }
 
   protected onScoreSubmitted(event: FacultyExamScoreSubmit): void {
+    const successMessage = event.isFinalized ? 'Score finalized.' : 'Score saved as draft.';
     if (event.candidate.resultId) {
       this.updateExamResultMutation.mutate(
         {
           resultId: event.candidate.resultId,
-          payload: { score: event.score, grade: event.grade },
+          payload: { score: event.score, isFinalized: event.isFinalized },
         },
         {
           onSuccess: () => {
-            toast.success('Score updated successfully.');
+            toast.success(successMessage);
             this.scoreDialog().close();
           },
         },
@@ -190,12 +191,12 @@ export default class FacultyExaminationsPage {
           payload: {
             enrollmentId: event.candidate.enrollmentId,
             score: event.score,
-            grade: event.grade,
+            isFinalized: event.isFinalized,
           },
         },
         {
           onSuccess: () => {
-            toast.success('Score entered successfully.');
+            toast.success(successMessage);
             this.scoreDialog().close();
           },
         },

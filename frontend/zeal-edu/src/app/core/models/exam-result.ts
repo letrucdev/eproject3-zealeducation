@@ -7,6 +7,7 @@ export interface ExamResult {
   score: number;
   grade: string | null;
   isPassed: boolean;
+  isFinalized: boolean;
   gradedById: string;
   gradedByName: string;
   isOverridden: boolean;
@@ -18,7 +19,6 @@ export interface ExamResult {
 
 export interface OverrideExamResultPayload {
   score: number;
-  grade: string | null;
   overrideReason: string;
 }
 

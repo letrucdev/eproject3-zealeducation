@@ -5,4 +5,4 @@ namespace ZealEducation.Application.Features.ExamResults.Commands.UpdateExamResu
 public record UpdateExamResultCommand(
     Guid ResultId,
     decimal Score,
-    string? Grade) : IRequest<Unit>;
+    bool IsFinalized) : IRequest<Unit>;

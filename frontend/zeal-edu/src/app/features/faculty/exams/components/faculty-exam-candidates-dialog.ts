@@ -32,7 +32,7 @@ import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../mo
     <hlm-dialog #dlg>
       <hlm-dialog-content
         *hlmDialogPortal
-        class="sm:max-w-3xl w-3xl flex max-h-[90dvh] flex-col"
+        class="sm:max-w-5xl w-5xl flex max-h-[90dvh] flex-col"
         [showCloseButton]="true"
       >
         <div hlmDialogHeader>
@@ -60,11 +60,11 @@ import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../mo
             <table class="w-full text-sm">
               <thead class="text-muted-foreground border-b text-left text-xs uppercase">
                 <tr>
-                  <th class="px-3 py-2 w-32">Code</th>
-                  <th class="px-3 py-2">Candidate</th>
+                  <th class="px-3 py-2 w-44">Code</th>
+                  <th class="px-3 py-2 w-44">Candidate</th>
                   <th class="px-3 py-2 w-20 text-center">Score</th>
                   <th class="px-3 py-2 w-20 text-center">Grade</th>
-                  <th class="px-3 py-2 w-24 text-center">Status</th>
+                  <th class="px-3 py-2 w-40 text-center">Status</th>
                   <th class="px-3 py-2 w-40">Graded At</th>
                   <th class="px-3 py-2 w-24 text-right">Actions</th>
                 </tr>
@@ -79,16 +79,24 @@ import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../mo
                     </td>
                     <td class="px-3 py-2 text-center">{{ row.grade || '–' }}</td>
                     <td class="px-3 py-2 text-center">
-                      @if (row.resultId == null) {
-                        <span class="text-muted-foreground text-xs">Not entered</span>
-                      } @else if (row.isPassed) {
-                        <span hlmBadge class="bg-emerald-100 text-emerald-800">Pass</span>
-                      } @else {
-                        <span hlmBadge class="bg-rose-100 text-rose-800">Fail</span>
-                      }
-                      @if (row.isOverridden) {
-                        <span hlmBadge class="ml-1 bg-amber-100 text-amber-800">Overridden</span>
-                      }
+                      <div class="flex flex-wrap items-center justify-center gap-1">
+                        @if (row.resultId == null) {
+                          <span class="text-muted-foreground text-xs">Not entered</span>
+                        } @else {
+                          @if (row.isOverridden) {
+                            <span hlmBadge class="bg-amber-100 text-amber-800">Overridden</span>
+                          } @else if (row.isFinalized) {
+                            <span hlmBadge class="bg-sky-100 text-sky-800">Final</span>
+                          } @else {
+                            <span hlmBadge class="bg-slate-100 text-slate-700">Draft</span>
+                          }
+                          @if (row.isPassed) {
+                            <span hlmBadge class="bg-emerald-100 text-emerald-800">Pass</span>
+                          } @else {
+                            <span hlmBadge class="bg-rose-100 text-rose-800">Fail</span>
+                          }
+                        }
+                      </div>
                     </td>
                     <td class="px-3 py-2 text-xs">
                       @if (row.gradedAt) {
@@ -104,14 +112,8 @@ import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../mo
                         size="sm"
                         type="button"
                         (click)="rowSelected.emit(row)"
-                        [disabled]="row.isOverridden"
-                        [attr.title]="
-                          row.isOverridden
-                            ? 'Result has been overridden by Incharge'
-                            : row.resultId
-                              ? 'Update score'
-                              : 'Enter score'
-                        "
+                        [disabled]="row.isOverridden || row.isFinalized"
+                        [attr.title]="actionTitle(row)"
                         [attr.aria-label]="
                           (row.resultId ? 'Edit score for ' : 'Add score for ') + row.candidateCode
                         "
@@ -132,7 +134,8 @@ import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../mo
 
         <div hlmDialogFooter class="shrink-0">
           <p class="text-muted-foreground mr-auto text-xs">
-            Graded: {{ gradedCount() }} / {{ candidates()?.length ?? 0 }}
+            Final: {{ finalCount() }} · Draft: {{ draftCount() }} · Pending: {{ pendingCount() }} ·
+            Total: {{ candidates()?.length ?? 0 }}
           </p>
           <button hlmBtn variant="outline" type="button" hlmDialogClose>Close</button>
         </div>
@@ -149,8 +152,16 @@ export class FacultyExamCandidatesDialog {
 
   protected readonly dlg = viewChild<HlmDialog>('dlg');
 
-  protected readonly gradedCount = computed(
-    () => this.candidates()?.filter((c) => c.resultId != null).length ?? 0,
+  protected readonly finalCount = computed(
+    () =>
+      this.candidates()?.filter((c) => c.resultId != null && c.isFinalized).length ?? 0,
+  );
+  protected readonly draftCount = computed(
+    () =>
+      this.candidates()?.filter((c) => c.resultId != null && !c.isFinalized).length ?? 0,
+  );
+  protected readonly pendingCount = computed(
+    () => this.candidates()?.filter((c) => c.resultId == null).length ?? 0,
   );
 
   open(): void {
@@ -159,5 +170,11 @@ export class FacultyExamCandidatesDialog {
 
   close(): void {
     this.dlg()?.close();
+  }
+
+  protected actionTitle(row: FacultyExaminationCandidate): string {
+    if (row.isOverridden) return 'Result has been overridden by Incharge';
+    if (row.isFinalized) return 'Result has been finalized — ask Incharge to override';
+    return row.resultId ? 'Update score' : 'Enter score';
   }
 }

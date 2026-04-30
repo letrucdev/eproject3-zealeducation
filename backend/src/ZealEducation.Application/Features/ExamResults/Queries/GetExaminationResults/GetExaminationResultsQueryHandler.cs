@@ -44,6 +44,7 @@ public class GetExaminationResultsQueryHandler(
             Score = r.Score,
             Grade = r.Grade,
             IsPassed = r.IsPassed,
+            IsFinalized = r.IsFinalized,
             GradedById = r.GradedById,
             GradedByName = r.GradedBy.UserAccount.FullName,
             IsOverridden = r.IsOverridden,

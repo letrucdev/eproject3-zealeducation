@@ -52,6 +52,10 @@ public class GetFacultyExaminationCandidatesQueryHandler(
                     .Where(r => r.ExamId == exam.Id)
                     .Select(r => (bool?)r.IsPassed)
                     .FirstOrDefault(),
+                IsFinalized = en.ExamResults
+                    .Where(r => r.ExamId == exam.Id)
+                    .Select(r => r.IsFinalized)
+                    .FirstOrDefault(),
                 IsOverridden = en.ExamResults
                     .Where(r => r.ExamId == exam.Id)
                     .Select(r => r.IsOverridden)

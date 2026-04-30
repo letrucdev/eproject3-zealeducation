@@ -1,5 +1,6 @@
 using MediatR;
 using ZealEducation.Application.Common.Exceptions;
+using ZealEducation.Application.Common.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Interfaces;
 
@@ -18,6 +19,9 @@ public class UpdateExamResultCommandHandler(
         if (result.IsOverridden)
             throw new ConflictException("This result has been overridden and can no longer be updated through this endpoint.");
 
+        if (result.IsFinalized)
+            throw new ConflictException("This result has been finalized and can no longer be updated. Ask Incharge for an override.");
+
         var examination = await examinationRepository.GetByIdAsync(result.ExamId, cancellationToken)
             ?? throw new NotFoundException(nameof(Examination), result.ExamId);
 
@@ -25,8 +29,9 @@ public class UpdateExamResultCommandHandler(
             throw new ConflictException($"Score must not exceed the exam's max score ({examination.MaxScore}).");
 
         result.Score = request.Score;
-        result.Grade = string.IsNullOrWhiteSpace(request.Grade) ? null : request.Grade.Trim();
+        result.Grade = ExamGradeCalculator.Calculate(request.Score, examination.MaxScore, examination.PassScore);
         result.IsPassed = request.Score >= examination.PassScore;
+        result.IsFinalized = request.IsFinalized;
 
         examResultRepository.Update(result);
         await unitOfWork.SaveChangesAsync(cancellationToken);

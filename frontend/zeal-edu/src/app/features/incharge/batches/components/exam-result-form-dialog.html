@@ -20,8 +20,8 @@
       role="status"
     >
       @if (isReOverride()) {
-        Updating the override will replace the score, grade, and reason. The original grader is
-        still recorded.
+        Updating the override will replace the score and reason. The grade is auto-calculated from
+        the new score. The original grader is still recorded.
       } @else {
         This will mark the result as overridden by Incharge. The original grader is still recorded.
       }
@@ -56,17 +56,21 @@
         </hlm-field>
 
         <hlm-field>
-          <label hlmFieldLabel for="exam-result-grade">Grade (optional)</label>
+          <label hlmFieldLabel for="exam-result-grade">Grade (auto-calculated)</label>
           <input
             hlmInput
             id="exam-result-grade"
             type="text"
-            formControlName="grade"
-            class="w-full"
-            maxlength="5"
-            placeholder="e.g. A, B+, P"
+            class="bg-muted/50 w-full"
+            [value]="derivedGrade() || '–'"
+            readonly
+            aria-readonly="true"
+            tabindex="-1"
           />
-          <hlm-field-error validator="maxlength">Max 5 characters.</hlm-field-error>
+          <p class="text-muted-foreground text-xs">
+            Letter grade is computed from the score: ≥90% A · ≥80% B · ≥70% C · ≥60% D · below
+            pass score F.
+          </p>
         </hlm-field>
 
         <hlm-field>

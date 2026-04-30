@@ -73,7 +73,7 @@ public class ExaminationController(ISender sender) : ControllerBase
             id,
             body.EnrollmentId,
             body.Score,
-            body.Grade));
+            body.IsFinalized));
 
         return Ok(ApiResponse<Guid>.Success(resultId, "Exam result recorded successfully"));
     }
@@ -88,5 +88,5 @@ public class ExaminationController(ISender sender) : ControllerBase
     public record CreateExamResultRequest(
         Guid EnrollmentId,
         decimal Score,
-        string? Grade);
+        bool IsFinalized);
 }

@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -16,18 +17,21 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { startWith } from 'rxjs';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { calculateLetterGrade } from '@shared/utils/exam-grade';
 import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../models/faculty-models';
 
 export interface FacultyExamScoreSubmit {
   examinationId: string;
   candidate: FacultyExaminationCandidate;
   score: number;
-  grade: string | null;
+  isFinalized: boolean;
 }
 
 const scoreWithinMaxValidator =
@@ -48,6 +52,7 @@ const scoreWithinMaxValidator =
     HlmInputImports,
     HlmButtonImports,
     HlmSpinnerImports,
+    ConfirmDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -70,7 +75,6 @@ const scoreWithinMaxValidator =
 
         <form
           [formGroup]="form"
-          (ngSubmit)="onSubmit()"
           class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
         >
           <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
@@ -101,36 +105,62 @@ const scoreWithinMaxValidator =
             </hlm-field>
 
             <hlm-field>
-              <label hlmFieldLabel for="faculty-exam-grade">Grade (optional)</label>
+              <label hlmFieldLabel for="faculty-exam-grade">Grade (auto-calculated)</label>
               <input
                 hlmInput
                 id="faculty-exam-grade"
                 type="text"
-                formControlName="grade"
-                class="w-full"
-                maxlength="5"
-                placeholder="e.g. A, B+, P"
+                class="bg-muted/50 w-full"
+                [value]="derivedGrade() || '–'"
+                readonly
+                aria-readonly="true"
+                tabindex="-1"
               />
-              <hlm-field-error validator="maxlength">Max 5 characters.</hlm-field-error>
+              <p class="text-muted-foreground text-xs">
+                Letter grade is computed from the score: ≥90% A · ≥80% B · ≥70% C · ≥60% D ·
+                below pass score F.
+              </p>
             </hlm-field>
           </hlm-field-group>
 
           <div hlmDialogFooter class="shrink-0">
             <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
-            <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+            <button
+              hlmBtn
+              variant="secondary"
+              type="button"
+              (click)="onSubmit(false)"
+              [disabled]="form.invalid || submitting()"
+            >
               @if (submitting()) {
                 <hlm-spinner class="mr-2" />
                 Saving...
-              } @else if (isEdit()) {
-                Save changes
               } @else {
-                Save score
+                Save as draft
+              }
+            </button>
+            <button
+              hlmBtn
+              type="button"
+              (click)="requestFinalize()"
+              [disabled]="form.invalid || submitting()"
+            >
+              @if (submitting()) {
+                <hlm-spinner class="mr-2" />
+                Saving...
+              } @else {
+                Save & finalize
               }
             </button>
           </div>
         </form>
       </hlm-dialog-content>
     </hlm-dialog>
+
+    <app-confirm-dialog
+      #finalizeConfirmDialog
+      (confirmed)="onSubmit(true)"
+    />
   `,
 })
 export class FacultyExamScoreFormDialog {
@@ -140,6 +170,7 @@ export class FacultyExamScoreFormDialog {
   readonly submitted = output<FacultyExamScoreSubmit>();
 
   protected readonly dlg = viewChild<HlmDialog>('dlg');
+  protected readonly finalizeConfirmDialog = viewChild<ConfirmDialog>('finalizeConfirmDialog');
 
   private readonly _examination = signal<FacultyExaminationSummary | null>(null);
   private readonly _candidate = signal<FacultyExaminationCandidate | null>(null);
@@ -154,7 +185,21 @@ export class FacultyExamScoreFormDialog {
       Validators.min(0),
       scoreWithinMaxValidator(() => this._examination()?.maxScore ?? null),
     ]),
-    grade: this._fb.nonNullable.control('', [Validators.maxLength(5)]),
+  });
+
+  private readonly _scoreSignal = toSignal(
+    this.form.controls.score.valueChanges.pipe(
+      startWith(this.form.controls.score.value),
+      takeUntilDestroyed(),
+    ),
+    { initialValue: this.form.controls.score.value },
+  );
+
+  protected readonly derivedGrade = computed(() => {
+    const exam = this._examination();
+    if (!exam) return '';
+    const score = this._scoreSignal();
+    return calculateLetterGrade(score == null ? null : Number(score), exam.maxScore, exam.passScore);
   });
 
   open(examination: FacultyExaminationSummary, candidate: FacultyExaminationCandidate): void {
@@ -162,7 +207,6 @@ export class FacultyExamScoreFormDialog {
     this._candidate.set(candidate);
     this.form.reset({
       score: candidate.score != null ? Number(candidate.score) : 0,
-      grade: candidate.grade ?? '',
     });
     this.form.controls.score.updateValueAndValidity();
     this.dlg()?.open();
@@ -172,7 +216,25 @@ export class FacultyExamScoreFormDialog {
     this.dlg()?.close();
   }
 
-  protected onSubmit(): void {
+  protected requestFinalize(): void {
+    if (this.form.invalid || this.submitting()) return;
+    const candidate = this._candidate();
+    if (!candidate) return;
+    const v = this.form.getRawValue();
+    const grade = this.derivedGrade() || '–';
+    this.finalizeConfirmDialog()?.open({
+      title: 'Finalize this score?',
+      message:
+        `Candidate: ${candidate.candidateCode} — ${candidate.candidateFullName}\n` +
+        `Score: ${v.score} · Grade: ${grade}\n\n` +
+        `This score will be locked for the candidate above. ` +
+        `You won't be able to edit it later — only an Incharge can override.`,
+      confirmLabel: 'Confirm finalize',
+      cancelLabel: 'Back',
+    });
+  }
+
+  protected onSubmit(isFinalized: boolean): void {
     if (this.form.invalid || this.submitting()) return;
 
     const examination = this._examination();
@@ -184,7 +246,7 @@ export class FacultyExamScoreFormDialog {
       examinationId: examination.examinationId,
       candidate,
       score: v.score,
-      grade: v.grade.trim() || null,
+      isFinalized,
     });
   }
 }

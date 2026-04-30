@@ -10,6 +10,7 @@ public class FacultyExaminationCandidateDto
     public decimal? Score { get; set; }
     public string? Grade { get; set; }
     public bool? IsPassed { get; set; }
+    public bool IsFinalized { get; set; }
     public bool IsOverridden { get; set; }
     public DateTime? GradedAt { get; set; }
 }
