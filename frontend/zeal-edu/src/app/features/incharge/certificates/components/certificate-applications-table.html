@@ -1,0 +1,139 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
+  [trackBy]="trackById"
+  itemLabel="applications"
+  emptyMessage="No certificate applications found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
+>
+  <ng-template certificateCell="createdAt" let-row>
+    <span class="text-sm">{{ row.appliedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+  </ng-template>
+
+  <ng-template certificateCell="candidate" let-row>
+    <div class="flex flex-col">
+      <span class="font-medium">{{ row.candidateName }}</span>
+      <span class="text-muted-foreground text-xs">{{ row.candidateCode }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template certificateCell="course" let-row>
+    <div class="flex flex-col">
+      <span class="font-medium">{{ row.courseName }}</span>
+      @if (row.batchCode) {
+        <span class="text-muted-foreground text-xs font-mono">{{ row.batchCode }}</span>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template certificateCell="fees" let-row>
+    @if (row.feesPaid) {
+      <ng-icon
+        hlm
+        name="lucideCircleCheck"
+        size="sm"
+        class="text-emerald-600"
+        title="Fees fully paid"
+      />
+    } @else {
+      <ng-icon hlm name="lucideCircleX" size="sm" class="text-rose-600" title="Fees not paid" />
+    }
+  </ng-template>
+
+  <ng-template certificateCell="attendance" let-row>
+    <span
+      class="text-sm font-medium"
+      [class]="row.attendanceOk ? 'text-emerald-700' : 'text-rose-700'"
+    >
+      {{ row.attendancePercent }}%
+    </span>
+  </ng-template>
+
+  <ng-template certificateCell="exams" let-row>
+    @if (row.examsPassed) {
+      <ng-icon
+        hlm
+        name="lucideCircleCheck"
+        size="sm"
+        class="text-emerald-600"
+        title="All exams passed"
+      />
+    } @else {
+      <ng-icon hlm name="lucideCircleX" size="sm" class="text-rose-600" title="Exams not passed" />
+    }
+  </ng-template>
+
+  <ng-template certificateCell="status" let-row>
+    @if (row.status === 'Approved') {
+      <span hlmBadge class="bg-emerald-100 text-emerald-800">Approved</span>
+    } @else {
+      <span hlmBadge class="bg-amber-100 text-amber-800">Pending</span>
+    }
+  </ng-template>
+
+  <ng-template certificateCell="certificateNumber" let-row>
+    @if (row.certificateNumber) {
+      <span class="font-mono text-sm">{{ row.certificateNumber }}</span>
+    } @else {
+      <span class="text-muted-foreground">—</span>
+    }
+  </ng-template>
+
+  <ng-template certificateCell="approval" let-row>
+    @if (row.status === 'Approved' && row.approvedAt) {
+      <div class="flex flex-col">
+        <span class="text-sm">{{ row.approvedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+        @if (row.approvedByName) {
+          <span class="text-muted-foreground text-xs">by {{ row.approvedByName }}</span>
+        }
+      </div>
+    } @else {
+      <span class="text-muted-foreground">—</span>
+    }
+  </ng-template>
+
+  <ng-template certificateCell="actions" let-row>
+    <div class="flex items-center justify-end gap-2">
+      @if (row.status === 'Pending') {
+        <button
+          hlmBtn
+          size="sm"
+          type="button"
+          [disabled]="!row.isCurrentlyEligible || approvingId() === row.applicationId"
+          (click)="approveClicked.emit(row)"
+          [title]="
+            row.isCurrentlyEligible
+              ? 'Approve and issue certificate'
+              : 'Candidate is not currently eligible'
+          "
+        >
+          <ng-icon hlm name="lucideCheckCheck" size="sm" class="mr-1" />
+          Approve
+        </button>
+      } @else {
+        <button
+          hlmBtn
+          variant="outline"
+          size="sm"
+          type="button"
+          [disabled]="regeneratingId() === row.applicationId"
+          (click)="regenerateClicked.emit(row)"
+          title="Re-render the certificate PDF with the current template"
+        >
+          @if (regeneratingId() === row.applicationId) {
+            <hlm-spinner class="mr-1" />
+          } @else {
+            <ng-icon hlm name="lucideRefreshCw" size="sm" class="mr-1" />
+          }
+          Regenerate
+        </button>
+      }
+    </div>
+  </ng-template>
+</app-data-table>

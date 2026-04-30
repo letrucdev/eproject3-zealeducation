@@ -42,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddSingleton<IReceiptPdfGenerator, QuestPdfReceiptGenerator>();
+        services.AddSingleton<ICertificatePdfGenerator, QuestPdfCertificateGenerator>();
 
         services.AddR2StorageServices(configuration);
         services.AddAuthenticationServices(configuration);

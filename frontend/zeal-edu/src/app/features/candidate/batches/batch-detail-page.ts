@@ -8,14 +8,29 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft } from '@ng-icons/lucide';
+import {
+  lucideArrowLeft,
+  lucideAward,
+  lucideGraduationCap,
+  lucideHourglass,
+} from '@ng-icons/lucide';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmAlertImports } from '@spartan-ng/helm/alert';
+import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
+import { BatchStatus } from '@core/models/batch-status';
 import { DataTableSortChange } from '@shared/components/data-table';
-import { CourseMaterialsQuery, StudyMaterialListItem } from '@features/incharge/materials/models/material-payload';
+import {
+  CourseMaterialsQuery,
+  StudyMaterialListItem,
+} from '@features/incharge/materials/models/material-payload';
 import { CandidatePortalService } from '../candidate-portal.service';
+import { CertificateService } from '../certificates/certificate.service';
+import { ApplyCertificateDialog } from '../certificates/components/apply-certificate-dialog';
+import { ApplyForCertificatePayload } from '../certificates/models/certificate-models';
 import { FeedbackService } from '../feedback.service';
 import { MyBatchAttendanceQuery, MyBatchSessionsQuery } from '../models/candidate-portal-models';
 import {
@@ -37,7 +52,10 @@ import { GeneralFeedbackDialog } from './components/general-feedback-dialog';
   selector: 'app-candidate-batch-detail-page',
   imports: [
     RouterLink,
+    HlmAlertImports,
+    HlmBadgeImports,
     HlmButtonImports,
+    HlmCardImports,
     HlmIconImports,
     HlmSkeletonImports,
     CandidateBatchInfoCard,
@@ -49,102 +67,19 @@ import { GeneralFeedbackDialog } from './components/general-feedback-dialog';
     FacultyFeedbackDialog,
     CourseFeedbackDialog,
     GeneralFeedbackDialog,
+    ApplyCertificateDialog,
   ],
-  providers: [provideIcons({ lucideArrowLeft })],
+  providers: [provideIcons({ lucideArrowLeft, lucideAward, lucideGraduationCap, lucideHourglass })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="flex flex-col gap-6">
-      <header class="flex flex-col gap-2">
-        <a hlmBtn variant="ghost" size="sm" routerLink="/app/candidate/batches" class="self-start">
-          <ng-icon hlm name="lucideArrowLeft" size="sm" />
-          Back to My Batches
-        </a>
-        <h1 class="text-2xl font-semibold tracking-tight">Batch Detail</h1>
-      </header>
-
-      @if (detailQuery.isPending()) {
-        <div class="grid gap-4">
-          <hlm-skeleton class="h-40" />
-          <hlm-skeleton class="h-32" />
-          <hlm-skeleton class="h-40" />
-        </div>
-      } @else if (detailQuery.isError()) {
-        <div class="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Failed to load batch.
-        </div>
-      } @else if (detailQuery.data(); as detail) {
-        <app-candidate-batch-info-card [detail]="detail" />
-
-        <app-candidate-batch-schedule-card
-          [page]="sessionsQuery.data()"
-          [isLoading]="sessionsQuery.isPending()"
-          [pageSize]="sessionsPageSize()"
-          [sortBy]="sessionsSortBy()"
-          [sortDirection]="sessionsSortDirection()"
-          [fromDate]="sessionsFromDate()"
-          [toDate]="sessionsToDate()"
-          (pageChanged)="onSessionsPageChanged($event)"
-          (pageSizeChanged)="onSessionsPageSizeChanged($event)"
-          (sortChanged)="onSessionsSortChanged($event)"
-          (dateRangeChanged)="onSessionsDateRangeChanged($event)"
-        />
-
-        <app-candidate-batch-attendance-card
-          [data]="attendanceQuery.data()"
-          [isLoading]="attendanceQuery.isPending()"
-          [pageSize]="attendancePageSize()"
-          [sortBy]="attendanceSortBy()"
-          [sortDirection]="attendanceSortDirection()"
-          [fromDate]="attendanceFromDate()"
-          [toDate]="attendanceToDate()"
-          (pageChanged)="onAttendancePageChanged($event)"
-          (pageSizeChanged)="onAttendancePageSizeChanged($event)"
-          (sortChanged)="onAttendanceSortChanged($event)"
-          (dateRangeChanged)="onAttendanceDateRangeChanged($event)"
-        />
-
-        <app-candidate-batch-tests-card
-          [data]="examResultsQuery.data()"
-          [isLoading]="examResultsQuery.isPending()"
-        />
-
-        <app-candidate-batch-materials-card
-          [data]="materialsQuery.data()"
-          [isLoading]="materialsQuery.isPending()"
-          (pageChanged)="onMaterialsPageChanged($event)"
-          (downloadClicked)="onMaterialDownload($event)"
-        />
-
-        <app-candidate-batch-feedback-card
-          [detail]="detail"
-          (facultyClicked)="onFacultyFeedbackClick()"
-          (courseClicked)="onCourseFeedbackClick()"
-          (generalClicked)="onGeneralFeedbackClick()"
-        />
-      }
-    </section>
-
-    <app-faculty-feedback-dialog
-      #facultyDialog
-      [submitting]="facultyMutation.isPending()"
-      (submitted)="onFacultySubmitted($event)"
-    />
-    <app-course-feedback-dialog
-      #courseDialog
-      [submitting]="courseMutation.isPending()"
-      (submitted)="onCourseSubmitted($event)"
-    />
-    <app-general-feedback-dialog
-      #generalDialog
-      [submitting]="generalMutation.isPending()"
-      (submitted)="onGeneralSubmitted($event)"
-    />
-  `,
+  templateUrl: './batch-detail-page.html',
 })
 export default class CandidateBatchDetailPage {
   private readonly _route = inject(ActivatedRoute);
   private readonly _service = inject(CandidatePortalService);
   private readonly _feedbackService = inject(FeedbackService);
+  private readonly _certificateService = inject(CertificateService);
+
+  protected readonly completedStatus = BatchStatus.Completed;
 
   protected readonly batchId = signal<string | null>(this._route.snapshot.paramMap.get('id'));
 
@@ -202,14 +137,18 @@ export default class CandidateBatchDetailPage {
     this.batchId,
     this._materialsParams,
   );
+  protected readonly eligibilityQuery = this._certificateService.eligibilityQuery(this.batchId);
 
   protected readonly facultyMutation = this._feedbackService.submitFacultyMutation();
   protected readonly courseMutation = this._feedbackService.submitCourseMutation();
   protected readonly generalMutation = this._feedbackService.submitGeneralMutation();
+  protected readonly applyCertificateMutation = this._certificateService.applyMutation();
 
   protected readonly facultyDialog = viewChild<FacultyFeedbackDialog>('facultyDialog');
   protected readonly courseDialog = viewChild<CourseFeedbackDialog>('courseDialog');
   protected readonly generalDialog = viewChild<GeneralFeedbackDialog>('generalDialog');
+  protected readonly applyCertificateDialog =
+    viewChild<ApplyCertificateDialog>('applyCertificateDialog');
 
   protected onSessionsPageChanged(page: number): void {
     this.sessionsPage.set(page);
@@ -314,6 +253,25 @@ export default class CandidateBatchDetailPage {
       onSuccess: () => {
         toast.success('General feedback submitted.');
         this.generalDialog()?.close();
+      },
+    });
+  }
+
+  protected onApplyForCertificateClick(): void {
+    const detail = this.detailQuery.data();
+    if (!detail) return;
+    this.applyCertificateDialog()?.open({
+      batchId: detail.batchId,
+      batchLabel: detail.batchCode,
+      courseName: detail.courseName,
+    });
+  }
+
+  protected onApplyCertificateSubmitted(payload: ApplyForCertificatePayload): void {
+    this.applyCertificateMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success('Certificate application submitted.');
+        this.applyCertificateDialog()?.close();
       },
     });
   }
