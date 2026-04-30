@@ -18,6 +18,7 @@ import {
   FacultyCoursesQuery,
   FacultyExamResultPayload,
   FacultyExaminationCandidate,
+  FacultyExaminationCandidatesQuery,
   FacultyExaminationSummary,
   FacultyExaminationsQuery,
   FacultyScheduleItem,
@@ -152,12 +153,17 @@ export class FacultyService {
     }));
   }
 
-  examCandidatesQuery(examinationId: Signal<string | null>, enabled: Signal<boolean>) {
-    return injectQuery<FacultyExaminationCandidate[], HttpErrorResponse>(() => ({
+  examCandidatesQuery(
+    examinationId: Signal<string | null>,
+    params: Signal<FacultyExaminationCandidatesQuery>,
+    enabled: Signal<boolean>,
+  ) {
+    return injectQuery<PaginatedList<FacultyExaminationCandidate>, HttpErrorResponse>(() => ({
       enabled: enabled() && examinationId() !== null,
-      queryKey: [...FACULTY_EXAM_CANDIDATES_KEY, examinationId()],
-      queryFn: () => this._fetchExamCandidates(examinationId() as string),
+      queryKey: [...FACULTY_EXAM_CANDIDATES_KEY, examinationId(), params()],
+      queryFn: () => this._fetchExamCandidates(examinationId() as string, params()),
       staleTime: 15_000,
+      placeholderData: keepPreviousData,
     }));
   }
 
@@ -376,13 +382,24 @@ export class FacultyService {
 
   private async _fetchExamCandidates(
     examinationId: string,
-  ): Promise<FacultyExaminationCandidate[]> {
+    query: FacultyExaminationCandidatesQuery,
+  ): Promise<PaginatedList<FacultyExaminationCandidate>> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+    if (query.search && query.search.trim().length > 0) {
+      params = params.set('search', query.search.trim());
+    }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
+
     const response = await firstValueFrom(
-      this._http.get<ApiResponse<FacultyExaminationCandidate[]>>(
+      this._http.get<ApiResponse<PaginatedList<FacultyExaminationCandidate>>>(
         `/faculty/me/examinations/${examinationId}/candidates`,
+        { params },
       ),
     );
-    return response.data ?? [];
+    return response.data ?? emptyPaginated<FacultyExaminationCandidate>(query);
   }
 
   private _invalidateExams(): void {

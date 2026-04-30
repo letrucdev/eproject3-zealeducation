@@ -32,6 +32,7 @@ import { FacultyExamTable } from '../exams/components/faculty-exam-table';
 import {
   FacultyBatchEnrollmentsQuery,
   FacultyExaminationCandidate,
+  FacultyExaminationCandidatesQuery,
   FacultyExaminationSummary,
   FacultyExaminationsQuery,
 } from '../models/faculty-models';
@@ -94,6 +95,11 @@ export default class FacultyBatchDetailPage {
   );
   private readonly _candidatesEnabled = computed(() => this._activeExaminationId() !== null);
 
+  protected readonly candidatesPage = signal(1);
+  protected readonly candidatesPageSize = signal(10);
+  protected readonly candidatesSortBy = signal<string | null>(null);
+  protected readonly candidatesSortDirection = signal<'asc' | 'desc'>('asc');
+
   private readonly _sessionsParams = computed(() => ({
     page: this.sessionsPage(),
     pageSize: this.sessionsPageSize(),
@@ -117,6 +123,13 @@ export default class FacultyBatchDetailPage {
     sortDirection: this.examsSortDirection(),
   }));
 
+  private readonly _candidatesParams = computed<FacultyExaminationCandidatesQuery>(() => ({
+    page: this.candidatesPage(),
+    pageSize: this.candidatesPageSize(),
+    sortBy: this.candidatesSortBy() ?? undefined,
+    sortDirection: this.candidatesSortDirection(),
+  }));
+
   protected readonly detailQuery = this._service.batchDetailQuery(this.currentBatchId);
   protected readonly sessionsQuery = this._service.batchSessionsQuery(
     this.currentBatchId,
@@ -129,6 +142,7 @@ export default class FacultyBatchDetailPage {
   protected readonly examsQuery = this._service.examinationsQuery(this._examsParams);
   protected readonly candidatesQuery = this._service.examCandidatesQuery(
     this._activeExaminationId,
+    this._candidatesParams,
     this._candidatesEnabled,
   );
 
@@ -201,7 +215,25 @@ export default class FacultyBatchDetailPage {
 
   protected onEnterScores(exam: FacultyExaminationSummary): void {
     this.activeExamination.set(exam);
+    this.candidatesPage.set(1);
+    this.candidatesSortBy.set(null);
+    this.candidatesSortDirection.set('asc');
     this.candidatesDialog().open();
+  }
+
+  protected onCandidatesPageChanged(page: number): void {
+    this.candidatesPage.set(page);
+  }
+
+  protected onCandidatesPageSizeChanged(size: number): void {
+    this.candidatesPageSize.set(size);
+    this.candidatesPage.set(1);
+  }
+
+  protected onCandidatesSortChanged(change: DataTableSortChange): void {
+    this.candidatesSortBy.set(change.sortBy);
+    this.candidatesSortDirection.set(change.sortDirection);
+    this.candidatesPage.set(1);
   }
 
   protected onCandidateSelected(candidate: FacultyExaminationCandidate): void {

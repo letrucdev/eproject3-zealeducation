@@ -220,10 +220,16 @@ public class FacultyController(ISender sender) : ControllerBase
 
     [HttpGet("me/examinations/{id:guid}/candidates")]
     [Authorize(Roles = FacultyOnly)]
-    public async Task<ActionResult<ApiResponse<List<FacultyExaminationCandidateDto>>>> GetMyExaminationCandidates(Guid id)
+    public async Task<ActionResult<ApiResponse<PaginatedList<FacultyExaminationCandidateDto>>>> GetMyExaminationCandidates(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var result = await sender.Send(new GetFacultyExaminationCandidatesQuery(id));
-        return Ok(ApiResponse<List<FacultyExaminationCandidateDto>>.Success(result));
+        var result = await sender.Send(new GetFacultyExaminationCandidatesQuery(id, page, pageSize, search, sortBy, sortDirection));
+        return Ok(ApiResponse<PaginatedList<FacultyExaminationCandidateDto>>.Success(result));
     }
 
     public record FacultyMarkAttendanceRequest(List<FacultyAttendanceEntryRequest> Entries);

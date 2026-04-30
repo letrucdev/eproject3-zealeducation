@@ -25,7 +25,10 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { calculateLetterGrade } from '@shared/utils/exam-grade';
-import { FacultyExaminationCandidate, FacultyExaminationSummary } from '../../models/faculty-models';
+import {
+  FacultyExaminationCandidate,
+  FacultyExaminationSummary,
+} from '../../models/faculty-models';
 
 export interface FacultyExamScoreSubmit {
   examinationId: string;
@@ -55,113 +58,7 @@ const scoreWithinMaxValidator =
     ConfirmDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <hlm-dialog #dlg>
-      <hlm-dialog-content
-        *hlmDialogPortal
-        class="sm:max-w-lg w-lg flex max-h-[90dvh] flex-col"
-        [showCloseButton]="true"
-      >
-        <div hlmDialogHeader>
-          <h2 hlmDialogTitle>
-            {{ isEdit() ? 'Update score' : 'Enter score' }}
-          </h2>
-          @if (examination(); as exam) {
-            <p class="text-muted-foreground text-sm">
-              {{ exam.examName }} — Max {{ exam.maxScore }}, Pass {{ exam.passScore }}.
-            </p>
-          }
-        </div>
-
-        <form
-          [formGroup]="form"
-          class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
-        >
-          <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-            @if (candidate(); as c) {
-              <div class="bg-muted/50 rounded-md border p-3 text-sm">
-                <div class="text-muted-foreground">Candidate</div>
-                <div class="font-medium">{{ c.candidateCode }} — {{ c.candidateFullName }}</div>
-              </div>
-            }
-
-            <hlm-field>
-              <label hlmFieldLabel for="faculty-exam-score">Score</label>
-              <input
-                hlmInput
-                id="faculty-exam-score"
-                type="number"
-                formControlName="score"
-                class="w-full"
-                min="0"
-                [attr.max]="examination()?.maxScore ?? null"
-                step="0.01"
-              />
-              <hlm-field-error validator="required">Score is required.</hlm-field-error>
-              <hlm-field-error validator="min">Score cannot be negative.</hlm-field-error>
-              <hlm-field-error validator="scoreExceedsMax">
-                Score cannot exceed the exam max score.
-              </hlm-field-error>
-            </hlm-field>
-
-            <hlm-field>
-              <label hlmFieldLabel for="faculty-exam-grade">Grade (auto-calculated)</label>
-              <input
-                hlmInput
-                id="faculty-exam-grade"
-                type="text"
-                class="bg-muted/50 w-full"
-                [value]="derivedGrade() || '–'"
-                readonly
-                aria-readonly="true"
-                tabindex="-1"
-              />
-              <p class="text-muted-foreground text-xs">
-                Letter grade is computed from the score: ≥90% A · ≥80% B · ≥70% C · ≥60% D ·
-                below pass score F.
-              </p>
-            </hlm-field>
-          </hlm-field-group>
-
-          <div hlmDialogFooter class="shrink-0">
-            <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
-            <button
-              hlmBtn
-              variant="secondary"
-              type="button"
-              (click)="onSubmit(false)"
-              [disabled]="form.invalid || submitting()"
-            >
-              @if (submitting()) {
-                <hlm-spinner class="mr-2" />
-                Saving...
-              } @else {
-                Save as draft
-              }
-            </button>
-            <button
-              hlmBtn
-              type="button"
-              (click)="requestFinalize()"
-              [disabled]="form.invalid || submitting()"
-            >
-              @if (submitting()) {
-                <hlm-spinner class="mr-2" />
-                Saving...
-              } @else {
-                Save & finalize
-              }
-            </button>
-          </div>
-        </form>
-      </hlm-dialog-content>
-    </hlm-dialog>
-
-    <app-confirm-dialog
-      #finalizeConfirmDialog
-      (confirmed)="onSubmit(true)"
-    />
-  `,
+  templateUrl: 'faculty-exam-score-form-dialog.html',
 })
 export class FacultyExamScoreFormDialog {
   private readonly _fb = inject(FormBuilder);
@@ -199,7 +96,11 @@ export class FacultyExamScoreFormDialog {
     const exam = this._examination();
     if (!exam) return '';
     const score = this._scoreSignal();
-    return calculateLetterGrade(score == null ? null : Number(score), exam.maxScore, exam.passScore);
+    return calculateLetterGrade(
+      score == null ? null : Number(score),
+      exam.maxScore,
+      exam.passScore,
+    );
   });
 
   open(examination: FacultyExaminationSummary, candidate: FacultyExaminationCandidate): void {

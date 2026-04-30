@@ -143,9 +143,15 @@
 <app-faculty-exam-candidates-dialog
   #candidatesDialog
   [examination]="activeExamination()"
-  [candidates]="candidatesQuery.data()"
+  [page]="candidatesQuery.data()"
   [isLoading]="candidatesQuery.isPending() || candidatesQuery.isFetching()"
+  [pageSize]="candidatesPageSize()"
+  [sortBy]="candidatesSortBy()"
+  [sortDirection]="candidatesSortDirection()"
   (rowSelected)="onCandidateSelected($event)"
+  (pageChanged)="onCandidatesPageChanged($event)"
+  (pageSizeChanged)="onCandidatesPageSizeChanged($event)"
+  (sortChanged)="onCandidatesSortChanged($event)"
 />
 
 <app-faculty-exam-score-form-dialog
