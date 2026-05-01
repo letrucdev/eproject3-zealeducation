@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Application.Common.Interfaces;
+using ZealEducation.Application.Features.Candidates.Notifications;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;
 using ZealEducation.Domain.Interfaces;
@@ -12,7 +14,9 @@ public class ResetCandidatePasswordCommandHandler(
     IRepository<Candidate> candidateRepository,
     IRepository<UserAccount> userRepository,
     IUnitOfWork unitOfWork,
-    IPasswordHasher passwordHasher) : IRequestHandler<ResetCandidatePasswordCommand, ResetCandidatePasswordResponse>
+    IPasswordHasher passwordHasher,
+    ICandidatePasswordResetNotificationService notificationService,
+    ILogger<ResetCandidatePasswordCommandHandler> logger) : IRequestHandler<ResetCandidatePasswordCommand, ResetCandidatePasswordResponse>
 {
     private const string PasswordAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
 
@@ -28,6 +32,7 @@ public class ResetCandidatePasswordCommandHandler(
             throw new ConflictException("This user account does not belong to a candidate.");
 
         var tempPassword = GenerateRandomString(12, PasswordAlphabet);
+        var resetAt = DateTime.UtcNow;
 
         user.PasswordHash = passwordHasher.Hash(tempPassword);
         user.MustChangePassword = true;
@@ -35,11 +40,43 @@ public class ResetCandidatePasswordCommandHandler(
         userRepository.Update(user);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
+        await TryQueuePasswordResetEmailAsync(user, candidate, tempPassword, resetAt, cancellationToken);
+
         return new ResetCandidatePasswordResponse
         {
             Username = user.Username,
             TemporaryPassword = tempPassword
         };
+    }
+
+    private async Task TryQueuePasswordResetEmailAsync(
+        UserAccount user,
+        Candidate candidate,
+        string tempPassword,
+        DateTime resetAt,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(user.Email))
+            return;
+
+        try
+        {
+            var model = new CandidatePasswordResetEmailModel
+            {
+                RecipientEmail = user.Email,
+                RecipientName = user.FullName,
+                Username = user.Username,
+                TemporaryPassword = tempPassword,
+                CandidateCode = candidate.CandidateCode,
+                ResetAt = resetAt
+            };
+
+            await notificationService.QueueAsync(model, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to queue password-reset email for candidate {CandidateId}", candidate.Id);
+        }
     }
 
     private static string GenerateRandomString(int length, string alphabet)

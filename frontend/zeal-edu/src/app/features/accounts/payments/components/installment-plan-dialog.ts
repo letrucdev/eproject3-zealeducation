@@ -15,7 +15,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
-import { InstallmentFrequency } from '../models/payment-enums';
+import { InstallmentFrequency } from '@core/models/payment-enums';
 import {
   PlannedInstallment,
   availableFrequencies,

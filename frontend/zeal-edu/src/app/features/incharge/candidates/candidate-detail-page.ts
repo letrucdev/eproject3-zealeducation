@@ -17,7 +17,7 @@ import {
 } from './components/candidate-update-dialog';
 import { FeeDetailDialog } from './components/fee-detail-dialog';
 import { FeeHistoryTable } from './components/fee-history-table';
-import { CandidateFeeStructureSummary } from './models/candidate-detail';
+import { CandidateFeeStructureSummary } from '@core/models/candidate-detail';
 
 @Component({
   selector: 'app-candidate-detail-page',

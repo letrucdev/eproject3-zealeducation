@@ -33,7 +33,7 @@ import { CoursesService } from '@core/services/courses.service';
 import { FacultiesService } from '@core/services/faculties.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { CreateBatchPayload, UpdateBatchPayload } from '../models/batch-payload';
-import { BATCH_STATUS_LABELS } from './batch-labels';
+import { BATCH_STATUS_LABELS } from '@core/models/batch-labels';
 
 export type BatchFormMode = 'create' | 'edit';
 

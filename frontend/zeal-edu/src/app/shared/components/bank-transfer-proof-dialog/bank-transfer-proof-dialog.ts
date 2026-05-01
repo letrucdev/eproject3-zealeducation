@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
-import { PaymentsService } from '../payments.service';
+import { PaymentsService } from '@core/services/payments.service';
 
 @Component({
   selector: 'app-bank-transfer-proof-dialog',

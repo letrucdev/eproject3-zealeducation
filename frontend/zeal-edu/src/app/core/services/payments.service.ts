@@ -5,14 +5,14 @@ import { QueryClient, keepPreviousData } from '@tanstack/query-core';
 import { firstValueFrom } from 'rxjs';
 import { ApiResponse } from '@core/http/api-response';
 import { PaginatedList } from '@core/models/paginated-list';
-import { FeeStructureDetail, FeeStructureListItem } from './models/fee-structure';
+import { FeeStructureDetail, FeeStructureListItem } from '@core/models/fee-structure';
 import {
   ConfirmPaymentPayload,
   ConfirmPaymentResponse,
   FeeStructureListQuery,
   SetPaymentTypePayload,
   SetPaymentTypeResponse,
-} from './models/payment-payload';
+} from '@core/models/payment-payload';
 
 export const PAYMENTS_LIST_KEY = ['payments', 'fee-structures'] as const;
 export const PAYMENTS_DETAIL_KEY = ['payments', 'fee-structure-detail'] as const;

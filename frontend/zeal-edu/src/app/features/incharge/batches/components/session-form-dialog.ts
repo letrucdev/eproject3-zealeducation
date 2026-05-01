@@ -29,7 +29,7 @@ import {
   CreateClassSessionPayload,
   UpdateClassSessionPayload,
 } from '@core/models/class-session';
-import { CLASS_SESSION_STATUS_LABELS } from './session-labels';
+import { CLASS_SESSION_STATUS_LABELS } from '@core/models/session-labels';
 
 export type SessionFormMode = 'create' | 'edit';
 

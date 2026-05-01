@@ -2,7 +2,7 @@ import { ClassSession, ClassSessionStatus } from '@core/models/class-session';
 import { AttendanceStatus } from '@core/models/attendance';
 import { BatchStatus } from '@core/models/batch-status';
 import { PaginatedList } from '@core/models/paginated-list';
-import { EnrollmentStatus } from '@features/incharge/candidates/models/candidate-detail';
+import { EnrollmentStatus } from '@core/models/candidate-detail';
 
 export interface MyBatchListItem {
   enrollmentId: string;

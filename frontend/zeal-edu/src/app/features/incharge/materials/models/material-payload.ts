@@ -4,13 +4,6 @@ export interface CourseListQuery {
   search?: string;
 }
 
-export interface CourseMaterialsQuery {
-  page: number;
-  pageSize: number;
-  search?: string;
-  includeInactive?: boolean;
-}
-
 export interface MaterialCourseListItem {
   courseId: string;
   courseName: string;
@@ -33,18 +26,6 @@ export interface ReplaceMaterialFilePayload {
 
 export interface ToggleMaterialActivePayload {
   isActive: boolean;
-}
-
-export interface StudyMaterialListItem {
-  materialId: string;
-  courseId: string;
-  title: string;
-  fileName: string;
-  fileType: string;
-  fileSizeMb: number;
-  isActive: boolean;
-  uploadedAt: string;
-  uploadedByName: string;
 }
 
 export interface CreateMaterialsResponse {

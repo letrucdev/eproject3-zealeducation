@@ -11,9 +11,9 @@ import {
   FeeType,
   PaymentStatus,
   PaymentType,
-} from '@features/accounts/payments/models/payment-enums';
-import { paymentTypeLabels } from '@features/accounts/payments/models/payment-labels';
-import { CandidateFeeStructureSummary } from '../models/candidate-detail';
+} from '@core/models/payment-enums';
+import { paymentTypeLabels } from '@core/models/payment-labels';
+import { CandidateFeeStructureSummary } from '@core/models/candidate-detail';
 
 @Component({
   selector: 'app-fee-history-table',

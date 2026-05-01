@@ -27,10 +27,10 @@ import {
   DataTableSortChange,
 } from '@shared/components/data-table';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
-import { FeeStructureListItem } from './models/fee-structure';
-import { FeeType, PaymentStatus, PaymentType } from './models/payment-enums';
-import { FeeStructureListQuery } from './models/payment-payload';
-import { PaymentsService } from './payments.service';
+import { FeeStructureListItem } from '@core/models/fee-structure';
+import { FeeType, PaymentStatus, PaymentType } from '@core/models/payment-enums';
+import { FeeStructureListQuery } from '@core/models/payment-payload';
+import { PaymentsService } from '@core/services/payments.service';
 
 type StatusFilter = PaymentStatus | 'all';
 type TypeFilter = FeeType | 'all';
