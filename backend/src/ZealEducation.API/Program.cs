@@ -7,6 +7,7 @@ using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
 using ZealEducation.Application;
 using ZealEducation.Infrastructure;
+using ZealEducation.Infrastructure.Services.Scheduling;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -34,6 +35,7 @@ builder.Services.AddControllersWithViews()
 
 builder.Services.AddMailer(builder.Configuration);
 builder.Services.AddQueue();
+builder.Services.AddScheduler();
 
 const string CorsPolicyName = "AllowFrontend";
 builder.Services.AddCors(options =>
@@ -83,6 +85,18 @@ var app = builder.Build();
 
 app.Services.ConfigureQueue()
     .LogQueuedTaskProgress(app.Services.GetRequiredService<ILogger<IQueue>>());
+
+app.Services.UseScheduler(scheduler =>
+{
+    scheduler
+        .Schedule<SendInstallmentRemindersInvocable>()
+        .EveryMinute()
+        .PreventOverlapping(nameof(SendInstallmentRemindersInvocable));
+    /* .DailyAt(8, 0) */
+})
+.OnError(ex => app.Services
+    .GetRequiredService<ILogger<Program>>()
+    .LogError(ex, "Scheduler task failed"));
 
 //await app.Services.InitialiseDatabaseAsync();
 
