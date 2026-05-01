@@ -1,4 +1,4 @@
-import { InstallmentFrequency } from '../models/payment-enums';
+import { InstallmentFrequency } from '@core/models/payment-enums';
 
 export const INSTALLMENT_THRESHOLD_WEEKS: Record<InstallmentFrequency, number> = {
   [InstallmentFrequency.Monthly]: 8,

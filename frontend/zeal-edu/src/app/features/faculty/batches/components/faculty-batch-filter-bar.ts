@@ -16,7 +16,7 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { BatchStatus } from '@core/models/batch-status';
-import { BATCH_STATUS_LABELS } from '@features/incharge/batches/components/batch-labels';
+import { BATCH_STATUS_LABELS } from '@core/models/batch-labels';
 
 type StatusFilterValue = BatchStatus | 'all';
 

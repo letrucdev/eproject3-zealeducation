@@ -21,7 +21,7 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { BatchEnrollmentItem } from '@core/models/batch-enrollment';
 import { PaginatedList } from '@core/models/paginated-list';
-import { EnrollmentStatus } from '@features/incharge/candidates/models/candidate-detail';
+import { EnrollmentStatus } from '@core/models/candidate-detail';
 import {
   DataTable,
   DataTableCellContext,

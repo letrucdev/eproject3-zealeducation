@@ -1,5 +1,5 @@
 import { CandidateStatus } from '@core/models/candidate-status';
-import { EnrollmentStatus } from './candidate-detail';
+import { EnrollmentStatus } from '@core/models/candidate-detail';
 
 export const CANDIDATE_STATUS_LABELS: Record<CandidateStatus, string> = {
   [CandidateStatus.Active]: 'Active',

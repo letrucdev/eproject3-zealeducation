@@ -8,8 +8,8 @@ import { PaginatedList } from '@core/models/paginated-list';
 import {
   PAYMENTS_DETAIL_KEY,
   PAYMENTS_LIST_KEY,
-} from '@features/accounts/payments/payments.service';
-import { CandidateDetail } from './models/candidate-detail';
+} from '@core/services/payments.service';
+import { CandidateDetail } from '@core/models/candidate-detail';
 import { CandidateListItem } from './models/candidate-list-item';
 import {
   ApplyFinePayload,

@@ -13,13 +13,7 @@
   (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template candidateCell="candidateCode" let-row>
-    <a
-      hlmBtn
-      variant="link"
-      class="pl-0"
-      [routerLink]="row.candidateId"
-      >{{ row.candidateCode }}</a
-    >
+    <a hlmBtn variant="link" class="pl-0" [routerLink]="row.candidateId">{{ row.candidateCode }}</a>
   </ng-template>
 
   <ng-template candidateCell="fullName" let-row>
@@ -48,7 +42,13 @@
 
   <ng-template candidateCell="currentBatch" let-row>
     @if (row.currentBatchCode) {
-      <span class="font-mono">{{ row.currentBatchCode }}</span>
+      <a
+        hlmBtn
+        variant="link"
+        [routerLink]="['/app/incharge/batches', row.currentBatchId]"
+        class="p-0 font-mono"
+        >{{ row.currentBatchCode }}</a
+      >
     } @else {
       <span class="text-muted-foreground">-</span>
     }

@@ -1,10 +1,6 @@
 import { CandidateStatus } from '@core/models/candidate-status';
 import { Gender } from '@core/models/gender';
-import {
-  FeeType,
-  PaymentStatus,
-  PaymentType,
-} from '@features/accounts/payments/models/payment-enums';
+import { FeeType, PaymentStatus, PaymentType } from '@core/models/payment-enums';
 
 export enum EnrollmentStatus {
   PendingAssignment = 'PendingAssignment',

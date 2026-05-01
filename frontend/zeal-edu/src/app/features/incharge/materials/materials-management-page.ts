@@ -33,7 +33,8 @@ import { CourseMaterialsSection } from './components/course-materials-section';
 import { MaterialFormDialog, MaterialFormSubmit } from './components/material-form-dialog';
 import { ReplaceFileDialog, ReplaceFileSubmit } from './components/replace-file-dialog';
 import { MaterialsService } from './materials.service';
-import { CourseListQuery, StudyMaterialListItem } from './models/material-payload';
+import { StudyMaterialListItem } from '@core/models/study-material';
+import { CourseListQuery } from './models/material-payload';
 
 @Component({
   selector: 'app-materials-management-page',

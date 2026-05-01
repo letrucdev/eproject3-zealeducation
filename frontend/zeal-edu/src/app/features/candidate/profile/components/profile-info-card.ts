@@ -4,7 +4,7 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { CandidateStatus } from '@core/models/candidate-status';
-import { CandidateDetail } from '@features/incharge/candidates/models/candidate-detail';
+import { CandidateDetail } from '@core/models/candidate-detail';
 import { CandidateChangePasswordDialog } from './change-password-dialog';
 
 @Component({

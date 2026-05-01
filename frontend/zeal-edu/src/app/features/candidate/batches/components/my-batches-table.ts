@@ -8,7 +8,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { BatchStatus } from '@core/models/batch-status';
 import { PaginatedList } from '@core/models/paginated-list';
-import { EnrollmentStatus } from '@features/incharge/candidates/models/candidate-detail';
+import { EnrollmentStatus } from '@core/models/candidate-detail';
 import {
   DataTable,
   DataTableCellContext,

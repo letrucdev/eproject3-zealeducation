@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmCardImports } from '@spartan-ng/helm/card';
-import { CandidateEnrollmentItem, EnrollmentStatus } from '../models/candidate-detail';
+import { CandidateEnrollmentItem, EnrollmentStatus } from '@core/models/candidate-detail';
 import { ENROLLMENT_STATUS_LABELS } from '../models/candidate-labels';
 import { HlmButton, HlmButtonImports } from '@spartan-ng/helm/button';
 

@@ -12,7 +12,7 @@ import {
   DataTableSortChange,
   SortDirection,
 } from '@shared/components/data-table';
-import { CLASS_SESSION_STATUS_LABELS } from '@features/incharge/batches/components/session-labels';
+import { CLASS_SESSION_STATUS_LABELS } from '@core/models/session-labels';
 import { FacultyScheduleItem } from '../../models/faculty-models';
 
 export interface FacultyScheduleAttendanceClick {

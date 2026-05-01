@@ -15,6 +15,7 @@ using ZealEducation.Infrastructure.Data.Interceptors;
 using ZealEducation.Infrastructure.Pdf;
 using ZealEducation.Infrastructure.Repositories;
 using ZealEducation.Infrastructure.Services;
+using ZealEducation.Infrastructure.Services.Email;
 using ZealEducation.Infrastructure.Storage;
 
 namespace ZealEducation.Infrastructure;
@@ -46,6 +47,9 @@ public static class DependencyInjection
 
         services.AddR2StorageServices(configuration);
         services.AddAuthenticationServices(configuration);
+
+        services.AddScoped<IEnquiryConvertedNotificationService, EnquiryConvertedNotificationService>();
+        services.AddScoped<ICandidatePasswordResetNotificationService, CandidatePasswordResetNotificationService>();
 
         return services;
     }

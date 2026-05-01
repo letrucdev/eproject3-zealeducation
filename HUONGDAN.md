@@ -6,6 +6,7 @@
 - [Node.js & npm](https://nodejs.org/)
 - [Angular CLI](https://angular.io/cli) (`ng`)
 - Một SQL Server / database instance đang chạy
+- (Tùy chọn) [Docker](https://www.docker.com/) để chạy MailHog cho test mail trong dev — xem mục [5. Cấu hình Mailing](#5-cấu-hình-mailing-coravel--mailhog)
 
 ---
 
@@ -147,6 +148,121 @@ Chạy từ thư mục `backend/`:
 ```
 
 > Nếu lần đầu chạy trên Linux/macOS, cấp quyền thực thi: `chmod +x scripts/run.sh`
+
+---
+
+### 5. Cấu hình Mailing (Coravel + MailHog)
+
+Backend dùng [Coravel.Mailer](https://docs.coravel.net/Mailing/) để gửi email (queue background) khi convert enquiry thành công — email gồm credentials đăng nhập, học phí, các phương án thanh toán (lump-sum + installment).
+
+#### 5.1. Cấu hình `Coravel:Mail` trong `appsettings.json`
+
+File: `backend/src/ZealEducation.API/appsettings.json`
+
+```json
+"Coravel": {
+  "Mail": {
+    "Driver": "FileLog",
+    "Host": "",
+    "Port": 587,
+    "Username": "",
+    "Password": "",
+    "From": {
+      "Address": "noreply@zealeducation.local",
+      "Name": "Zeal Education"
+    }
+  }
+}
+```
+
+**Các giá trị `Driver` hỗ trợ:**
+
+| Driver | Mục đích | Ghi chú |
+|--------|----------|---------|
+| `FileLog` | Dev — ghi mail ra file thay vì gửi | Không cần SMTP server. Mail được log vào console + thư mục output |
+| `SMTP` | Gửi qua SMTP server thật | Cần điền `Host`, `Port`, `Username`, `Password` (Username/Password để rỗng nếu server không yêu cầu auth, ví dụ MailHog) |
+
+#### 5.2. Setup MailHog cho local dev (khuyến nghị)
+
+[MailHog](https://github.com/mailhog/MailHog) là SMTP server giả + Web UI để bắt mail trong dev (không gửi thật). Phù hợp cho việc kiểm tra HTML render, layout, và nội dung email.
+
+**Chạy MailHog bằng Docker:**
+
+```bash
+docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mailhog/mailhog
+```
+
+- Port `1025`: SMTP (app gửi tới)
+- Port `8025`: Web UI để xem mail (mở browser http://localhost:8025)
+
+> **Alternative:** [Mailpit](https://github.com/axllent/mailpit) là bản kế nhiệm của MailHog, cùng cách dùng:
+> ```bash
+> docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit
+> ```
+
+**Cập nhật `appsettings.json` để dùng MailHog:**
+
+```json
+"Coravel": {
+  "Mail": {
+    "Driver": "SMTP",
+    "Host": "localhost",
+    "Port": 1025,
+    "Username": "",
+    "Password": "",
+    "From": {
+      "Address": "noreply@zealeducation.local",
+      "Name": "Zeal Education"
+    }
+  }
+}
+```
+
+#### 5.3. App chạy trên WSL + MailHog chạy trên Docker Desktop (Windows)
+
+Tùy WSL integration của Docker Desktop có bật hay không:
+
+**Cách 1 — WSL integration bật** (default trên Docker Desktop 4.x+): dùng `Host: "localhost"` như bình thường.
+
+Verify nhanh từ trong WSL:
+
+```bash
+curl -s http://localhost:8025 | head -5    # Truy cập MailHog UI
+nc -zv localhost 1025                       # Kiểm tra SMTP port
+```
+
+**Cách 2 — WSL integration tắt** hoặc cách 1 không kết nối được: lấy IP gateway của Windows host từ WSL:
+
+```bash
+# Lấy IP gateway của Windows host
+ip route show | grep -i default | awk '{ print $3}'
+
+# Hoặc dùng special hostname (Docker Desktop mới hỗ trợ)
+getent hosts host.docker.internal
+```
+
+Đổi `Host` trong `appsettings.json`:
+
+```json
+"Host": "host.docker.internal",
+"Port": 1025
+```
+
+> **Firewall:** nếu Cách 2 vẫn không kết nối, kiểm tra Windows Defender Firewall — có thể cần allow inbound port 1025 từ WSL subnet.
+
+#### 5.4. Test luồng gửi mail
+
+1. Khởi động MailHog (mục 5.2) và backend (mục 4).
+2. Convert một enquiry qua API: `POST /api/course-enquiries/{id}/convert` với body chứa `email`.
+3. Mở browser **http://localhost:8025** → MailHog UI hiển thị email vừa gửi:
+   - Subject: `Enrollment confirmation - {CourseName}`
+   - Body HTML render đầy đủ với màu theme khớp frontend
+   - Tab `MIME Source` để xem raw HTML/headers nếu cần debug
+
+#### 5.5. Lưu ý production
+
+- Production phải dùng SMTP thật (Gmail App Password, Office365, AWS SES, SendGrid SMTP relay…).
+- Đặt `Username`/`Password` vào **User Secrets** hoặc **Environment Variables**, không commit vào `appsettings.json`.
 
 ---
 

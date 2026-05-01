@@ -1,4 +1,4 @@
-import { PaymentMethod, PaymentType } from './payment-enums';
+import { PaymentMethod, PaymentType } from '@core/models/payment-enums';
 
 export const paymentMethodLabels: Record<PaymentMethod, string> = {
   [PaymentMethod.Cash]: 'Cash',

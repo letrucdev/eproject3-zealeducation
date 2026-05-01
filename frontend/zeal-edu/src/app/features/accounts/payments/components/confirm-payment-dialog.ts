@@ -16,9 +16,9 @@ import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmRadioGroupImports } from '@spartan-ng/helm/radio-group';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
-import { InstallmentPlanItem } from '../models/fee-structure';
-import { PaymentMethod } from '../models/payment-enums';
-import { paymentMethodLabels } from '../models/payment-labels';
+import { InstallmentPlanItem } from '@core/models/fee-structure';
+import { PaymentMethod } from '@core/models/payment-enums';
+import { paymentMethodLabels } from '@core/models/payment-labels';
 
 export type ConfirmPaymentMode = 'installment' | 'full';
 
