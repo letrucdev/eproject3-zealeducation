@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Coravel;
+using Coravel.Queuing.Interfaces;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
@@ -23,11 +25,15 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-builder.Services.AddControllers()
+builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    })
+    .AddRazorRuntimeCompilation();
+
+builder.Services.AddMailer(builder.Configuration);
+builder.Services.AddQueue();
 
 const string CorsPolicyName = "AllowFrontend";
 builder.Services.AddCors(options =>
@@ -74,6 +80,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.Services.ConfigureQueue()
+    .LogQueuedTaskProgress(app.Services.GetRequiredService<ILogger<IQueue>>());
 
 //await app.Services.InitialiseDatabaseAsync();
 
