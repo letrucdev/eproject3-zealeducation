@@ -2,10 +2,10 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, Signal, inject } from '@angular/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../../../core/http/api-response';
-import { AuditLogDetail } from '../../../core/models/audit-log-detail';
-import { AuditLogListItem } from '../../../core/models/audit-log-list-item';
-import { PaginatedList } from '../../../core/models/paginated-list';
+import { ApiResponse } from '@core/http/api-response';
+import { AuditLogDetail } from '@core/models/audit-log-detail';
+import { AuditLogListItem } from '@core/models/audit-log-list-item';
+import { PaginatedList } from '@core/models/paginated-list';
 import { AuditLogListQuery } from './models/audit-log-list-query';
 
 export const AUDIT_LOG_QUERY_KEY = ['audit-logs'] as const;
@@ -53,6 +53,8 @@ export class AuditLogService {
     if (query.toDate) {
       params = params.set('toDate', query.toDate);
     }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<AuditLogListItem>>>('/audit-logs', { params }),

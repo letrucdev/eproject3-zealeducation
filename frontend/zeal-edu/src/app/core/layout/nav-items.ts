@@ -1,4 +1,4 @@
-import { UserRole } from '../models/user-role';
+import { UserRole } from '@core/models/user-role';
 
 export interface NavigationMenu {
   title: string;
@@ -48,6 +48,108 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         route: '/app/counselor/course-enquiries',
         icon: 'lucideUserSearch',
         roles: [UserRole.Counselor],
+      },
+    ],
+  },
+  {
+    title: 'Manages',
+    roles: [UserRole.Incharge],
+    items: [
+      {
+        label: 'Courses',
+        route: '/app/incharge/courses',
+        icon: 'lucideBookOpen',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Batches',
+        route: '/app/incharge/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Candidates',
+        route: '/app/incharge/candidates',
+        icon: 'lucideUsers',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Materials',
+        route: '/app/incharge/materials',
+        icon: 'lucideFolderOpen',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Feedback',
+        route: '/app/incharge/feedback',
+        icon: 'lucideMessageSquare',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Certificates',
+        route: '/app/incharge/certificates',
+        icon: 'lucideAward',
+        roles: [UserRole.Incharge],
+      },
+    ],
+  },
+  {
+    title: 'Faculty',
+    roles: [UserRole.Faculty],
+    items: [
+      {
+        label: 'Schedule',
+        route: '/app/faculty/schedule',
+        icon: 'lucideCalendarDays',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'My Batches',
+        route: '/app/faculty/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Faculty],
+      },
+      {
+        label: 'Examinations',
+        route: '/app/faculty/examinations',
+        icon: 'lucideClipboardCheck',
+        roles: [UserRole.Faculty],
+      },
+    ],
+  },
+  {
+    title: 'Finance',
+    roles: [UserRole.AccountsStaff],
+    items: [
+      {
+        label: 'Payments',
+        route: '/app/accounts/payments',
+        icon: 'lucideWallet',
+        roles: [UserRole.AccountsStaff],
+      },
+    ],
+  },
+  {
+    title: 'My Learning',
+    roles: [UserRole.Candidate],
+    items: [
+      {
+        label: 'My Batches',
+        route: '/app/candidate/batches',
+        icon: 'lucideGraduationCap',
+        roles: [UserRole.Candidate],
+      },
+      {
+        label: 'My Certificates',
+        route: '/app/candidate/certificates',
+        icon: 'lucideAward',
+        roles: [UserRole.Candidate],
+      },
+      {
+        label: 'Profile',
+        route: '/app/candidate/profile',
+        icon: 'lucideUser',
+        roles: [UserRole.Candidate],
       },
     ],
   },

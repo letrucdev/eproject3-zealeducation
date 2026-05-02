@@ -3,11 +3,14 @@
   [page]="page()"
   [isLoading]="isLoading()"
   [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
   [trackBy]="trackById"
   itemLabel="logs"
   emptyMessage="No audit log entries found."
   (pageChanged)="pageChanged.emit($event)"
   (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
 >
   <ng-template auditLogCell="changedAt" let-row>
     <span class="text-sm">{{ row.changedAt | date: 'dd MMM yyyy HH:mm' }}</span>

@@ -23,10 +23,12 @@ public class AuditLogController(ISender sender) : ControllerBase
         [FromQuery] Guid? userId = null,
         [FromQuery] string? tableName = null,
         [FromQuery] DateTime? fromDate = null,
-        [FromQuery] DateTime? toDate = null)
+        [FromQuery] DateTime? toDate = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
         var result = await sender.Send(
-            new GetAuditLogsQuery(page, pageSize, search, action, userId, tableName, fromDate, toDate));
+            new GetAuditLogsQuery(page, pageSize, search, action, userId, tableName, fromDate, toDate, sortBy, sortDirection));
         return Ok(ApiResponse<PaginatedList<AuditLogListItemDto>>.Success(result));
     }
 

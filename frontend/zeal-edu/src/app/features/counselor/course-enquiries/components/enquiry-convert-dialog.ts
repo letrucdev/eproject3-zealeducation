@@ -17,11 +17,12 @@ import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
-import { ConvertEnquiryResult } from '../../../../core/models/convert-enquiry-result';
-import { CourseEnquiryDetail } from '../../../../core/models/course-enquiry-detail';
-import { Gender } from '../../../../core/models/gender';
-import { ConvertEnquiryPayload } from '../models/course-enquiry-payload';
+import { ConvertEnquiryResult } from '@core/models/convert-enquiry-result';
+import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
+import { Gender } from '@core/models/gender';
+import { ConvertEnquiryPayload } from '@features/counselor/course-enquiries/models/course-enquiry-payload';
 
 export interface EnquiryConvertSubmit {
   enquiryId: string;
@@ -39,6 +40,7 @@ export interface EnquiryConvertSubmit {
     HlmButtonImports,
     HlmTextareaImports,
     HlmIconImports,
+    HlmSpinnerImports,
   ],
   providers: [provideIcons({ lucideUserCheck, lucideCheckCheck, lucideCopy })],
   changeDetection: ChangeDetectionStrategy.OnPush,

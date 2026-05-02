@@ -5,16 +5,18 @@ import { lucideEye } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { AuditAction } from '../../../../core/models/audit-action';
-import { AuditLogListItem } from '../../../../core/models/audit-log-list-item';
-import { PaginatedList } from '../../../../core/models/paginated-list';
+import { AuditAction } from '@core/models/audit-action';
+import { AuditLogListItem } from '@core/models/audit-log-list-item';
+import { PaginatedList } from '@core/models/paginated-list';
 import {
   DataTable,
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
-} from '../../../../shared/components/data-table';
-import { getUserInitials } from '../../../../core/utils/user-initials';
+  DataTableSortChange,
+  SortDirection,
+} from '@shared/components/data-table';
+import { getUserInitials } from '@core/utils/user-initials';
 
 @Directive({
   selector: '[auditLogCell]',
@@ -49,16 +51,19 @@ export class AuditLogTable {
   readonly page = input<PaginatedList<AuditLogListItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
   readonly getUserInitials = getUserInitials;
 
   readonly viewClicked = output<AuditLogListItem>();
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly columns: DataTableColumn<AuditLogListItem>[] = [
-    { key: 'changedAt', header: 'Changed At', width: 'w-36' },
-    { key: 'user', header: 'User', width: 'w-48' },
-    { key: 'action', header: 'Action', width: 'w-40', align: 'center' },
+    { key: 'changedAt', header: 'Changed At', sortable: true, width: 'w-36' },
+    { key: 'user', header: 'User', sortable: true, width: 'w-48' },
+    { key: 'action', header: 'Action', sortable: true, width: 'w-40', align: 'center' },
     { key: 'tableName', header: 'Table', width: 'w-40' },
     { key: 'recordId', header: 'Record ID', width: 'w-56' },
     { key: 'ipAddress', header: 'IP Address', width: 'w-40' },

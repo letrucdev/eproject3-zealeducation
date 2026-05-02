@@ -1,0 +1,103 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-xl flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>
+        {{ isEdit() ? 'Edit Course' : 'New Course' }}
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        {{
+          isEdit()
+            ? 'Update course details, duration, and pricing.'
+            : 'Add a new course offering with duration and base fee.'
+        }}
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <hlm-field>
+          <label hlmFieldLabel for="course-name">Course Name</label>
+          <input
+            hlmInput
+            id="course-name"
+            type="text"
+            formControlName="courseName"
+            class="w-full"
+            maxlength="100"
+          />
+          <hlm-field-error validator="required">Course name is required.</hlm-field-error>
+          <hlm-field-error validator="maxlength">Max 100 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="course-description">Description (optional)</label>
+          <textarea
+            hlmTextarea
+            id="course-description"
+            rows="3"
+            formControlName="description"
+            class="w-full"
+            maxlength="2000"
+          ></textarea>
+          <hlm-field-error validator="maxlength">Description is too long.</hlm-field-error>
+        </hlm-field>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <hlm-field>
+            <label hlmFieldLabel for="course-duration">Duration (weeks)</label>
+            <input
+              hlmInput
+              appDigitsOnly
+              id="course-duration"
+              type="text"
+              inputmode="numeric"
+              formControlName="durationWeeks"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Duration is required.</hlm-field-error>
+            <hlm-field-error validator="min">Must be at least 1 week.</hlm-field-error>
+            <hlm-field-error validator="max">Max 520 weeks.</hlm-field-error>
+          </hlm-field>
+
+          <hlm-field>
+            <label hlmFieldLabel for="course-fee">Base Fee</label>
+            <input
+              hlmInput
+              id="course-fee"
+              type="number"
+              min="0"
+              step="1"
+              formControlName="baseFee"
+              class="w-full"
+            />
+            <hlm-field-error validator="required">Base fee is required.</hlm-field-error>
+            <hlm-field-error validator="min">Fee cannot be negative.</hlm-field-error>
+          </hlm-field>
+        </div>
+
+        <hlm-field>
+          <label
+            class="border-input flex h-9 w-fit cursor-pointer items-center gap-2 rounded-md border px-3 text-sm"
+          >
+            <hlm-checkbox formControlName="isActive" class="size-4" aria-label="Active course" />
+            Active (available for enquiries and enrollment)
+          </label>
+        </hlm-field>
+      </hlm-field-group>
+
+      <div hlmDialogFooter class="shrink-0">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create course' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

@@ -1,0 +1,102 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-3xl md:max-w-5xl w-full flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      @if (examination(); as exam) {
+        <h2 hlmDialogTitle>{{ exam.examName }}</h2>
+        <p class="text-muted-foreground text-sm">
+          {{ exam.batchCode }} — {{ exam.courseName }} · Max {{ exam.maxScore }} · Pass
+          {{ exam.passScore }}
+        </p>
+      } @else {
+        <h2 hlmDialogTitle>Exam Candidates</h2>
+      }
+    </div>
+
+    <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+      <app-data-table
+        [columns]="columns"
+        [page]="page()"
+        [isLoading]="isLoading()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        [trackBy]="trackByEnrollmentId"
+        itemLabel="candidates"
+        emptyMessage="No candidates enrolled in this batch yet."
+        (pageChanged)="pageChanged.emit($event)"
+        (pageSizeChanged)="pageSizeChanged.emit($event)"
+        (sortChanged)="sortChanged.emit($event)"
+      >
+        <ng-template facultyExamCandidateCell="candidateCode" let-row>
+          <span class="font-mono">{{ row.candidateCode }}</span>
+        </ng-template>
+
+        <ng-template facultyExamCandidateCell="candidateFullName" let-row>
+          <span class="font-medium">{{ row.candidateFullName }}</span>
+        </ng-template>
+
+        <ng-template facultyExamCandidateCell="score" let-row>
+          {{ row.score != null ? row.score : '–' }}
+        </ng-template>
+
+        <ng-template facultyExamCandidateCell="grade" let-row>
+          {{ row.grade || '–' }}
+        </ng-template>
+
+        <ng-template facultyExamCandidateCell="status" let-row>
+          <div class="flex items-center justify-center gap-1">
+            @if (row.resultId == null) {
+              <span class="text-muted-foreground text-xs">Not entered</span>
+            } @else {
+              @if (row.isOverridden) {
+                <span hlmBadge class="bg-amber-100 text-amber-800">Overridden</span>
+              } @else if (row.isFinalized) {
+                <span hlmBadge class="bg-sky-100 text-sky-800">Final</span>
+              } @else {
+                <span hlmBadge class="bg-slate-100 text-slate-700">Draft</span>
+              }
+              @if (row.isPassed) {
+                <span hlmBadge class="bg-emerald-100 text-emerald-800">Pass</span>
+              } @else {
+                <span hlmBadge class="bg-rose-100 text-rose-800">Fail</span>
+              }
+            }
+          </div>
+        </ng-template>
+
+        <ng-template facultyExamCandidateCell="gradedAt" let-row>
+          @if (row.gradedAt) {
+            <span class="text-xs">{{ row.gradedAt | date: 'dd MMM yyyy, HH:mm' }}</span>
+          } @else {
+            –
+          }
+        </ng-template>
+
+        <ng-template facultyExamCandidateCell="actions" let-row>
+          <button
+            hlmBtn
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="rowSelected.emit(row)"
+            [disabled]="row.isOverridden || row.isFinalized"
+            [attr.title]="actionTitle(row)"
+            [attr.aria-label]="
+              (row.resultId ? 'Edit score for ' : 'Add score for ') + row.candidateCode
+            "
+          >
+            @if (row.resultId == null) {
+              <ng-icon hlm name="lucidePlus" size="sm" />
+            } @else {
+              <ng-icon hlm name="lucidePencil" size="sm" />
+            }
+          </button>
+        </ng-template>
+      </app-data-table>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

@@ -1,4 +1,4 @@
-import { AuditAction } from '../../../../core/models/audit-action';
+import { AuditAction } from '@core/models/audit-action';
 
 export interface AuditLogListQuery {
   page: number;
@@ -9,4 +9,6 @@ export interface AuditLogListQuery {
   tableName?: string;
   fromDate?: string;
   toDate?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }

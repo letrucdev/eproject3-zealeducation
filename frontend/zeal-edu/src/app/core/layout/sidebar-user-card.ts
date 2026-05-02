@@ -3,9 +3,9 @@ import { provideIcons } from '@ng-icons/core';
 import { lucideLogOut } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { AuthService } from '../auth/auth-service';
-import { CurrentUser } from '../auth/current-user';
-import { getUserInitials } from '../utils/user-initials';
+import { AuthService } from '@core/auth/auth-service';
+import { CurrentUser } from '@core/auth/current-user';
+import { getUserInitials } from '@core/utils/user-initials';
 import { ROLE_LABELS } from './nav-items';
 
 @Component({

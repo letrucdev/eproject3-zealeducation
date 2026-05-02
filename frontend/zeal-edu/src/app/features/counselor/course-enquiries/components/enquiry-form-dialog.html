@@ -17,50 +17,80 @@
       </p>
     </div>
 
-    <form
-      [formGroup]="form"
-      (ngSubmit)="submit()"
-      class="mt-2 flex min-h-0 flex-1 flex-col gap-4"
-    >
-      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex min-h-0 flex-1 flex-col gap-4">
+      <hlm-field-group class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <div class="grid gap-4 sm:grid-cols-2">
           <hlm-field>
             <label hlmFieldLabel for="enquiry-name">Full Name</label>
-            <input hlmInput id="enquiry-name" type="text" formControlName="fullName" class="w-full" />
+            <input
+              hlmInput
+              id="enquiry-name"
+              type="text"
+              formControlName="fullName"
+              class="w-full"
+            />
             <hlm-field-error validator="required">Full name is required.</hlm-field-error>
           </hlm-field>
 
           <hlm-field>
             <label hlmFieldLabel for="enquiry-phone">Phone</label>
-            <input hlmInput appDigitsOnly id="enquiry-phone" type="tel" formControlName="phone" class="w-full" />
+            <input
+              hlmInput
+              appDigitsOnly
+              id="enquiry-phone"
+              type="tel"
+              formControlName="phone"
+              class="w-full"
+            />
             <hlm-field-error validator="required">Phone is required.</hlm-field-error>
             <hlm-field-error validator="minlength">Phone number must be 10 digits</hlm-field-error>
             <hlm-field-error validator="maxlength">Phone number must be 10 digits</hlm-field-error>
             <hlm-field-error validator="pattern">Only digits are allowed</hlm-field-error>
+            <hlm-field-error validator="phoneTaken">
+              An enquiry with this phone number already exists.
+            </hlm-field-error>
           </hlm-field>
         </div>
 
         <hlm-field>
           <label hlmFieldLabel for="enquiry-email">Email (optional)</label>
-          <input
-            hlmInput
-            id="enquiry-email"
-            type="email"
-            formControlName="email"
-            class="w-full"
-          />
+          <input hlmInput id="enquiry-email" type="email" formControlName="email" class="w-full" />
           <hlm-field-error validator="email">Invalid email format.</hlm-field-error>
         </hlm-field>
 
         <hlm-field>
-          <label hlmFieldLabel for="enquiry-course">Course Interested</label>
-          <input
-            hlmInput
-            id="enquiry-course"
-            type="text"
+          <label hlmFieldLabel>Course Interested</label>
+          <hlm-combobox
             formControlName="courseInterested"
+            [(search)]="courseSearch"
+            [itemToString]="courseItemToString"
             class="w-full"
-          />
+          >
+            <hlm-combobox-input placeholder="Search for a course..." showClear />
+            <hlm-combobox-content *hlmComboboxPortal>
+              @if (courses.isError()) {
+                <hlm-combobox-status>Failed to load courses.</hlm-combobox-status>
+              } @else if (courses.isPending()) {
+                <hlm-combobox-status>
+                  <hlm-spinner />
+                  Loading...
+                </hlm-combobox-status>
+              } @else {
+                @let items = courses.data()?.items ?? [];
+                @if (items.length === 0) {
+                  <hlm-combobox-empty>No courses found.</hlm-combobox-empty>
+                }
+                <div hlmComboboxList>
+                  @for (course of items; track course.courseId) {
+                    <hlm-combobox-item [value]="course">
+                      {{ course.courseName }} -
+                      {{ course.baseFee | vnd }}
+                    </hlm-combobox-item>
+                  }
+                </div>
+              }
+            </hlm-combobox-content>
+          </hlm-combobox>
           <hlm-field-error validator="required">Course is required.</hlm-field-error>
         </hlm-field>
 
@@ -114,9 +144,10 @@
       <div hlmDialogFooter class="shrink-0">
         <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
         <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
-          {{
-            submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create enquiry'
-          }}
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Saving...' : isEdit() ? 'Save changes' : 'Create enquiry' }}
         </button>
       </div>
     </form>

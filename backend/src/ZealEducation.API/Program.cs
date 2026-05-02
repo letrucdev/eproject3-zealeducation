@@ -1,21 +1,41 @@
 using System.Text.Json.Serialization;
+using Coravel;
+using Coravel.Queuing.Interfaces;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
 using ZealEducation.Application;
 using ZealEducation.Infrastructure;
-using ZealEducation.Infrastructure.Data;
+using ZealEducation.Infrastructure.Services.Scheduling;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Allow uploads up to ~60 MB (50 MB for files + multipart overhead).
+const long MaxRequestBytes = 60L * 1024 * 1024;
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = MaxRequestBytes);
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = MaxRequestBytes;
+    options.ValueLengthLimit = int.MaxValue;
+});
 
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-builder.Services.AddControllers()
+builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    })
+    .AddRazorRuntimeCompilation();
+
+builder.Services.AddMailer(builder.Configuration);
+builder.Services.AddQueue();
+builder.Services.AddScheduler();
 
 const string CorsPolicyName = "AllowFrontend";
 builder.Services.AddCors(options =>
@@ -27,7 +47,8 @@ builder.Services.AddCors(options =>
 
         policy.WithOrigins("*")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .WithExposedHeaders("Content-Disposition");
     });
 });
 
@@ -62,7 +83,22 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-await app.Services.InitialiseDatabaseAsync();
+app.Services.ConfigureQueue()
+    .LogQueuedTaskProgress(app.Services.GetRequiredService<ILogger<IQueue>>());
+
+app.Services.UseScheduler(scheduler =>
+{
+    scheduler
+        .Schedule<SendInstallmentRemindersInvocable>()
+        .EveryMinute()
+        .PreventOverlapping(nameof(SendInstallmentRemindersInvocable));
+    /* .DailyAt(8, 0) */
+})
+.OnError(ex => app.Services
+    .GetRequiredService<ILogger<Program>>()
+    .LogError(ex, "Scheduler task failed"));
+
+//await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<GlobalExceptionHandler>();
@@ -76,7 +112,10 @@ if (app.Environment.IsDevelopment())
 app.UseCors(CorsPolicyName);
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<PasswordResetTokenGuardMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

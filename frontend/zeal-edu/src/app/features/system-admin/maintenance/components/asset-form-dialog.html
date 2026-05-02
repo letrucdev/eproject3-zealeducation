@@ -1,0 +1,63 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content *hlmDialogPortal class="sm:max-w-3xl w-[90vw] flex max-h-[90dvh] flex-col" [showCloseButton]="true">
+    <div hlmDialogHeader>
+      <h3 hlmDialogTitle>
+        {{ mode() === 'create' ? 'Add Asset' : 'Edit Asset &ndash; ' + assetNameLabel() }}
+      </h3>
+      <p class="text-muted-foreground text-sm">
+        Fill in the details for the system asset below.
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 py-4">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <hlm-field>
+          <label hlmFieldLabel>Asset Name</label>
+          <input hlmInput formControlName="assetName" type="text" placeholder="e.g. Lab PC 01" class="w-full" />
+          <hlm-field-error validator="required">Asset Name is required.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel>Asset Type</label>
+          <input hlmInput formControlName="assetType" type="text" placeholder="e.g. Computer" class="w-full" />
+          <hlm-field-error validator="required">Asset Type is required.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel>Serial Number</label>
+          <input hlmInput formControlName="serialNumber" type="text" placeholder="e.g. SN-12345" class="w-full" [readOnly]="mode() === 'edit'" [class.opacity-50]="mode() === 'edit'" />
+          <hlm-field-error validator="required">Serial Number is required.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel>Location</label>
+          <input hlmInput formControlName="location" type="text" placeholder="e.g. Room 101" class="w-full" />
+          <hlm-field-error validator="required">Location is required.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel>Purchase Date</label>
+          <input hlmInput formControlName="purchaseDate" type="date" class="w-full" [readOnly]="mode() === 'edit'" [class.opacity-50]="mode() === 'edit'" />
+          <hlm-field-error validator="required">Purchase Date is required.</hlm-field-error>
+        </hlm-field>
+      </div>
+
+      <hlm-field>
+        <label hlmFieldLabel>Notes</label>
+        <textarea hlmInput formControlName="notes" rows="3" placeholder="Additional notes..." class="w-full"></textarea>
+      </hlm-field>
+
+      <div hlmDialogFooter class="mt-4">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="submitting() || form.invalid">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+            Saving...
+          } @else {
+            Save
+          }
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

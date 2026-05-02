@@ -54,6 +54,7 @@ public class CreateFacultyCommandHandler(
             Gender = request.Gender,
             Role = UserRole.Faculty,
             IsActive = true,
+            MustChangePassword = true,
             FailedLoginCount = 0
         };
 

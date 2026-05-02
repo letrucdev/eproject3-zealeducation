@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { UserAccount } from '../models/user-account';
+import { UserAccount } from '@core/models/user-account';
 
 const USER_STORAGE_KEY = 'zeal-edu.current-user';
 
@@ -9,6 +9,7 @@ export class CurrentUser {
 
   readonly user = this._user.asReadonly();
   readonly role = computed(() => this._user()?.role);
+  readonly mustChangePassword = computed(() => this._user()?.mustChangePassword === true);
 
   set(user: UserAccount): void {
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));

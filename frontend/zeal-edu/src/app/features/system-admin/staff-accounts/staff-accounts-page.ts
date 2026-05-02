@@ -10,8 +10,9 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
-import { StaffListItem } from '../../../core/models/staff-list-item';
-import { UserRole } from '../../../core/models/user-role';
+import { HlmCardImports } from '@spartan-ng/helm/card';
+import { StaffListItem } from '@core/models/staff-list-item';
+import { UserRole } from '@core/models/user-role';
 import {
   StaffFilterBar,
   StaffFilterValue,
@@ -24,10 +25,12 @@ import { StaffStatsCards } from './components/staff-stats-cards';
 import { StaffTable } from './components/staff-table';
 import { StaffListQuery } from './models/staff-form-payload';
 import { StaffAccountsService } from './staff-accounts.service';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-staff-accounts-page',
   imports: [
+    HlmCardImports,
     StaffStatsCards,
     StaffFilterBar,
     StaffTable,
@@ -52,20 +55,28 @@ import { StaffAccountsService } from './staff-accounts.service';
         [isLoading]="statsQuery.isPending()"
       />
 
-      <app-staff-filter-bar
-        [initial]="initialFilter"
-        (filterChanged)="onFilterChanged($event)"
-        (createClicked)="onCreateClicked()"
-      />
-
-      <app-staff-table
-        [page]="listQuery.data()"
-        [isLoading]="listQuery.isPending()"
-        [pageSize]="pageSize()"
-        (editClicked)="onEditClicked($event)"
-        (pageChanged)="onPageChanged($event)"
-        (pageSizeChanged)="onPageSizeChanged($event)"
-      />
+      <section hlmCard>
+        <div hlmCardHeader>
+          <app-staff-filter-bar
+            [initial]="initialFilter"
+            (filterChanged)="onFilterChanged($event)"
+            (createClicked)="onCreateClicked()"
+          />
+        </div>
+        <div hlmCardContent>
+          <app-staff-table
+            [page]="listQuery.data()"
+            [isLoading]="listQuery.isPending()"
+            [pageSize]="pageSize()"
+            [sortBy]="sortBy()"
+            [sortDirection]="sortDirection()"
+            (editClicked)="onEditClicked($event)"
+            (pageChanged)="onPageChanged($event)"
+            (pageSizeChanged)="onPageSizeChanged($event)"
+            (sortChanged)="onSortChanged($event)"
+          />
+        </div>
+      </section>
 
       <app-staff-form-dialog
         #formDialog
@@ -85,6 +96,8 @@ export default class StaffAccountsPage {
   protected readonly search = signal('');
   protected readonly roleFilter = signal<UserRole | ''>('');
   protected readonly statusFilter = signal<'all' | 'active' | 'inactive'>('all');
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('asc');
 
   protected readonly initialFilter: StaffFilterValue = {
     search: '',
@@ -103,6 +116,8 @@ export default class StaffAccountsPage {
       this.statusFilter() === 'all'
         ? undefined
         : this.statusFilter() === 'active',
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -157,6 +172,12 @@ export default class StaffAccountsPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 

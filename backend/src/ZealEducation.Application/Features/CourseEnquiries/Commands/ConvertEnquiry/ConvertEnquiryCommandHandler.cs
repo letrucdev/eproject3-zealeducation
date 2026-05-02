@@ -1,7 +1,10 @@
 using System.Security.Cryptography;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Application.Common.Interfaces;
+using ZealEducation.Application.Features.CourseEnquiries.Notifications;
+using ZealEducation.Application.Features.Payments.Common;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;
 using ZealEducation.Domain.Interfaces;
@@ -12,8 +15,13 @@ public class ConvertEnquiryCommandHandler(
     IRepository<CourseEnquiry> enquiryRepository,
     IRepository<UserAccount> userRepository,
     IRepository<Candidate> candidateRepository,
+    IRepository<Course> courseRepository,
+    IRepository<Enrollment> enrollmentRepository,
+    IRepository<FeeStructure> feeStructureRepository,
     IUnitOfWork unitOfWork,
-    IPasswordHasher passwordHasher) : IRequestHandler<ConvertEnquiryCommand, ConvertEnquiryResponse>
+    IPasswordHasher passwordHasher,
+    IEnquiryConvertedNotificationService notificationService,
+    ILogger<ConvertEnquiryCommandHandler> logger) : IRequestHandler<ConvertEnquiryCommand, ConvertEnquiryResponse>
 {
     private const string UsernameAlphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
     private const string PasswordAlphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
@@ -28,6 +36,9 @@ public class ConvertEnquiryCommandHandler(
 
         if (enquiry.Status == EnquiryStatus.Closed)
             throw new ConflictException("This enquiry is closed.");
+
+        var course = await courseRepository.GetByIdAsync(enquiry.CourseInterestedId, cancellationToken)
+            ?? throw new NotFoundException(nameof(Course), enquiry.CourseInterestedId);
 
         var email = request.Email.Trim();
         var phone = enquiry.Phone.Trim();
@@ -56,6 +67,7 @@ public class ConvertEnquiryCommandHandler(
             Gender = request.Gender,
             Role = UserRole.Candidate,
             IsActive = false,
+            MustChangePassword = true,
             FailedLoginCount = 0
         };
 
@@ -71,6 +83,29 @@ public class ConvertEnquiryCommandHandler(
             RegisteredByStaffId = enquiry.AssignedCounselorId
         };
 
+        var feeStructure = new FeeStructure
+        {
+            Id = Guid.NewGuid(),
+            CandidateId = candidate.Id,
+            FeeType = FeeType.Tuition,
+            TotalFee = course.BaseFee,
+            AmountPaid = 0,
+            OutstandingBalance = course.BaseFee,
+            PaymentStatus = PaymentStatus.Unpaid,
+            PaymentType = PaymentType.NotSet
+        };
+
+        var enrollment = new Enrollment
+        {
+            Id = Guid.NewGuid(),
+            CandidateId = candidate.Id,
+            FeeId = feeStructure.Id,
+            CourseId = course.Id,
+            EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            Status = EnrollmentStatus.PendingAssignment,
+            Notes = "New student registration"
+        };
+
         enquiry.Email = email;
         enquiry.Status = EnquiryStatus.Converted;
         enquiry.ConvertedCandidateId = candidate.Id;
@@ -78,8 +113,12 @@ public class ConvertEnquiryCommandHandler(
 
         await userRepository.AddAsync(userAccount, cancellationToken);
         await candidateRepository.AddAsync(candidate, cancellationToken);
+        await enrollmentRepository.AddAsync(enrollment, cancellationToken);
+        await feeStructureRepository.AddAsync(feeStructure, cancellationToken);
         enquiryRepository.Update(enquiry);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await TryQueueConvertedEmailAsync(enquiry, course, userAccount, candidate, tempPassword, enrollment.EnrollmentDate, cancellationToken);
 
         return new ConvertEnquiryResponse
         {
@@ -90,6 +129,54 @@ public class ConvertEnquiryCommandHandler(
             TemporaryPassword = tempPassword,
             Email = email
         };
+    }
+
+    private async Task TryQueueConvertedEmailAsync(
+        CourseEnquiry enquiry,
+        Course course,
+        UserAccount userAccount,
+        Candidate candidate,
+        string tempPassword,
+        DateOnly enrollmentDate,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var installmentOptions = new List<EnquiryConvertedInstallmentOption>();
+            foreach (var frequency in Enum.GetValues<InstallmentFrequency>())
+            {
+                if (!InstallmentPlanCalculator.IsFrequencyAllowed(frequency, course.DurationWeeks))
+                    continue;
+
+                var items = InstallmentPlanCalculator.Build(course.BaseFee, course.DurationWeeks, enrollmentDate, frequency);
+                installmentOptions.Add(new EnquiryConvertedInstallmentOption
+                {
+                    Frequency = frequency,
+                    Items = items
+                });
+            }
+
+            var model = new EnquiryConvertedEmailModel
+            {
+                RecipientEmail = userAccount.Email,
+                RecipientName = enquiry.FullName,
+                Username = userAccount.Username,
+                TemporaryPassword = tempPassword,
+                CandidateCode = candidate.CandidateCode,
+                ConvertedAt = enquiry.ConvertedAt ?? DateTime.UtcNow,
+                CourseName = course.CourseName,
+                DurationWeeks = course.DurationWeeks,
+                BaseFee = course.BaseFee,
+                LumpSumAmount = course.BaseFee,
+                InstallmentOptions = installmentOptions
+            };
+
+            await notificationService.QueueAsync(model, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to queue enquiry-converted email for candidate {CandidateId}", candidate.Id);
+        }
     }
 
     private async Task<string> GenerateUniqueUsernameAsync(string phone, CancellationToken cancellationToken)

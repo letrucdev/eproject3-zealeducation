@@ -10,7 +10,8 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
-import { AuditLogListItem } from '../../../core/models/audit-log-list-item';
+import { HlmCardImports } from '@spartan-ng/helm/card';
+import { AuditLogListItem } from '@core/models/audit-log-list-item';
 import { AuditLogService } from './audit-log.service';
 import { AuditLogDetailDialog } from './components/audit-log-detail-dialog';
 import {
@@ -19,10 +20,11 @@ import {
 } from './components/audit-log-filter-bar';
 import { AuditLogTable } from './components/audit-log-table';
 import { AuditLogListQuery } from './models/audit-log-list-query';
+import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-audit-log-page',
-  imports: [AuditLogFilterBar, AuditLogTable, AuditLogDetailDialog],
+  imports: [HlmCardImports, AuditLogFilterBar, AuditLogTable, AuditLogDetailDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="flex flex-col gap-6">
@@ -34,19 +36,27 @@ import { AuditLogListQuery } from './models/audit-log-list-query';
         </p>
       </header>
 
-      <app-audit-log-filter-bar
-        [initial]="initialFilter"
-        (filterChanged)="onFilterChanged($event)"
-      />
-
-      <app-audit-log-table
-        [page]="listQuery.data()"
-        [isLoading]="listQuery.isPending()"
-        [pageSize]="pageSize()"
-        (viewClicked)="onViewClicked($event)"
-        (pageChanged)="onPageChanged($event)"
-        (pageSizeChanged)="onPageSizeChanged($event)"
-      />
+      <section hlmCard>
+        <div hlmCardHeader>
+          <app-audit-log-filter-bar
+            [initial]="initialFilter"
+            (filterChanged)="onFilterChanged($event)"
+          />
+        </div>
+        <div hlmCardContent>
+          <app-audit-log-table
+            [page]="listQuery.data()"
+            [isLoading]="listQuery.isPending()"
+            [pageSize]="pageSize()"
+            [sortBy]="sortBy()"
+            [sortDirection]="sortDirection()"
+            (viewClicked)="onViewClicked($event)"
+            (pageChanged)="onPageChanged($event)"
+            (pageSizeChanged)="onPageSizeChanged($event)"
+            (sortChanged)="onSortChanged($event)"
+          />
+        </div>
+      </section>
 
       <app-audit-log-detail-dialog
         #detailDialog
@@ -68,6 +78,8 @@ export default class AuditLogPage {
   protected readonly tableNameFilter = signal('');
   protected readonly fromDate = signal('');
   protected readonly toDate = signal('');
+  protected readonly sortBy = signal<string | null>(null);
+  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
   protected readonly selectedId = signal<string | null>(null);
 
   protected readonly initialFilter: AuditLogFilterValue = {
@@ -86,6 +98,8 @@ export default class AuditLogPage {
     tableName: this.tableNameFilter() || undefined,
     fromDate: this.fromDate() ? new Date(this.fromDate()).toISOString() : undefined,
     toDate: this.toDate() ? this._endOfDay(this.toDate()) : undefined,
+    sortBy: this.sortBy() ?? undefined,
+    sortDirection: this.sortDirection(),
   }));
 
   protected readonly listQuery = this._service.listQuery(this._listParams);
@@ -118,6 +132,12 @@ export default class AuditLogPage {
 
   onPageSizeChanged(size: number): void {
     this.pageSize.set(size);
+    this.page.set(1);
+  }
+
+  onSortChanged(change: DataTableSortChange): void {
+    this.sortBy.set(change.sortBy);
+    this.sortDirection.set(change.sortDirection);
     this.page.set(1);
   }
 

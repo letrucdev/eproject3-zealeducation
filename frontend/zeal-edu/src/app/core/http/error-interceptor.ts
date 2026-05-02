@@ -2,30 +2,28 @@ import { HttpErrorResponse, HttpInterceptorFn, HttpStatusCode } from '@angular/c
 import { inject } from '@angular/core';
 import { toast } from '@spartan-ng/brain/sonner';
 import { catchError, throwError } from 'rxjs';
-import { AuthToken } from '../auth/auth-token';
-import { CurrentUser } from '../auth/current-user';
+import { AuthToken } from '@core/auth/auth-token';
+import { CurrentUser } from '@core/auth/current-user';
 import { Router } from '@angular/router';
 import { ApiResponse } from './api-response';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authToken = inject(AuthToken);
   const currentUser = inject(CurrentUser);
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
       const isLoginRequest = req.url.endsWith('/auth/login');
+      const isResetPasswordRequest = req.url.endsWith('/auth/change-password');
 
-      if (err.status === HttpStatusCode.Unauthorized && !isLoginRequest) {
+      const isAuthRequest = isLoginRequest || isResetPasswordRequest;
+
+      if (err.status === HttpStatusCode.Unauthorized && !isAuthRequest) {
         authToken.clear();
         currentUser.clear();
-        inject(Router).navigateByUrl('/login');
-      }
-
-      /*      if (err.status === HttpStatusCode.BadRequest) {
-        toast.error(resolveValidateError(err));
-      } */
-
-      if (err.status !== HttpStatusCode.Unauthorized || !isLoginRequest) {
+        router.navigateByUrl('/login', { replaceUrl: true });
+      } else if (err.status !== HttpStatusCode.Unauthorized || !isAuthRequest) {
         toast.error(resolveMessage(err));
       }
 
@@ -39,20 +37,14 @@ export function resolveMessage(err: HttpErrorResponse): string {
     return 'Unable to reach the server. Please check your connection.';
   }
 
-  /* const body = err.error as ApiErrorBody | string | null;
+  const body = err.error as ApiResponse<{ errors?: string[] }> | null;
 
-  if (typeof body === 'string' && body.trim().length > 0) {
-    return body;
+  if (body?.data?.errors?.length) {
+    return body.data.errors.join('\n');
   }
 
-  const message = (body as ApiErrorBody | null)?.message?.trim();
-  if (message) {
-    return message;
-  } */
-
-  const body = err.error as ApiResponse<{ errors: [] }>;
-  if (body) {
-    return body.data?.errors.join('\n') ?? body.message;
+  if (body?.message) {
+    return body.message;
   }
 
   return err.message;

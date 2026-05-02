@@ -21,6 +21,7 @@ public class UserAccountDto
     public Gender Gender { get; set; }
     public UserRole Role { get; set; }
     public bool IsActive { get; set; }
+    public bool MustChangePassword { get; set; }
     public DateTime? LastLogin { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

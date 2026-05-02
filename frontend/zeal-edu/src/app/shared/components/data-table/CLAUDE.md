@@ -18,6 +18,8 @@ Import from `src/app/shared/components/data-table`.
 | `pageSize` | `number` | Default `10`. |
 | `pageSizeOptions` | `number[]` | Default `[10, 20, 50]`. |
 | `itemLabel` | `string` | Footer label (`"Showing 1 to 10 of 23 <itemLabel>"`). Default `"items"`. |
+| `sortBy` | `string \| null` | Currently sorted column key (matches `column.sortKey ?? column.key`). |
+| `sortDirection` | `'asc' \| 'desc' \| null` | Direction for the active sort column. |
 
 ## Outputs
 
@@ -25,6 +27,7 @@ Import from `src/app/shared/components/data-table`.
 |---|---|
 | `pageChanged` | `number` (new page) |
 | `pageSizeChanged` | `number` (new size) |
+| `sortChanged` | `{ sortBy: string; sortDirection: 'asc' \| 'desc' }` |
 
 Row actions (edit, delete, etc.) are emitted by the **consumer** from inside the cell template — don't add new outputs to `DataTable` for them.
 
@@ -40,6 +43,8 @@ Row actions (edit, delete, etc.) are emitted by the **consumer** from inside the
   headerClass: 'bg-muted',   // optional extra classes on <th>
   cellClass: 'font-medium',  // optional extra classes on <td>
   value: (row) => row.email, // fallback when no cell template is provided
+  sortable: true,            // turn the header into a click-to-sort button
+  sortKey: 'fullName',       // optional override sent in `sortChanged`; defaults to `key`
 }
 ```
 
@@ -130,6 +135,36 @@ protected readonly query = this.service.listQuery(computed(() => ({
 ```
 
 Reset `page` to `1` when `pageSize` changes.
+
+## Sorting
+
+Server-side, controlled externally — the table only emits the user's intent.
+
+- Mark a column with `sortable: true`. Its header becomes a button with up/down/up-down arrow icons.
+- Pass the active sort via `[sortBy]` and `[sortDirection]`.
+- `(sortChanged)` emits `{ sortBy, sortDirection }` when the user clicks. Clicking the active column toggles asc → desc; clicking a different column resets to asc.
+- Use `sortKey` when the column key (template/cell key) differs from the field name the API expects.
+
+```ts
+protected readonly sortBy = signal<string | null>('createdAt');
+protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
+
+onSortChanged({ sortBy, sortDirection }: DataTableSortChange): void {
+  this.sortBy.set(sortBy);
+  this.sortDirection.set(sortDirection);
+  this.page.set(1); // reset to first page on sort change
+}
+```
+
+```html
+<app-data-table
+  [columns]="columns"
+  [page]="query.data()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
+  (sortChanged)="onSortChanged($event)"
+/>
+```
 
 ## Gotchas
 

@@ -9,7 +9,7 @@ import {
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
-import { StaffStatistics } from '../../../../core/models/staff-statistics';
+import { StaffStatistics } from '@core/models/staff-statistics';
 
 @Component({
   selector: 'app-staff-stats-cards',

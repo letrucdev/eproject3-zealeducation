@@ -1,16 +1,23 @@
 using System.Text;
+using Amazon.Runtime;
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Domain.Interfaces;
 using ZealEducation.Infrastructure.Data;
 using ZealEducation.Infrastructure.Data.Interceptors;
+using ZealEducation.Infrastructure.Pdf;
 using ZealEducation.Infrastructure.Repositories;
 using ZealEducation.Infrastructure.Services;
+using ZealEducation.Infrastructure.Services.Email;
+using ZealEducation.Infrastructure.Services.Scheduling;
+using ZealEducation.Infrastructure.Storage;
 
 namespace ZealEducation.Infrastructure;
 
@@ -36,8 +43,41 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddSingleton<IReceiptPdfGenerator, QuestPdfReceiptGenerator>();
+        services.AddSingleton<ICertificatePdfGenerator, QuestPdfCertificateGenerator>();
 
+        services.AddR2StorageServices(configuration);
         services.AddAuthenticationServices(configuration);
+
+        services.AddScoped<IEnquiryConvertedNotificationService, EnquiryConvertedNotificationService>();
+        services.AddScoped<ICandidatePasswordResetNotificationService, CandidatePasswordResetNotificationService>();
+        services.AddScoped<IInstallmentReminderNotificationService, InstallmentReminderNotificationService>();
+
+        services.AddScoped<SendInstallmentRemindersInvocable>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddR2StorageServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<R2Options>(configuration.GetSection(R2Options.SectionName));
+
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var r2 = sp.GetRequiredService<IOptions<R2Options>>().Value;
+
+            var config = new AmazonS3Config
+            {
+                ServiceURL = $"https://{r2.AccountId}.r2.cloudflarestorage.com",
+                ForcePathStyle = true,
+                AuthenticationRegion = "auto"
+            };
+
+            var credentials = new BasicAWSCredentials(r2.AccessKeyId, r2.SecretAccessKey);
+            return new AmazonS3Client(credentials, config);
+        });
+
+        services.AddScoped<IFileStorageService, CloudflareR2StorageService>();
 
         return services;
     }

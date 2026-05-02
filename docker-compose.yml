@@ -1,0 +1,82 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: zeal-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Zeal_StrongPass!2026}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1434:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: zeal-backend
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: >-
+        Server=mssql,1433;Database=ZealEducationDb;User ID=sa;Password=${MSSQL_SA_PASSWORD:-Zeal_StrongPass!2026};TrustServerCertificate=True;Encrypt=False;
+      Jwt__Issuer: ZealEducation.API
+      Jwt__Audience: ZealEducation.Client
+      Jwt__SecretKey: ${JWT_SECRET_KEY:-ZealEducation-Super-Secret-Key-Change-Me-In-Production-0123456789}
+      Jwt__ExpiryMinutes: "120"
+      Cors__AllowedOrigins__0: ${FRONTEND_ORIGIN:-http://localhost:8080}
+      # Cloudflare R2 (override these for real uploads)
+      R2__AccountId: ${R2_ACCOUNT_ID:-}
+      R2__AccessKeyId: ${R2_ACCESS_KEY_ID:-}
+      R2__SecretAccessKey: ${R2_SECRET_ACCESS_KEY:-}
+      R2__BucketName: ${R2_BUCKET_NAME:-}
+      # SMTP (Coravel mailer) — defaults point at the bundled mailhog
+      Coravel__Mail__Driver: SMTP
+      Coravel__Mail__Host: ${SMTP_HOST:-mailhog}
+      Coravel__Mail__Port: ${SMTP_PORT:-1025}
+      Coravel__Mail__Username: ${SMTP_USERNAME:-}
+      Coravel__Mail__Password: ${SMTP_PASSWORD:-}
+      Coravel__Mail__From__Address: ${SMTP_FROM_ADDRESS:-noreply@zealeducation.local}
+      Coravel__Mail__From__Name: ${SMTP_FROM_NAME:-Zeal Education}
+    ports:
+      - "5085:8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend/zeal-edu
+      dockerfile: Dockerfile
+      args:
+        # Baked into the Angular bundle at build time
+        API_URL: ${FRONTEND_API_URL:-http://localhost:5085/api}
+        APP_NAME: ${APP_NAME:-Zeal Education}
+    container_name: zeal-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: zeal-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    restart: unless-stopped
+
+volumes:
+  mssql-data:

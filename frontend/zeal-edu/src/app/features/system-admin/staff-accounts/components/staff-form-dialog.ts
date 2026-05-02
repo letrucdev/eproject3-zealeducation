@@ -16,17 +16,18 @@ import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
-import { DigitsOnlyDirective } from '../../../../shared/directives/digits-only.directive';
-import { Gender } from '../../../../core/models/gender';
-import { StaffDetail } from '../../../../core/models/staff-detail';
-import { UserRole } from '../../../../core/models/user-role';
+import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
+import { DigitsOnlyDirective } from '@shared/directives/digits-only.directive';
+import { Gender } from '@core/models/gender';
+import { StaffDetail } from '@core/models/staff-detail';
+import { UserRole } from '@core/models/user-role';
 import {
   CreateFacultyPayload,
   CreateStaffPayload,
   UpdateFacultyPayload,
   UpdateStaffPayload,
-} from '../models/staff-form-payload';
-import { ROLE_LABELS } from '../../../../core/layout/nav-items';
+} from '@features/system-admin/staff-accounts/models/staff-form-payload';
+import { ROLE_LABELS } from '@core/layout/nav-items';
 
 export type StaffFormMode = 'create' | 'edit';
 
@@ -67,6 +68,7 @@ export type StaffFormSubmit =
     HlmInputImports,
     HlmSelectImports,
     HlmButtonImports,
+    HlmSpinnerImports,
     DigitsOnlyDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

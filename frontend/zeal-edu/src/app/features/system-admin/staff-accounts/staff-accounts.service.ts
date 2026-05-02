@@ -3,11 +3,11 @@ import { Injectable, Signal, inject } from '@angular/core';
 import { QueryClient } from '@tanstack/query-core';
 import { injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../../../core/http/api-response';
-import { PaginatedList } from '../../../core/models/paginated-list';
-import { StaffDetail } from '../../../core/models/staff-detail';
-import { StaffListItem } from '../../../core/models/staff-list-item';
-import { StaffStatistics } from '../../../core/models/staff-statistics';
+import { ApiResponse } from '@core/http/api-response';
+import { PaginatedList } from '@core/models/paginated-list';
+import { StaffDetail } from '@core/models/staff-detail';
+import { StaffListItem } from '@core/models/staff-list-item';
+import { StaffStatistics } from '@core/models/staff-statistics';
 import {
   CreateFacultyPayload,
   CreateStaffPayload,
@@ -101,6 +101,8 @@ export class StaffAccountsService {
     if (query.isActive !== undefined) {
       params = params.set('isActive', String(query.isActive));
     }
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<StaffListItem>>>('/staff', { params }),

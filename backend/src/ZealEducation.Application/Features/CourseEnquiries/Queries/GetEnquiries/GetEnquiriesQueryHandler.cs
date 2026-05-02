@@ -9,7 +9,8 @@ namespace ZealEducation.Application.Features.CourseEnquiries.Queries.GetEnquirie
 public class GetEnquiriesQueryHandler(
     IRepository<CourseEnquiry> enquiryRepository,
     IRepository<Staff> staffRepository,
-    IRepository<UserAccount> userRepository) : IRequestHandler<GetEnquiriesQuery, PaginatedList<CourseEnquiryListItemDto>>
+    IRepository<UserAccount> userRepository,
+    IRepository<Course> courseRepository) : IRequestHandler<GetEnquiriesQuery, PaginatedList<CourseEnquiryListItemDto>>
 {
     private static readonly EnquiryStatus[] OpenStatuses =
     [
@@ -27,11 +28,13 @@ public class GetEnquiriesQueryHandler(
         var enquiries = enquiryRepository.Query();
         var staffs = staffRepository.Query();
         var users = userRepository.Query();
+        var courses = courseRepository.Query();
 
         var query = from e in enquiries
                     join s in staffs on e.AssignedCounselorId equals s.Id
                     join u in users on s.UserAccountId equals u.Id
-                    select new { Enquiry = e, CounselorName = u.FullName };
+                    join c in courses on e.CourseInterestedId equals c.Id
+                    select new { Enquiry = e, CounselorName = u.FullName, c.CourseName };
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
@@ -40,7 +43,7 @@ public class GetEnquiriesQueryHandler(
                 x.Enquiry.FullName.ToLower().Contains(search) ||
                 x.Enquiry.Phone.Contains(search) ||
                 (x.Enquiry.Email != null && x.Enquiry.Email.ToLower().Contains(search)) ||
-                x.Enquiry.CourseInterested.ToLower().Contains(search));
+                x.CourseName.ToLower().Contains(search));
         }
 
         if (request.Status.HasValue)
@@ -64,9 +67,29 @@ public class GetEnquiriesQueryHandler(
                 OpenStatuses.Contains(x.Enquiry.Status));
         }
 
-        var projected = query
-            .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 1 : 0)
-            .ThenBy(x => x.Enquiry.NextFollowUpDate)
+        var sortKey = (request.SortBy ?? string.Empty).Trim().ToLower();
+        var direction = (request.SortDirection ?? "asc").Trim().ToLower();
+
+        var ordered = (sortKey, direction) switch
+        {
+            ("status", "desc") => query.OrderByDescending(x => x.Enquiry.Status),
+            ("status", _) => query.OrderBy(x => x.Enquiry.Status),
+            ("source", "desc") => query.OrderByDescending(x => x.Enquiry.Source),
+            ("source", _) => query.OrderBy(x => x.Enquiry.Source),
+            ("createdat", "asc") => query.OrderBy(x => x.Enquiry.CreatedAt),
+            ("createdat", _) => query.OrderByDescending(x => x.Enquiry.CreatedAt),
+            ("nextfollowupdate", "desc") => query
+                .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 0 : 1)
+                .ThenByDescending(x => x.Enquiry.NextFollowUpDate),
+            ("nextfollowupdate", _) => query
+                .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 1 : 0)
+                .ThenBy(x => x.Enquiry.NextFollowUpDate),
+            _ => query
+                .OrderBy(x => x.Enquiry.NextFollowUpDate == null ? 1 : 0)
+                .ThenBy(x => x.Enquiry.NextFollowUpDate),
+        };
+
+        var projected = ordered
             .ThenByDescending(x => x.Enquiry.CreatedAt)
             .Select(x => new CourseEnquiryListItemDto
             {
@@ -74,7 +97,8 @@ public class GetEnquiriesQueryHandler(
                 FullName = x.Enquiry.FullName,
                 Phone = x.Enquiry.Phone,
                 Email = x.Enquiry.Email,
-                CourseInterested = x.Enquiry.CourseInterested,
+                CourseInterestedId = x.Enquiry.CourseInterestedId,
+                CourseInterestedName = x.CourseName,
                 Source = x.Enquiry.Source,
                 Status = x.Enquiry.Status,
                 NextFollowUpDate = x.Enquiry.NextFollowUpDate,

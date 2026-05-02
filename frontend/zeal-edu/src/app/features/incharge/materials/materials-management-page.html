@@ -1,0 +1,116 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Materials</h1>
+      <p class="text-muted-foreground text-sm">
+        Upload study materials and assign them to one or more courses.
+      </p>
+    </div>
+    <button hlmBtn type="button" (click)="onUploadClick()">
+      <ng-icon name="lucidePlus" class="mr-2 text-[16px]" />
+      Upload material
+    </button>
+  </header>
+
+  <!-- <div hlmCard class="p-4"></div> -->
+
+  @if (coursesQuery.isPending()) {
+    <div class="flex items-center justify-center py-16">
+      <hlm-spinner />
+    </div>
+  } @else if (coursesQuery.isError()) {
+    <div hlmCard class="p-6 text-center text-sm">
+      Failed to load courses.
+      <button hlmBtn variant="link" type="button" (click)="coursesQuery.refetch()">Retry</button>
+    </div>
+  } @else {
+    @let page = coursesQuery.data();
+    @let courses = page?.items ?? [];
+
+    <div hlmCard class="gap-4">
+      <form
+        [formGroup]="filterForm"
+        class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between px-6"
+      >
+        <div class="relative w-full md:w-96">
+          <ng-icon
+            hlm
+            name="lucideSearch"
+            size="sm"
+            class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+          />
+          <input
+            hlmInput
+            type="search"
+            class="w-full ps-9"
+            placeholder="Search materials by title..."
+            formControlName="search"
+            aria-label="Search materials"
+          />
+        </div>
+
+        <label class="text-foreground inline-flex cursor-pointer items-center gap-2 text-sm">
+          <hlm-checkbox formControlName="includeInactive" />
+          Show hidden materials
+        </label>
+      </form>
+      @if (courses.length === 0) {
+        <div hlmCard class="text-muted-foreground p-8 text-center text-sm mx-6">
+          <p>No matching courses.</p>
+        </div>
+      } @else {
+        <hlm-accordion type="multiple" class="px-6">
+          @for (c of courses; track c.courseId) {
+            <hlm-accordion-item
+              appCourseMaterialsSection
+              [course]="c"
+              [search]="search()"
+              [includeInactive]="includeInactive()"
+              (action)="onCardAction($event)"
+            />
+          }
+        </hlm-accordion>
+      }
+
+      @if (page && page.totalPages > 1) {
+        <div class="text-muted-foreground mt-4 flex items-center justify-end gap-2 text-xs px-6">
+          <span>Page {{ page.pageNumber }} / {{ page.totalPages }}</span>
+          <button
+            hlmBtn
+            variant="outline"
+            size="icon-sm"
+            type="button"
+            [disabled]="!canPrevCoursePage()"
+            aria-label="Previous page"
+            (click)="goPrevCoursePage()"
+          >
+            <ng-icon name="lucideChevronLeft" class="text-[16px]" />
+          </button>
+          <button
+            hlmBtn
+            variant="outline"
+            size="icon-sm"
+            type="button"
+            [disabled]="!canNextCoursePage()"
+            aria-label="Next page"
+            (click)="goNextCoursePage()"
+          >
+            <ng-icon name="lucideChevronRight" class="text-[16px]" />
+          </button>
+        </div>
+      }
+    </div>
+  }
+</section>
+
+<app-material-form-dialog
+  #formDialog
+  [submitting]="createMutation.isPending() || updateTitleMutation.isPending()"
+  (submitted)="onFormSubmitted($event)"
+/>
+<app-replace-file-dialog
+  #replaceDialog
+  [submitting]="replaceFileMutation.isPending()"
+  (submitted)="onReplaceSubmitted($event)"
+/>
+<app-confirm-dialog #confirmDialog (confirmed)="onConfirmDelete()" />

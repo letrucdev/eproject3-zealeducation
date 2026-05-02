@@ -15,7 +15,7 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { AuditAction } from '../../../../core/models/audit-action';
+import { AuditAction } from '@core/models/audit-action';
 
 export interface AuditLogFilterValue {
   search: string;

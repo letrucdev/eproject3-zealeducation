@@ -1,9 +1,10 @@
-import { writeFileSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
 import { config } from 'dotenv';
 
 config();
 
-const requiredKeys = ['API_URL'] as const;
+const requiredKeys = ['API_URL', 'APP_NAME'] as const;
 const missing = requiredKeys.filter((k) => !process.env[k]);
 if (missing.length) {
   console.error(
@@ -14,8 +15,11 @@ if (missing.length) {
 
 const content = `export const environment = {
   apiUrl: '${process.env['API_URL']}',
+  appName: '${process.env['APP_NAME']}'
 };
 `;
 
-writeFileSync('./src/environments/environment.ts', content);
+const target = './src/environments/environment.ts';
+mkdirSync(dirname(target), { recursive: true });
+writeFileSync(target, content);
 console.log('Generated src/environments/environment.ts');

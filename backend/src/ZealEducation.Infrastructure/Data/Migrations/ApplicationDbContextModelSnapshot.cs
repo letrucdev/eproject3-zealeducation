@@ -22,6 +22,52 @@ namespace ZealEducation.Infrastructure.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.AttendanceRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ClassSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EnrollmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("PracticalHours")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnrollmentId");
+
+                    b.HasIndex("ClassSessionId", "EnrollmentId")
+                        .IsUnique();
+
+                    b.ToTable("attendance_record", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.AuditLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -75,6 +121,69 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("audit_log", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BatchCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid?>("FacultyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("MaxCapacity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(30);
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("NeedsInstructor");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchCode")
+                        .IsUnique();
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FacultyId");
+
+                    b.ToTable("batch", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Candidate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -98,6 +207,9 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<string>("EmergencyContact")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RegisteredAt")
                         .ValueGeneratedOnAdd()
@@ -136,6 +248,163 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("candidate", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.CertificateApplication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ApprovedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CertificateFilePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CertificateNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EnrollmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedByStaffId");
+
+                    b.HasIndex("CertificateNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_certificate_application_certificate_number")
+                        .HasFilter("[CertificateNumber] IS NOT NULL");
+
+                    b.HasIndex("EnrollmentId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_certificate_application_enrollment");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_certificate_application_status");
+
+                    b.ToTable("certificate_application", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.ClassSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateOnly>("SessionDate")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Scheduled");
+
+                    b.Property<string>("Topic")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId", "SessionDate", "StartTime")
+                        .IsUnique();
+
+                    b.ToTable("class_session", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("BaseFee")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("CourseName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DurationWeeks")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseName")
+                        .IsUnique();
+
+                    b.ToTable("course", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -151,10 +420,8 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<Guid?>("ConvertedCandidateId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CourseInterested")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                    b.Property<Guid>("CourseInterestedId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -203,9 +470,12 @@ namespace ZealEducation.Infrastructure.Data.Migrations
 
                     b.HasIndex("ConvertedCandidateId");
 
+                    b.HasIndex("CourseInterestedId");
+
                     b.HasIndex("NextFollowUpDate");
 
-                    b.HasIndex("Phone");
+                    b.HasIndex("Phone")
+                        .IsUnique();
 
                     b.HasIndex("Status");
 
@@ -247,6 +517,194 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.HasIndex("EnquiryId");
 
                     b.ToTable("enquiry_note", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Enrollment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("EnrollmentDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid?>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("InchargeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("PendingAssignment");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FeeId")
+                        .IsUnique()
+                        .HasFilter("[FeeId] IS NOT NULL");
+
+                    b.HasIndex("InchargeId");
+
+                    b.ToTable("enrollment", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.ExamResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EnrollmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ExamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Grade")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<DateTime>("GradedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("GradedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsFinalized")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOverridden")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("OverrideById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OverrideReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("numeric(6,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnrollmentId");
+
+                    b.HasIndex("GradedById");
+
+                    b.HasIndex("OverrideById");
+
+                    b.HasIndex("ExamId", "EnrollmentId")
+                        .IsUnique();
+
+                    b.ToTable("exam_result", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Examination", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("ExamDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("ExamName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("MaxScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(100);
+
+                    b.Property<int>("PassScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(50);
+
+                    b.Property<Guid>("ScheduledById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduledById");
+
+                    b.HasIndex("BatchId", "ExamName", "ExamDate")
+                        .IsUnique();
+
+                    b.ToTable("examination", (string)null);
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.Faculty", b =>
@@ -301,6 +759,413 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("faculty", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeeType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Tuition");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("OutstandingBalance")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("decimal(12,2)")
+                        .HasComputedColumnSql("[TotalFee] - [AmountPaid]", true);
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Unpaid");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("NotSet");
+
+                    b.Property<decimal>("TotalFee")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.ToTable("fee_structure", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsProcessed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ProcessedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("TargetFacultyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("IsProcessed")
+                        .HasDatabaseName("ix_feedback_is_processed");
+
+                    b.HasIndex("ProcessedById");
+
+                    b.HasIndex("TargetFacultyId");
+
+                    b.HasIndex("CandidateId", "BatchId", "Type")
+                        .IsUnique()
+                        .HasDatabaseName("ix_feedback_unique_no_target")
+                        .HasFilter("[TargetFacultyId] IS NULL");
+
+                    b.HasIndex("CandidateId", "BatchId", "Type", "TargetFacultyId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_feedback_unique_target")
+                        .HasFilter("[TargetFacultyId] IS NOT NULL");
+
+                    b.ToTable("feedback", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Fine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid>("IssuedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("IssuedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("PaidDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ViolationReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("FeeId")
+                        .IsUnique();
+
+                    b.HasIndex("IssuedByStaffId");
+
+                    b.ToTable("fine", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountDue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("AmountPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("DueDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("InstallmentNo")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("PaidDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeeId", "InstallmentNo")
+                        .IsUnique();
+
+                    b.ToTable("installment_plan", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentReminderLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DaysOffset")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("InstallmentPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RecipientEmail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ReminderType")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<DateOnly>("SentForDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SentForDate");
+
+                    b.HasIndex("InstallmentPlanId", "SentForDate", "ReminderType")
+                        .IsUnique();
+
+                    b.ToTable("installment_reminder_log", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.MaterialDownloadLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DownloadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("MaterialId", "DownloadedAt");
+
+                    b.ToTable("material_download_log", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("BankTransferProofPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("InstallmentPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("OutstandingBalanceAfter")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid>("ProcessedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiptFilePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ReceiptNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeeId");
+
+                    b.HasIndex("InstallmentPlanId");
+
+                    b.HasIndex("ProcessedByStaffId");
+
+                    b.HasIndex("ReceiptNumber")
+                        .IsUnique();
+
+                    b.ToTable("payment_transaction", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
                 {
                     b.Property<Guid>("Id")
@@ -350,6 +1215,145 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("staff", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.StudyMaterial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("FileSizeMb")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UploadedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FilePath");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UploadedByStaffId");
+
+                    b.HasIndex("CourseId", "IsActive");
+
+                    b.ToTable("study_material", (string)null);
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.SystemAsset", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AssetName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("AssetType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ConditionStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastMaintenance")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<Guid>("ManagedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetType");
+
+                    b.HasIndex("ConditionStatus");
+
+                    b.HasIndex("ManagedBy");
+
+                    b.HasIndex("SerialNumber")
+                        .IsUnique();
+
+                    b.ToTable("system_asset", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.UserAccount", b =>
                 {
                     b.Property<Guid>("Id")
@@ -393,6 +1397,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("MustChangePassword")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -433,6 +1442,25 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("user_account", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.AttendanceRecord", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.ClassSession", "ClassSession")
+                        .WithMany("AttendanceRecords")
+                        .HasForeignKey("ClassSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Enrollment", "Enrollment")
+                        .WithMany("AttendanceRecords")
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ClassSession");
+
+                    b.Navigation("Enrollment");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.UserAccount", "User")
@@ -442,6 +1470,24 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Course", "Course")
+                        .WithMany("Batches")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Faculty");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.Candidate", b =>
@@ -462,6 +1508,35 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("UserAccount");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.CertificateApplication", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "ApprovedByStaff")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ZealEducation.Domain.Entities.Enrollment", "Enrollment")
+                        .WithMany()
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedByStaff");
+
+                    b.Navigation("Enrollment");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.ClassSession", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Batch", "Batch")
+                        .WithMany("ClassSessions")
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Batch");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.Staff", "AssignedCounselor")
@@ -475,9 +1550,17 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .HasForeignKey("ConvertedCandidateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("ZealEducation.Domain.Entities.Course", "CourseInterested")
+                        .WithMany("Enquiries")
+                        .HasForeignKey("CourseInterestedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("AssignedCounselor");
 
                     b.Navigation("ConvertedCandidate");
+
+                    b.Navigation("CourseInterested");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.EnquiryNote", b =>
@@ -499,6 +1582,99 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("Enquiry");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Enrollment", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Batch", "Batch")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "Fee")
+                        .WithOne("Enrollment")
+                        .HasForeignKey("ZealEducation.Domain.Entities.Enrollment", "FeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "Incharge")
+                        .WithMany()
+                        .HasForeignKey("InchargeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Fee");
+
+                    b.Navigation("Incharge");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.ExamResult", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Enrollment", "Enrollment")
+                        .WithMany("ExamResults")
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Examination", "Examination")
+                        .WithMany("ExamResults")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "GradedBy")
+                        .WithMany()
+                        .HasForeignKey("GradedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "OverrideBy")
+                        .WithMany()
+                        .HasForeignKey("OverrideById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Examination");
+
+                    b.Navigation("GradedBy");
+
+                    b.Navigation("OverrideBy");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Examination", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Batch", "Batch")
+                        .WithMany("Examinations")
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "ScheduledBy")
+                        .WithMany()
+                        .HasForeignKey("ScheduledById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("ScheduledBy");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Faculty", b =>
                 {
                     b.HasOne("ZealEducation.Domain.Entities.Staff", "Staff")
@@ -508,6 +1684,144 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Feedback", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Batch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.UserAccount", "ProcessedBy")
+                        .WithMany()
+                        .HasForeignKey("ProcessedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ZealEducation.Domain.Entities.Faculty", "TargetFaculty")
+                        .WithMany()
+                        .HasForeignKey("TargetFacultyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("ProcessedBy");
+
+                    b.Navigation("TargetFaculty");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Fine", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
+                        .WithOne("Fine")
+                        .HasForeignKey("ZealEducation.Domain.Entities.Fine", "FeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "IssuedByStaff")
+                        .WithMany()
+                        .HasForeignKey("IssuedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("FeeStructure");
+
+                    b.Navigation("IssuedByStaff");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentPlan", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
+                        .WithMany("InstallmentPlans")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FeeStructure");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentReminderLog", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.InstallmentPlan", "InstallmentPlan")
+                        .WithMany()
+                        .HasForeignKey("InstallmentPlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InstallmentPlan");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.MaterialDownloadLog", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.StudyMaterial", "Material")
+                        .WithMany("DownloadLogs")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Material");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.FeeStructure", "FeeStructure")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.InstallmentPlan", "InstallmentPlan")
+                        .WithMany()
+                        .HasForeignKey("InstallmentPlanId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "ProcessedByStaff")
+                        .WithMany()
+                        .HasForeignKey("ProcessedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FeeStructure");
+
+                    b.Navigation("InstallmentPlan");
+
+                    b.Navigation("ProcessedByStaff");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
@@ -521,14 +1835,93 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Navigation("UserAccount");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.StudyMaterial", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Course", "Course")
+                        .WithMany("StudyMaterials")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", "UploadedByStaff")
+                        .WithMany()
+                        .HasForeignKey("UploadedByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("UploadedByStaff");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.SystemAsset", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.Staff", null)
+                        .WithMany()
+                        .HasForeignKey("ManagedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Batch", b =>
+                {
+                    b.Navigation("ClassSessions");
+
+                    b.Navigation("Enrollments");
+
+                    b.Navigation("Examinations");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.ClassSession", b =>
+                {
+                    b.Navigation("AttendanceRecords");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Course", b =>
+                {
+                    b.Navigation("Batches");
+
+                    b.Navigation("Enquiries");
+
+                    b.Navigation("StudyMaterials");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.CourseEnquiry", b =>
                 {
                     b.Navigation("Notes");
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Enrollment", b =>
+                {
+                    b.Navigation("AttendanceRecords");
+
+                    b.Navigation("ExamResults");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.Examination", b =>
+                {
+                    b.Navigation("ExamResults");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.FeeStructure", b =>
+                {
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Fine");
+
+                    b.Navigation("InstallmentPlans");
+
+                    b.Navigation("PaymentTransactions");
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.Staff", b =>
                 {
                     b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.StudyMaterial", b =>
+                {
+                    b.Navigation("DownloadLogs");
                 });
 #pragma warning restore 612, 618
         }

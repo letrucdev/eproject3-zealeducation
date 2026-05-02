@@ -1,0 +1,67 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-xl w-xl flex flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Apply Fine</h2>
+      @if (target(); as t) {
+        <p class="text-muted-foreground text-sm">
+          Issuing a fine to <span class="font-medium">{{ t.candidateName }}</span>
+          ({{ t.candidateCode }}). A new fee structure with type
+          <span class="font-medium">Fine</span> will be created.
+        </p>
+      }
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex flex-col gap-4">
+      <hlm-field-group>
+        <hlm-field>
+          <label hlmFieldLabel for="fine-reason">Violation Reason</label>
+          <textarea
+            hlmTextarea
+            id="fine-reason"
+            formControlName="violationReason"
+            class="w-full"
+            rows="3"
+            maxlength="500"
+            placeholder="Describe the rule violation..."
+          ></textarea>
+          <hlm-field-error validator="required">Reason is required.</hlm-field-error>
+          <hlm-field-error validator="maxlength">Max 500 characters.</hlm-field-error>
+        </hlm-field>
+
+        <hlm-field>
+          <label hlmFieldLabel for="fine-amount">Penalty Amount</label>
+          <input
+            hlmInput
+            id="fine-amount"
+            type="number"
+            min="1"
+            step="1000"
+            formControlName="penaltyAmount"
+            class="w-full"
+          />
+          <hlm-field-error validator="required">Amount is required.</hlm-field-error>
+          <hlm-field-error validator="min">Amount must be greater than 0.</hlm-field-error>
+          @if (form.controls.penaltyAmount.value > 0) {
+            <p class="text-muted-foreground text-xs">
+              Preview: {{ form.controls.penaltyAmount.value | vnd }}
+            </p>
+          }
+        </hlm-field>
+      </hlm-field-group>
+
+      <div hlmDialogFooter>
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Applying...' : 'Apply fine' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

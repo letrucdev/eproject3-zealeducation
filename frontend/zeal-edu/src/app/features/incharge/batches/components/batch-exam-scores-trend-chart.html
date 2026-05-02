@@ -1,0 +1,51 @@
+<section hlmCard class="h-full">
+  <div hlmCardHeader class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h2 hlmCardTitle>Exam Scores</h2>
+      <p hlmCardDescription>{{ subtitle() }}</p>
+    </div>
+    <div hlmButtonGroup role="radiogroup" aria-label="Select date range">
+      @for (option of rangeOptions; track option.value) {
+        <button
+          hlmToggle
+          type="button"
+          variant="outline"
+          [state]="toggleState(option.value)"
+          (stateChange)="onToggleState(option.value, $event)"
+          [attr.aria-pressed]="toggleState(option.value) === 'on'"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
+  <div hlmCardContent class="min-w-0">
+    @if (isLoading()) {
+      <hlm-skeleton class="h-72 w-full" />
+    } @else if (hasData()) {
+      <div class="w-full overflow-hidden">
+        <ngx-area-chart
+          [data]="chartData()"
+          [categories]="categories()"
+          [height]="288"
+          [hideLegend]="false"
+          [yGridLine]="false"
+          [hideYAxis]="false"
+          [xGridLine]="false"
+          [xDomainLine]="false"
+          [xTickLine]="false"
+          [minMaxTicksOnly]="false"
+          [xNumTicks]="6"
+          [xFormatter]="xFormatter"
+          [tooltipTitleFormatter]="tooltipTitleFormatter"
+        />
+      </div>
+    } @else {
+      <div
+        class="text-muted-foreground flex min-h-72 h-full w-full items-center justify-center text-sm"
+      >
+        No exam scores recorded in this period.
+      </div>
+    }
+  </div>
+</section>

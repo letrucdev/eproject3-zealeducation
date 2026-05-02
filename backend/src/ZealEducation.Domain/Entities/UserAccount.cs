@@ -14,6 +14,7 @@ public class UserAccount : BaseAuditableEntity
     public Gender Gender { get; set; }
     public UserRole Role { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool MustChangePassword { get; set; }
     public int FailedLoginCount { get; set; }
     public DateTime? LastLogin { get; set; }
 }

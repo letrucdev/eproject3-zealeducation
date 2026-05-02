@@ -1,0 +1,92 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-2xl w-[90vw] flex max-h-[90dvh] flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h3 hlmDialogTitle>Configure Installment Plan</h3>
+      <p class="text-muted-foreground text-sm">
+        Choose a payment cadence. Installments are auto-calculated from the course duration.
+      </p>
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-col gap-5 py-4 overflow-y-auto"
+    >
+      @if (availableOptions().length === 0) {
+        <p class="text-sm text-rose-600">
+          This course duration does not allow any installment plan.
+        </p>
+      } @else {
+        <fieldset hlmRadioGroup formControlName="frequency" class="grid gap-3">
+          <legend class="text-sm font-medium mb-1">Plan</legend>
+          @for (option of availableOptions(); track option) {
+            <label
+              class="flex items-start gap-3 rounded-md border px-4 py-3 cursor-pointer hover:bg-accent/50"
+              [class.border-primary]="selectedFrequency() === option"
+            >
+              <hlm-radio class="mt-1" [value]="option">
+                <hlm-radio-indicator indicator />
+              </hlm-radio>
+              <div class="flex-1">
+                <div class="font-medium">{{ describe(option) }}</div>
+                <div class="text-xs text-muted-foreground mt-1">
+                  {{ previewSummary(option) }}
+                </div>
+              </div>
+            </label>
+          }
+        </fieldset>
+
+        @if (preview().length > 0) {
+          <div class="rounded-md border">
+            <div
+              class="px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground border-b"
+            >
+              Preview ({{ preview().length }} installments)
+            </div>
+            <div class="max-h-72 overflow-y-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-muted/40 sticky top-0">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-medium w-6">No.</th>
+                    <th class="px-3 py-2 text-right font-medium w-40">Amount Due</th>
+                    <th class="px-3 py-2 text-right font-medium w-40">Due Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of preview(); track row.installmentNo) {
+                    <tr class="border-t">
+                      <td class="px-3 py-2">{{ row.installmentNo }}</td>
+                      <td class="px-3 py-2 text-right">
+                        {{ row.amountDue | vnd }}
+                      </td>
+                      <td class="px-3 py-2 text-right">{{ row.dueDate | date: 'yyyy-MM-dd' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      }
+
+      <div hlmDialogFooter class="mt-2">
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button
+          hlmBtn
+          type="submit"
+          [disabled]="availableOptions().length === 0 || form.invalid || submitting()"
+        >
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Saving...' : 'Confirm Plan' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

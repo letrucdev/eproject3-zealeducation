@@ -1,0 +1,66 @@
+@let c = course();
+@let data = materialsQuery.data();
+@let items = data?.items ?? [];
+<hlm-accordion-trigger>
+  <span class="flex w-full items-center justify-between pr-3">
+    <span class="font-medium">{{ c.courseName }}</span>
+    <span class="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+      {{ c.totalMaterials }} {{ c.totalMaterials === 1 ? 'material' : 'materials' }}
+    </span>
+  </span>
+</hlm-accordion-trigger>
+<hlm-accordion-content appAutoSizeAccordionContent>
+  @if (materialsQuery.isPending() && isOpened()) {
+    <div class="flex items-center justify-center py-8">
+      <hlm-spinner />
+    </div>
+  } @else if (materialsQuery.isError()) {
+    <div class="text-muted-foreground p-4 text-center text-sm">
+      Failed to load materials.
+      <button hlmBtn variant="link" type="button" (click)="materialsQuery.refetch()">Retry</button>
+    </div>
+  } @else if (items.length === 0) {
+    <div
+      class="text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-md border border-dashed py-8 text-sm mb-3"
+    >
+      <ng-icon name="lucideInbox" class="text-[24px]" />
+      <p>No materials yet for this course.</p>
+    </div>
+  } @else {
+    <div
+      class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 mb-3"
+    >
+      @for (m of items; track m.materialId) {
+        <app-material-card-item [material]="m" (action)="onCardAction($event)" />
+      }
+    </div>
+
+    @if (data && data.totalPages > 1) {
+      <div class="text-muted-foreground mt-4 flex items-center justify-end gap-2 text-xs">
+        <span>Page {{ data.pageNumber }} / {{ data.totalPages }}</span>
+        <button
+          hlmBtn
+          variant="outline"
+          size="icon-sm"
+          type="button"
+          [disabled]="!canPrev()"
+          aria-label="Previous page"
+          (click)="goPrev()"
+        >
+          <ng-icon name="lucideChevronLeft" class="text-[16px]" />
+        </button>
+        <button
+          hlmBtn
+          variant="outline"
+          size="icon-sm"
+          type="button"
+          [disabled]="!canNext()"
+          aria-label="Next page"
+          (click)="goNext()"
+        >
+          <ng-icon name="lucideChevronRight" class="text-[16px]" />
+        </button>
+      </div>
+    }
+  }
+</hlm-accordion-content>

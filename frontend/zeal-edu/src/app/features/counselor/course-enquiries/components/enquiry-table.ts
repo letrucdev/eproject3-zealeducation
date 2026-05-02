@@ -5,17 +5,19 @@ import { lucideEye, lucidePencil, lucideUserCheck } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { CourseEnquiryListItem } from '../../../../core/models/course-enquiry-list-item';
-import { EnquiryStatus } from '../../../../core/models/enquiry-status';
+import { CourseEnquiryListItem } from '@core/models/course-enquiry-list-item';
+import { EnquiryStatus } from '@core/models/enquiry-status';
 import {
   DataTable,
   DataTableCellContext,
   DataTableCellDef,
   DataTableColumn,
-} from '../../../../shared/components/data-table';
-import { PaginatedList } from '../../../../core/models/paginated-list';
+  DataTableSortChange,
+  SortDirection,
+} from '@shared/components/data-table';
+import { PaginatedList } from '@core/models/paginated-list';
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUS_LABELS } from './enquiry-labels';
-import { EnquirySource } from '../../../../core/models/enquiry-source';
+import { EnquirySource } from '@core/models/enquiry-source';
 
 @Directive({
   selector: '[enquiryCell]',
@@ -43,12 +45,15 @@ export class EnquiryTable {
   readonly page = input<PaginatedList<CourseEnquiryListItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
+  readonly sortBy = input<string | null>(null);
+  readonly sortDirection = input<SortDirection | null>(null);
 
   readonly viewClicked = output<CourseEnquiryListItem>();
   readonly editClicked = output<CourseEnquiryListItem>();
   readonly convertClicked = output<CourseEnquiryListItem>();
   readonly pageChanged = output<number>();
   readonly pageSizeChanged = output<number>();
+  readonly sortChanged = output<DataTableSortChange>();
 
   protected readonly statuses = EnquiryStatus;
 
@@ -56,10 +61,10 @@ export class EnquiryTable {
     { key: 'fullName', header: 'Name', width: 'w-56' },
     { key: 'phone', header: 'Phone', width: 'w-36' },
     { key: 'email', header: 'Email', width: 'w-56' },
-    { key: 'courseInterested', header: 'Course', width: 'w-48' },
-    { key: 'source', header: 'Source', width: 'w-32' },
-    { key: 'status', header: 'Status', width: 'w-36', align: 'center' },
-    { key: 'nextFollowUpDate', header: 'Next Follow-Up', width: 'w-40' },
+    { key: 'courseInterestedName', header: 'Course', width: 'w-48' },
+    { key: 'source', header: 'Source', sortable: true, width: 'w-32' },
+    { key: 'status', header: 'Status', sortable: true, width: 'w-36', align: 'center' },
+    { key: 'nextFollowUpDate', header: 'Next Follow-Up', sortable: true, width: 'w-40' },
     { key: 'assignedCounselorName', header: 'Counselor', width: 'w-40' },
     { key: 'actions', header: 'Actions', width: 'w-48', align: 'right' },
   ];

@@ -24,10 +24,6 @@ public class CourseEnquiryConfiguration : IEntityTypeConfiguration<CourseEnquiry
         builder.Property(e => e.Email)
             .HasMaxLength(100);
 
-        builder.Property(e => e.CourseInterested)
-            .IsRequired()
-            .HasMaxLength(150);
-
         builder.Property(e => e.Source)
             .IsRequired()
             .HasMaxLength(30)
@@ -41,6 +37,11 @@ public class CourseEnquiryConfiguration : IEntityTypeConfiguration<CourseEnquiry
 
         builder.Property(e => e.NextFollowUpDate)
             .HasColumnType("date");
+
+        builder.HasOne(e => e.CourseInterested)
+            .WithMany(c => c.Enquiries)
+            .HasForeignKey(e => e.CourseInterestedId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(e => e.AssignedCounselor)
             .WithMany()
@@ -60,7 +61,8 @@ public class CourseEnquiryConfiguration : IEntityTypeConfiguration<CourseEnquiry
         builder.HasIndex(e => e.AssignedCounselorId);
         builder.HasIndex(e => e.Status);
         builder.HasIndex(e => e.NextFollowUpDate);
-        builder.HasIndex(e => e.Phone);
+        builder.HasIndex(e => e.Phone).IsUnique();
+        builder.HasIndex(e => e.CourseInterestedId);
 
         builder.Ignore(e => e.DomainEvents);
     }

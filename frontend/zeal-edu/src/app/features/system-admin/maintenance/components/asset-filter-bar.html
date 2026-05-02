@@ -1,0 +1,43 @@
+<form [formGroup]="form" class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-2">
+    <div class="relative w-full md:w-96">
+      <ng-icon
+        hlm
+        name="lucideSearch"
+        size="sm"
+        class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+      />
+      <input
+        hlmInput
+        type="search"
+        class="w-full ps-9"
+        placeholder="Search by name, type, serial, or location..."
+        formControlName="search"
+      />
+    </div>
+
+    @if (!showingDecommissioned()) {
+
+      <hlm-select formControlName="conditionStatus" [itemToString]="statusLabel" class="w-full md:w-44">
+        <hlm-select-trigger>
+          <hlm-select-value placeholder="All Status" />
+        </hlm-select-trigger>
+        <hlm-select-content *hlmSelectPortal>
+          <hlm-select-item value="">All Status</hlm-select-item>
+          <hlm-select-item value="Good">Good</hlm-select-item>
+          <hlm-select-item value="Maintenance">Maintenance</hlm-select-item>
+          <hlm-select-item value="Faulty">Faulty</hlm-select-item>
+        </hlm-select-content>
+      </hlm-select>
+    } @else {
+      <div class="text-sm font-medium text-destructive px-2">Decommissioned Assets</div>
+    }
+  </div>
+
+  @if (!showingDecommissioned()) {
+    <button hlmBtn type="button" (click)="createClicked.emit()">
+      <ng-icon hlm name="lucidePlus" size="sm" class="mr-2" />
+      Add Asset
+    </button>
+  }
+</form>

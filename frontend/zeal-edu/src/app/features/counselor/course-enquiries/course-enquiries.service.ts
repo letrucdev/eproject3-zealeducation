@@ -3,13 +3,13 @@ import { Injectable, Signal, inject } from '@angular/core';
 import { QueryClient } from '@tanstack/query-core';
 import { injectMutation, injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse } from '../../../core/http/api-response';
-import { ConvertEnquiryResult } from '../../../core/models/convert-enquiry-result';
-import { CourseEnquiryDetail } from '../../../core/models/course-enquiry-detail';
-import { CourseEnquiryListItem } from '../../../core/models/course-enquiry-list-item';
-import { EnquiryNote } from '../../../core/models/enquiry-note';
-import { EnquiryStatistics } from '../../../core/models/enquiry-statistics';
-import { PaginatedList } from '../../../core/models/paginated-list';
+import { ApiResponse } from '@core/http/api-response';
+import { ConvertEnquiryResult } from '@core/models/convert-enquiry-result';
+import { CourseEnquiryDetail } from '@core/models/course-enquiry-detail';
+import { CourseEnquiryListItem } from '@core/models/course-enquiry-list-item';
+import { EnquiryNote } from '@core/models/enquiry-note';
+import { EnquiryStatistics } from '@core/models/enquiry-statistics';
+import { PaginatedList } from '@core/models/paginated-list';
 import {
   AddEnquiryNotePayload,
   ConvertEnquiryPayload,
@@ -17,6 +17,7 @@ import {
   EnquiryListQuery,
   UpdateEnquiryPayload,
 } from './models/course-enquiry-payload';
+import { toast } from '@spartan-ng/brain/sonner';
 
 export const ENQUIRY_QUERY_KEY = ['course-enquiries'] as const;
 export const ENQUIRY_STATS_QUERY_KEY = ['course-enquiry-statistics'] as const;
@@ -52,10 +53,11 @@ export class CourseEnquiriesService {
   createMutation() {
     return injectMutation<unknown, HttpErrorResponse, CreateEnquiryPayload>(() => ({
       mutationFn: (payload) =>
-        firstValueFrom(
-          this._http.post<ApiResponse<unknown>>('/course-enquiries', payload),
-        ),
-      onSuccess: () => this._invalidateAll(),
+        firstValueFrom(this._http.post<ApiResponse<unknown>>('/course-enquiries', payload)),
+      onSuccess: () => {
+        toast.success('Enquiry updated successfully.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -69,7 +71,10 @@ export class CourseEnquiriesService {
         firstValueFrom(
           this._http.put<ApiResponse<unknown>>(`/course-enquiries/${enquiryId}`, payload),
         ),
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Enquiry created successfully.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -89,7 +94,10 @@ export class CourseEnquiriesService {
         if (!response.data) throw new Error(response.message || 'Failed to add note');
         return response.data;
       },
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Note added.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -109,7 +117,10 @@ export class CourseEnquiriesService {
         if (!response.data) throw new Error(response.message || 'Failed to convert');
         return response.data;
       },
-      onSuccess: () => this._invalidateAll(),
+      onSuccess: () => {
+        toast.success('Enquiry converted successfully.');
+        this._invalidateAll();
+      },
     }));
   }
 
@@ -124,6 +135,8 @@ export class CourseEnquiriesService {
     if (query.status) params = params.set('status', query.status);
     if (query.source) params = params.set('source', query.source);
     if (query.dueFollowUpOnly) params = params.set('dueFollowUpOnly', 'true');
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
       this._http.get<ApiResponse<PaginatedList<CourseEnquiryListItem>>>('/course-enquiries', {
@@ -137,9 +150,7 @@ export class CourseEnquiriesService {
     const response = await firstValueFrom(
       this._http.get<ApiResponse<EnquiryStatistics>>('/course-enquiries/statistics'),
     );
-    return (
-      response.data ?? { total: 0, new: 0, inFollowUp: 0, converted: 0, overdue: 0 }
-    );
+    return response.data ?? { total: 0, new: 0, inFollowUp: 0, converted: 0, overdue: 0 };
   }
 
   private async _fetchDetail(enquiryId: string): Promise<CourseEnquiryDetail> {
@@ -162,8 +173,8 @@ export class CourseEnquiriesService {
   }
 
   private _invalidateAll(): void {
-    void this._queryClient.refetchQueries({ queryKey: ENQUIRY_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: ENQUIRY_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: ENQUIRY_DETAIL_QUERY_KEY });
     void this._queryClient.refetchQueries({ queryKey: ENQUIRY_STATS_QUERY_KEY });
-    void this._queryClient.refetchQueries({ queryKey: ENQUIRY_DETAIL_QUERY_KEY });
   }
 }

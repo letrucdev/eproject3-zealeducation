@@ -3,6 +3,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using ZealEducation.Application.Common.Behaviors;
+using ZealEducation.Application.Common.Interfaces;
+using ZealEducation.Application.Common.Services;
 
 namespace ZealEducation.Application;
 
@@ -18,6 +20,9 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
+
+        services.AddScoped<IPaymentReceiptArchiver, PaymentReceiptArchiver>();
+        services.AddScoped<ICertificateArchiver, CertificateArchiver>();
 
         return services;
     }
