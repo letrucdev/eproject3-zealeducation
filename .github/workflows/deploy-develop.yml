@@ -10,6 +10,7 @@ jobs:
   deploy:
     name: SSH & docker compose up
     runs-on: ubuntu-latest
+    environment: develop
 
     steps:
       - name: Deploy over SSH
