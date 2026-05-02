@@ -15,25 +15,30 @@
     (decommissionedToggled)="onDecommissionedToggled()"
   />
 
-  <app-asset-filter-bar
-    [initial]="initialFilter"
-    [showingDecommissioned]="showingDecommissioned()"
-    (filterChanged)="onFilterChanged($event)"
-    (createClicked)="onCreateClicked()"
-  />
-
-  <app-asset-table
-    [page]="page()"
-    [isLoading]="listQuery.isPending()"
-    [pageSize]="pageSize()"
-    [showingDecommissioned]="showingDecommissioned()"
-    (viewClicked)="onViewClicked($event)"
-    (editClicked)="onEditClicked($event)"
-    (deleteClicked)="onDeleteClicked($event)"
-    (conditionChangeClicked)="onConditionChangeClicked($event)"
-    (pageChanged)="onPageChanged($event)"
-    (pageSizeChanged)="onPageSizeChanged($event)"
-  />
+  <section hlmCard>
+    <div hlmCardHeader>
+      <app-asset-filter-bar
+        [initial]="initialFilter"
+        [showingDecommissioned]="showingDecommissioned()"
+        (filterChanged)="onFilterChanged($event)"
+        (createClicked)="onCreateClicked()"
+      />
+    </div>
+    <div hlmCardContent>
+      <app-asset-table
+        [page]="page()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        [showingDecommissioned]="showingDecommissioned()"
+        (viewClicked)="onViewClicked($event)"
+        (editClicked)="onEditClicked($event)"
+        (deleteClicked)="onDeleteClicked($event)"
+        (conditionChangeClicked)="onConditionChangeClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+      />
+    </div>
+  </section>
 
   <app-asset-form-dialog
     #formDialog

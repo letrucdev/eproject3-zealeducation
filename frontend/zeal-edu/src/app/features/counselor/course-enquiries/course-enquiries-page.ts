@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { CourseEnquiryListItem } from '@core/models/course-enquiry-list-item';
 import { EnquiryFilterBar, EnquiryFilterValue } from './components/enquiry-filter-bar';
 import { EnquiryFormDialog, EnquiryFormSubmit } from './components/enquiry-form-dialog';
@@ -27,6 +28,7 @@ type DialogIntent = 'none' | 'edit' | 'view' | 'convert';
 @Component({
   selector: 'app-course-enquiries-page',
   imports: [
+    HlmCardImports,
     EnquiryStatsCards,
     EnquiryFilterBar,
     EnquiryTable,
