@@ -18,10 +18,12 @@ import {
   BatchAssignFacultyDialog,
   BatchAssignFacultySubmit,
 } from './components/batch-assign-faculty-dialog';
+import { BatchCreationTrendChart } from './components/batch-creation-trend-chart';
 import { BatchFilterBar, BatchFilterValue } from './components/batch-filter-bar';
 import { BatchFormDialog, BatchFormSubmit } from './components/batch-form-dialog';
 import { BatchStatsCards } from './components/batch-stats-cards';
 import { BatchTable } from './components/batch-table';
+import { BatchCreationTrendRange } from './models/batch-creation-trend';
 import { BatchListQuery } from './models/batch-payload';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { DataTableSortChange } from '@shared/components/data-table';
@@ -31,6 +33,7 @@ import { DataTableSortChange } from '@shared/components/data-table';
   imports: [
     HlmCardImports,
     BatchStatsCards,
+    BatchCreationTrendChart,
     BatchFilterBar,
     BatchTable,
     BatchFormDialog,
@@ -49,6 +52,9 @@ export default class BatchesManagementPage {
   protected readonly confirmDialog = viewChild.required<ConfirmDialog>('confirmDialog');
 
   private readonly _pendingDelete = signal<BatchListItem | null>(null);
+
+  protected readonly trendRange = signal<BatchCreationTrendRange>(90);
+  protected readonly trendQuery = this._service.creationTrendQuery(this.trendRange);
 
   protected readonly page = signal(1);
   protected readonly pageSize = signal(10);
@@ -106,6 +112,10 @@ export default class BatchesManagementPage {
     this.search.set(value.search);
     this.statusFilter.set(value.status);
     this.page.set(1);
+  }
+
+  onTrendRangeChanged(range: BatchCreationTrendRange): void {
+    this.trendRange.set(range);
   }
 
   onPageChanged(page: number): void {

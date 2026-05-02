@@ -38,15 +38,27 @@ import {
   CreateBulkSessionsResponse,
   UpdateBatchPayload,
 } from './models/batch-payload';
+import {
+  BatchCreationTrendPoint,
+  BatchCreationTrendRange,
+} from './models/batch-creation-trend';
+import {
+  BatchExamScoresTrendPoint,
+  BatchExamScoresTrendRange,
+} from './models/batch-exam-scores-trend';
+import { BatchGradeDistribution } from './models/batch-grade-distribution';
 
 export const BATCH_QUERY_KEY = ['batches'] as const;
 export const BATCH_DETAIL_QUERY_KEY = ['batch-detail'] as const;
 export const BATCH_STATS_QUERY_KEY = ['batch-statistics'] as const;
+export const BATCH_CREATION_TREND_QUERY_KEY = ['batch-creation-trend'] as const;
 export const BATCH_ENROLLMENTS_QUERY_KEY = ['batch-enrollments'] as const;
 export const BATCH_ASSIGNABLE_QUERY_KEY = ['batch-assignable'] as const;
 export const BATCH_SESSIONS_QUERY_KEY = ['batch-sessions'] as const;
 export const SESSION_ATTENDANCE_QUERY_KEY = ['session-attendance'] as const;
 export const BATCH_EXAMINATIONS_QUERY_KEY = ['batch-examinations'] as const;
+export const BATCH_EXAM_SCORES_TREND_QUERY_KEY = ['batch-exam-scores-trend'] as const;
+export const BATCH_GRADE_DISTRIBUTION_QUERY_KEY = ['batch-grade-distribution'] as const;
 export const EXAM_RESULTS_QUERY_KEY = ['exam-results'] as const;
 
 interface CreateBatchResponse {
@@ -82,6 +94,14 @@ export class BatchesService {
     return injectQuery(() => ({
       queryKey: BATCH_STATS_QUERY_KEY,
       queryFn: () => this._fetchStatistics(),
+    }));
+  }
+
+  creationTrendQuery(days: Signal<BatchCreationTrendRange>) {
+    return injectQuery(() => ({
+      queryKey: [...BATCH_CREATION_TREND_QUERY_KEY, days()],
+      queryFn: () => this._fetchCreationTrend(days()),
+      staleTime: 60_000,
     }));
   }
 
@@ -124,6 +144,27 @@ export class BatchesService {
       queryFn: () => this._fetchSessions(batchId() as string, params()),
       staleTime: 30_000,
       placeholderData: keepPreviousData,
+    }));
+  }
+
+  examScoresTrendQuery(
+    batchId: Signal<string | null>,
+    days: Signal<BatchExamScoresTrendRange>,
+  ) {
+    return injectQuery<BatchExamScoresTrendPoint[], HttpErrorResponse>(() => ({
+      enabled: batchId() !== null,
+      queryKey: [...BATCH_EXAM_SCORES_TREND_QUERY_KEY, batchId(), days()],
+      queryFn: () => this._fetchExamScoresTrend(batchId() as string, days()),
+      staleTime: 60_000,
+    }));
+  }
+
+  gradeDistributionQuery(batchId: Signal<string | null>) {
+    return injectQuery<BatchGradeDistribution, HttpErrorResponse>(() => ({
+      enabled: batchId() !== null,
+      queryKey: [...BATCH_GRADE_DISTRIBUTION_QUERY_KEY, batchId()],
+      queryFn: () => this._fetchGradeDistribution(batchId() as string),
+      staleTime: 60_000,
     }));
   }
 
@@ -397,6 +438,18 @@ export class BatchesService {
     );
   }
 
+  private async _fetchCreationTrend(
+    days: BatchCreationTrendRange,
+  ): Promise<BatchCreationTrendPoint[]> {
+    const params = new HttpParams().set('days', String(days));
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<BatchCreationTrendPoint[]>>('/batches/creation-trend', {
+        params,
+      }),
+    );
+    return response.data ?? [];
+  }
+
   private async _fetchDetail(batchId: string): Promise<BatchDetail> {
     const response = await firstValueFrom(
       this._http.get<ApiResponse<BatchDetail>>(`/batches/${batchId}`),
@@ -465,6 +518,31 @@ export class BatchesService {
     return response.data ?? emptyPaginated<ClassSession>(query);
   }
 
+  private async _fetchExamScoresTrend(
+    batchId: string,
+    days: BatchExamScoresTrendRange,
+  ): Promise<BatchExamScoresTrendPoint[]> {
+    const params = new HttpParams().set('days', String(days));
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<BatchExamScoresTrendPoint[]>>(
+        `/batches/${batchId}/exam-scores-trend`,
+        { params },
+      ),
+    );
+    return response.data ?? [];
+  }
+
+  private async _fetchGradeDistribution(batchId: string): Promise<BatchGradeDistribution> {
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<BatchGradeDistribution>>(
+        `/batches/${batchId}/grade-distribution`,
+      ),
+    );
+    return (
+      response.data ?? { a: 0, b: 0, c: 0, d: 0, f: 0, ungraded: 0, total: 0 }
+    );
+  }
+
   private async _fetchExaminations(
     batchId: string,
     query: BatchExaminationsQuery,
@@ -517,15 +595,20 @@ export class BatchesService {
   private _invalidateAll(): void {
     void this._queryClient.invalidateQueries({ queryKey: BATCH_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_STATS_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_CREATION_TREND_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_ENROLLMENTS_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_ASSIGNABLE_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_DETAIL_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_SESSIONS_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_EXAMINATIONS_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_EXAM_SCORES_TREND_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_GRADE_DISTRIBUTION_QUERY_KEY });
   }
 
   private _invalidateExamResults(): void {
     void this._queryClient.invalidateQueries({ queryKey: EXAM_RESULTS_QUERY_KEY });
     void this._queryClient.invalidateQueries({ queryKey: BATCH_EXAMINATIONS_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_EXAM_SCORES_TREND_QUERY_KEY });
+    void this._queryClient.invalidateQueries({ queryKey: BATCH_GRADE_DISTRIBUTION_QUERY_KEY });
   }
 }

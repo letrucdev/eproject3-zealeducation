@@ -8,6 +8,13 @@
     </div>
   </header>
 
+  <app-registrations-trend-chart
+    [data]="trendQuery.data()"
+    [isLoading]="trendQuery.isPending()"
+    [range]="trendRange()"
+    (rangeChanged)="onTrendRangeChanged($event)"
+  />
+
   <section hlmCard>
     <div hlmCardHeader>
       <app-candidate-filter-bar
