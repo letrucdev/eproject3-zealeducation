@@ -1,4 +1,5 @@
-import { writeFileSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
 import { config } from 'dotenv';
 
 config();
@@ -18,5 +19,7 @@ const content = `export const environment = {
 };
 `;
 
-writeFileSync('./src/environments/environment.ts', content);
+const target = './src/environments/environment.ts';
+mkdirSync(dirname(target), { recursive: true });
+writeFileSync(target, content);
 console.log('Generated src/environments/environment.ts');
