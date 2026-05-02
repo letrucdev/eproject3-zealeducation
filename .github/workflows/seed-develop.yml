@@ -73,6 +73,6 @@ jobs:
             fi
 
             echo "==> Cleaning up seed scripts in container"
-            docker compose exec -T mssql rm -rf /tmp/seed
+            docker compose exec -T --user root mssql rm -rf /tmp/seed
 
             echo "==> Done"
