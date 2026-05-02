@@ -19,5 +19,11 @@ export const CANDIDATE_ROUTES: Routes = [
     data: { breadcrumb: 'Profile' },
     loadComponent: () => import('./profile/profile-page'),
   },
+  {
+    path: 'certificates',
+    title: 'My Certificates',
+    data: { breadcrumb: 'Certificates' },
+    loadComponent: () => import('./certificates/my-certificates-page'),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'batches' },
 ];

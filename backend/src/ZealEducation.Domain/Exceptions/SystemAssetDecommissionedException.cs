@@ -1,10 +1,5 @@
-using System;
-
 namespace ZealEducation.Domain.Exceptions;
 
-public class SystemAssetDecommissionedException : Exception
+public class SystemAssetDecommissionedException(string message) : Exception(message)
 {
-    public SystemAssetDecommissionedException(string message) : base(message)
-    {
-    }
 }

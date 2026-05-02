@@ -28,6 +28,14 @@ export interface FacultyBatchEnrollmentsQuery {
   sortDirection?: 'asc' | 'desc';
 }
 
+export interface FacultyExaminationCandidatesQuery {
+  page: number;
+  pageSize: number;
+  search?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
 export interface FacultyScheduleQuery {
   from: string;
   to: string;
@@ -83,12 +91,12 @@ export interface FacultyExaminationSummary {
 export interface FacultyExamResultPayload {
   enrollmentId: string;
   score: number;
-  grade: string | null;
+  isFinalized: boolean;
 }
 
 export interface FacultyUpdateExamResultPayload {
   score: number;
-  grade: string | null;
+  isFinalized: boolean;
 }
 
 export interface FacultyExaminationCandidate {
@@ -100,6 +108,7 @@ export interface FacultyExaminationCandidate {
   score: number | null;
   grade: string | null;
   isPassed: boolean | null;
+  isFinalized: boolean;
   isOverridden: boolean;
   gradedAt: string | null;
 }

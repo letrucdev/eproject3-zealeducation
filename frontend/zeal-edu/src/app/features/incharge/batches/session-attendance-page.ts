@@ -24,7 +24,7 @@ import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { AttendanceStatus, MarkAttendanceEntry } from '@core/models/attendance';
 import { ClassSessionStatus } from '@core/models/class-session';
 import { BatchesService } from './batches.service';
-import { ATTENDANCE_STATUS_LABELS } from './components/session-labels';
+import { ATTENDANCE_STATUS_LABELS } from '@core/models/session-labels';
 
 interface AttendanceFormRow {
   status: AttendanceStatus;

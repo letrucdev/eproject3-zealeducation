@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ZealEducation.Application.Common.Exceptions;
+using ZealEducation.Application.Common.Helpers;
 using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Interfaces;
@@ -48,8 +49,9 @@ public class CreateExamResultCommandHandler(
             ExamId = examination.Id,
             EnrollmentId = enrollment.Id,
             Score = request.Score,
-            Grade = string.IsNullOrWhiteSpace(request.Grade) ? null : request.Grade.Trim(),
+            Grade = ExamGradeCalculator.Calculate(request.Score, examination.MaxScore, examination.PassScore),
             IsPassed = request.Score >= examination.PassScore,
+            IsFinalized = request.IsFinalized,
             GradedById = staff.Id,
             IsOverridden = false,
             OverrideById = null,

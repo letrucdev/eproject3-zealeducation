@@ -19,7 +19,7 @@ public class CreateEnquiryCommandHandler(
             ?? throw new UnauthorizedException("User is not authenticated.");
 
         var staffs = await staffRepository.FindAsync(s => s.UserAccountId == userId, cancellationToken);
-        var staff = staffs[0]
+        var staff = staffs.FirstOrDefault()
             ?? throw new UnauthorizedException("Current user is not linked to a staff profile.");
 
         var course = await courseRepository.GetByIdAsync(request.CourseInterestedId, cancellationToken)

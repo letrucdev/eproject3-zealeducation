@@ -1,10 +1,13 @@
 using System.Text.Json.Serialization;
+using Coravel;
+using Coravel.Queuing.Interfaces;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
 using ZealEducation.Application;
 using ZealEducation.Infrastructure;
+using ZealEducation.Infrastructure.Services.Scheduling;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -23,11 +26,16 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-builder.Services.AddControllers()
+builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    })
+    .AddRazorRuntimeCompilation();
+
+builder.Services.AddMailer(builder.Configuration);
+builder.Services.AddQueue();
+builder.Services.AddScheduler();
 
 const string CorsPolicyName = "AllowFrontend";
 builder.Services.AddCors(options =>
@@ -75,6 +83,21 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.Services.ConfigureQueue()
+    .LogQueuedTaskProgress(app.Services.GetRequiredService<ILogger<IQueue>>());
+
+app.Services.UseScheduler(scheduler =>
+{
+    scheduler
+        .Schedule<SendInstallmentRemindersInvocable>()
+        .EveryMinute()
+        .PreventOverlapping(nameof(SendInstallmentRemindersInvocable));
+    /* .DailyAt(8, 0) */
+})
+.OnError(ex => app.Services
+    .GetRequiredService<ILogger<Program>>()
+    .LogError(ex, "Scheduler task failed"));
+
 //await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
@@ -94,3 +117,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

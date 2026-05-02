@@ -1,4 +1,4 @@
-import { EnrollmentStatus } from '@features/incharge/candidates/models/candidate-detail';
+import { EnrollmentStatus } from '@core/models/candidate-detail';
 
 export interface BatchEnrollmentItem {
   enrollmentId: string;

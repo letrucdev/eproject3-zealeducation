@@ -44,7 +44,10 @@
       "@spartan-ng/helm/input-group": ["./libs/ui/input-group/src/index.ts"],
       "@spartan-ng/helm/spinner": ["./libs/ui/spinner/src/index.ts"],
       "@spartan-ng/helm/radio-group": ["./libs/ui/radio-group/src/index.ts"],
-      "@spartan-ng/helm/accordion": ["./libs/ui/accordion/src/index.ts"]
+      "@spartan-ng/helm/accordion": ["./libs/ui/accordion/src/index.ts"],
+      "@spartan-ng/helm/alert": ["./libs/ui/alert/src/index.ts"],
+      "@spartan-ng/helm/button-group": ["./libs/ui/button-group/src/index.ts"],
+      "@spartan-ng/helm/toggle": ["./libs/ui/toggle/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

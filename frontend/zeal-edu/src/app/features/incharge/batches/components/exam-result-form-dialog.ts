@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -16,6 +17,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { startWith } from 'rxjs';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
@@ -23,7 +25,8 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ExamResult, OverrideExamResultPayload } from '@core/models/exam-result';
 import { Examination } from '@core/models/examination';
-import { HlmTextarea, HlmTextareaImports } from '@spartan-ng/helm/textarea';
+import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
+import { calculateLetterGrade } from '@shared/utils/exam-grade';
 
 export interface ExamResultFormSubmit {
   resultId: string;
@@ -74,7 +77,6 @@ export class ExamResultFormDialog {
       Validators.min(0),
       scoreWithinMaxValidator(() => this._examination()?.maxScore ?? null),
     ]),
-    grade: this._fb.nonNullable.control('', [Validators.maxLength(5)]),
     overrideReason: this._fb.nonNullable.control('', [
       Validators.required,
       Validators.minLength(5),
@@ -82,12 +84,26 @@ export class ExamResultFormDialog {
     ]),
   });
 
+  private readonly _scoreSignal = toSignal(
+    this.form.controls.score.valueChanges.pipe(
+      startWith(this.form.controls.score.value),
+      takeUntilDestroyed(),
+    ),
+    { initialValue: this.form.controls.score.value },
+  );
+
+  protected readonly derivedGrade = computed(() => {
+    const exam = this._examination();
+    if (!exam) return '';
+    const score = this._scoreSignal();
+    return calculateLetterGrade(score == null ? null : Number(score), exam.maxScore, exam.passScore);
+  });
+
   open(examination: Examination, result: ExamResult): void {
     this._examination.set(examination);
     this._editing.set(result);
     this.form.reset({
       score: Number(result.score),
-      grade: result.grade ?? '',
       overrideReason: result.overrideReason ?? '',
     });
     this.form.controls.score.updateValueAndValidity();
@@ -109,7 +125,6 @@ export class ExamResultFormDialog {
       resultId: result.resultId,
       payload: {
         score: v.score,
-        grade: v.grade.trim() || null,
         overrideReason: v.overrideReason.trim(),
       },
     });

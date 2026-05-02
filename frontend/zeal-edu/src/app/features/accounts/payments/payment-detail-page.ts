@@ -29,7 +29,7 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { VndPipe } from '@shared/pipes/vnd-pipe';
-import { BankTransferProofDialog } from './components/bank-transfer-proof-dialog';
+import { BankTransferProofDialog } from '@shared/components/bank-transfer-proof-dialog/bank-transfer-proof-dialog';
 import {
   ConfirmPaymentDialog,
   ConfirmPaymentDialogSubmit,
@@ -38,15 +38,15 @@ import {
   InstallmentPlanDialog,
   InstallmentPlanDialogSubmit,
 } from './components/installment-plan-dialog';
-import { InstallmentPlanItem, PaymentTransactionItem } from './models/fee-structure';
+import { InstallmentPlanItem, PaymentTransactionItem } from '@core/models/fee-structure';
 import {
   InstallmentStatus,
   PaymentMethod,
   PaymentStatus,
   PaymentType,
-} from './models/payment-enums';
-import { paymentMethodLabels, paymentTypeLabels } from './models/payment-labels';
-import { PaymentsService } from './payments.service';
+} from '@core/models/payment-enums';
+import { paymentMethodLabels, paymentTypeLabels } from '@core/models/payment-labels';
+import { PaymentsService } from '@core/services/payments.service';
 
 @Component({
   selector: 'app-payment-detail-page',

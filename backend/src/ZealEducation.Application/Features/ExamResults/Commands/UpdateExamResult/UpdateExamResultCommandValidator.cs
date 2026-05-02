@@ -8,6 +8,5 @@ public class UpdateExamResultCommandValidator : AbstractValidator<UpdateExamResu
     {
         RuleFor(x => x.ResultId).NotEmpty();
         RuleFor(x => x.Score).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Grade).MaximumLength(5);
     }
 }

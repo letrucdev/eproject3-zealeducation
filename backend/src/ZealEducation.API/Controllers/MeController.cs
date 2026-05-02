@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZealEducation.API.Common.Models;
 using ZealEducation.Application.Common.Models;
+using ZealEducation.Application.Features.CandidatePortal.Commands.ApplyForCertificate;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyBatchAttendance;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyBatchDetail;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyBatchExamResults;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyBatchMaterials;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyBatchSessions;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyBatches;
+using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyCertificateEligibility;
+using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyCertificateFile;
+using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyCertificates;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyProfile;
 using ZealEducation.Application.Features.CandidatePortal.Queries.GetMyStudyMaterialFile;
 using ZealEducation.Application.Features.Candidates.Queries.GetCandidateDetail;
@@ -101,4 +105,36 @@ public class MeController(ISender sender) : ControllerBase
         var result = await sender.Send(new GetMyStudyMaterialFileQuery(id));
         return File(result.Content, result.ContentType, result.FileName);
     }
+
+    [HttpGet("certificates")]
+    public async Task<ActionResult<ApiResponse<List<MyCertificateListItemDto>>>> GetCertificates()
+    {
+        var result = await sender.Send(new GetMyCertificatesQuery());
+        return Ok(ApiResponse<List<MyCertificateListItemDto>>.Success(result));
+    }
+
+    [HttpGet("certificates/eligibility")]
+    public async Task<ActionResult<ApiResponse<MyCertificateEligibilityDto>>> GetCertificateEligibility(
+        [FromQuery] Guid batchId)
+    {
+        var result = await sender.Send(new GetMyCertificateEligibilityQuery(batchId));
+        return Ok(ApiResponse<MyCertificateEligibilityDto>.Success(result));
+    }
+
+    [HttpPost("certificates/apply")]
+    public async Task<ActionResult<ApiResponse<Guid>>> ApplyForCertificate(
+        [FromBody] ApplyForCertificateRequest body)
+    {
+        var id = await sender.Send(new ApplyForCertificateCommand(body.BatchId));
+        return Ok(ApiResponse<Guid>.Success(id, "Certificate application submitted."));
+    }
+
+    [HttpGet("certificates/{id:guid}/file")]
+    public async Task<IActionResult> GetCertificateFile(Guid id)
+    {
+        var result = await sender.Send(new GetMyCertificateFileQuery(id));
+        return File(result.Content, result.ContentType, result.FileName);
+    }
+
+    public record ApplyForCertificateRequest(Guid BatchId);
 }

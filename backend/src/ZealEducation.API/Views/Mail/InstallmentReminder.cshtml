@@ -1,0 +1,61 @@
+@model InstallmentReminderEmailModel
+@{
+    var isOverdue = Model.ReminderType == ReminderType.Overdue;
+    var headline = isOverdue
+        ? $"Tuition installment overdue by {Model.DaysOffset} day{(Model.DaysOffset == 1 ? string.Empty : "s")}"
+        : $"Tuition installment due in {-Model.DaysOffset} day{(-Model.DaysOffset == 1 ? string.Empty : "s")}";
+
+    ViewData["Title"] = isOverdue ? "Payment overdue" : "Payment reminder";
+    ViewData["HeaderSubtitle"] = headline;
+
+    string FormatAmount(decimal value) => $"{value.ToString("N0", CultureInfo.InvariantCulture)} VND";
+    string FormatDate(DateOnly date) => date.ToString("dd MMM yyyy", CultureInfo.InvariantCulture);
+
+    var introText = isOverdue
+        ? $"Your tuition installment #{Model.InstallmentNo} is currently <strong>{Model.DaysOffset} day{(Model.DaysOffset == 1 ? string.Empty : "s")} past due</strong>. Please settle the outstanding balance as soon as possible to avoid further penalties."
+        : $"This is a friendly reminder that your tuition installment #{Model.InstallmentNo} is due in <strong>{-Model.DaysOffset} day{(-Model.DaysOffset == 1 ? string.Empty : "s")}</strong>. Please arrange payment before the due date.";
+}
+<p style="margin:0 0 16px;">Hi <strong>@Model.RecipientName</strong>,</p>
+<p style="margin:0 0 16px;">@Html.Raw(introText)</p>
+
+<h2 style="margin:24px 0 8px;font-size:16px;color:@MailTheme.Primary;border-bottom:1px solid @MailTheme.Border;padding-bottom:6px;">Installment details</h2>
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;width:40%;">Candidate code</td>
+        <td style="padding:6px 0;font-family:Consolas,monospace;">@Model.CandidateCode</td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">Installment no.</td>
+        <td style="padding:6px 0;">#@Model.InstallmentNo</td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">Due date</td>
+        <td style="padding:6px 0;"><strong>@FormatDate(Model.DueDate)</strong></td>
+    </tr>
+</table>
+
+<h2 style="margin:24px 0 8px;font-size:16px;color:@MailTheme.Primary;border-bottom:1px solid @MailTheme.Border;padding-bottom:6px;">Payment summary</h2>
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid @MailTheme.Border;border-radius:6px;overflow:hidden;">
+    <thead>
+        <tr style="background:@MailTheme.Primary;color:@MailTheme.PrimaryFg;">
+            <th align="left" style="padding:10px 12px;font-weight:600;">Description</th>
+            <th align="right" style="padding:10px 12px;font-weight:600;">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="background:@MailTheme.Card;">
+            <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">Amount due</td>
+            <td align="right" style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">@FormatAmount(Model.AmountDue)</td>
+        </tr>
+        <tr style="background:@MailTheme.Muted;">
+            <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">Amount paid</td>
+            <td align="right" style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">@FormatAmount(Model.AmountPaid)</td>
+        </tr>
+        <tr style="background:@MailTheme.Card;">
+            <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;"><strong>Outstanding balance</strong></td>
+            <td align="right" style="padding:10px 12px;border-top:1px solid @MailTheme.Border;"><strong>@FormatAmount(Model.Outstanding)</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<p style="margin:32px 0 0;color:@MailTheme.MutedFg;font-size:13px;">If you have already completed this payment, please disregard this message. For any questions or to arrange payment, please contact our support team.</p>

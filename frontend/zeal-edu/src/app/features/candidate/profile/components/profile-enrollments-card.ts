@@ -8,7 +8,7 @@ import {
   CandidateDetail,
   CandidateEnrollmentItem,
   EnrollmentStatus,
-} from '@features/incharge/candidates/models/candidate-detail';
+} from '@core/models/candidate-detail';
 import {
   DataTable,
   DataTableCellContext,

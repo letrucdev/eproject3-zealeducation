@@ -19,7 +19,7 @@ public class LoginCommandHandler(
     public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var matchedUsers = await userRepository.FindAsync(u => u.Username == request.Username, cancellationToken);
-        var user = matchedUsers[0];
+        var user = matchedUsers.FirstOrDefault();
 
         if (user is null || !user.IsActive)
             throw new UnauthorizedException("Invalid username or password.");

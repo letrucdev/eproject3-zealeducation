@@ -16,9 +16,11 @@ import { ApplyFineDialog, ApplyFineSubmit } from './components/apply-fine-dialog
 import { CandidateFilterBar, CandidateFilterValue } from './components/candidate-filter-bar';
 import { CandidateTable } from './components/candidate-table';
 import { CandidateUpdateDialog, CandidateUpdateSubmit } from './components/candidate-update-dialog';
+import { RegistrationsTrendChart } from './components/registrations-trend-chart';
 import { ResetPasswordResultDialog } from './components/reset-password-result-dialog';
 import { CandidateListItem } from './models/candidate-list-item';
 import { CandidateListQuery } from './models/candidate-payload';
+import { RegistrationsTrendRange } from './models/candidate-registration-trend';
 import { DataTableSortChange } from '@shared/components/data-table';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
@@ -31,6 +33,7 @@ import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog'
     CandidateUpdateDialog,
     ApplyFineDialog,
     ConfirmDialog,
+    RegistrationsTrendChart,
     ResetPasswordResultDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +47,9 @@ export default class CandidatesManagementPage {
   protected readonly fineDialog = viewChild.required<ApplyFineDialog>('fineDialog');
   protected readonly resetConfirm = viewChild.required<ConfirmDialog>('resetConfirm');
   protected readonly resetResultDialog = viewChild.required<ResetPasswordResultDialog>('resetResultDialog');
+
+  protected readonly trendRange = signal<RegistrationsTrendRange>(90);
+  protected readonly trendQuery = this._service.registrationsTrendQuery(this.trendRange);
 
   protected readonly page = signal(1);
   protected readonly pageSize = signal(10);
@@ -108,6 +114,10 @@ export default class CandidatesManagementPage {
     this.courseFilter.set(value.course?.courseId ?? null);
     this.batchFilter.set(value.batch?.batchId ?? null);
     this.page.set(1);
+  }
+
+  onTrendRangeChanged(range: RegistrationsTrendRange): void {
+    this.trendRange.set(range);
   }
 
   onPageChanged(page: number): void {

@@ -31,7 +31,7 @@ public class ExamResultController(ISender sender) : ControllerBase
     [Authorize(Roles = InchargeOrFaculty)]
     public async Task<ActionResult<ApiResponse<object>>> Update(Guid id, [FromBody] UpdateExamResultRequest body)
     {
-        await sender.Send(new UpdateExamResultCommand(id, body.Score, body.Grade));
+        await sender.Send(new UpdateExamResultCommand(id, body.Score, body.IsFinalized));
         return Ok(ApiResponse<object>.Success(null, "Exam result updated successfully"));
     }
 
@@ -39,7 +39,7 @@ public class ExamResultController(ISender sender) : ControllerBase
     [Authorize(Roles = InchargeOnly)]
     public async Task<ActionResult<ApiResponse<object>>> Override(Guid id, [FromBody] OverrideExamResultRequest body)
     {
-        await sender.Send(new OverrideExamResultCommand(id, body.Score, body.Grade, body.OverrideReason));
+        await sender.Send(new OverrideExamResultCommand(id, body.Score, body.OverrideReason));
         return Ok(ApiResponse<object>.Success(null, "Exam result overridden successfully"));
     }
 
@@ -51,6 +51,6 @@ public class ExamResultController(ISender sender) : ControllerBase
         return Ok(ApiResponse<object>.Success(null, "Exam result deleted successfully"));
     }
 
-    public record UpdateExamResultRequest(decimal Score, string? Grade);
-    public record OverrideExamResultRequest(decimal Score, string? Grade, string OverrideReason);
+    public record UpdateExamResultRequest(decimal Score, bool IsFinalized);
+    public record OverrideExamResultRequest(decimal Score, string OverrideReason);
 }

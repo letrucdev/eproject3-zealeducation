@@ -1,0 +1,111 @@
+<app-data-table
+  [columns]="columns"
+  [page]="page()"
+  [isLoading]="isLoading()"
+  [pageSize]="pageSize()"
+  [sortBy]="sortBy()"
+  [sortDirection]="sortDirection()"
+  [trackBy]="trackById"
+  itemLabel="feedback"
+  emptyMessage="No feedback found."
+  (pageChanged)="pageChanged.emit($event)"
+  (pageSizeChanged)="pageSizeChanged.emit($event)"
+  (sortChanged)="sortChanged.emit($event)"
+>
+  <ng-template feedbackCell="createdAt" let-row>
+    <span class="text-sm">{{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+  </ng-template>
+
+  <ng-template feedbackCell="candidate" let-row>
+    <div class="flex flex-col">
+      <span class="font-medium">{{ row.candidateName }}</span>
+      <span class="text-muted-foreground text-xs">{{ row.candidateCode }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template feedbackCell="batch" let-row>
+    <div class="flex flex-col">
+      <span class="font-mono text-sm">{{ row.batchCode }}</span>
+      <span class="text-muted-foreground text-xs">{{ row.courseName }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template feedbackCell="type" let-row>
+    <span hlmBadge [class]="typeBadgeClass(row.type)">{{ row.type }}</span>
+  </ng-template>
+
+  <ng-template feedbackCell="target" let-row>
+    @if (row.type === 'Faculty' && row.targetFacultyName) {
+      <span class="text-sm">{{ row.targetFacultyName }}</span>
+    } @else {
+      <span class="text-muted-foreground">—</span>
+    }
+  </ng-template>
+
+  <ng-template feedbackCell="rating" let-row>
+    <span class="inline-flex items-center gap-1 font-medium">
+      <ng-icon hlm name="lucideStar" size="sm" class="text-amber-500" />
+      {{ row.rating }}/5
+    </span>
+  </ng-template>
+
+  <ng-template feedbackCell="comment" let-row>
+    @if (row.comment) {
+      <span class="block max-w-md truncate text-sm" [title]="row.comment">{{ row.comment }}</span>
+    } @else {
+      <span class="text-muted-foreground italic text-sm">No comment</span>
+    }
+  </ng-template>
+
+  <ng-template feedbackCell="isProcessed" let-row>
+    @if (row.isProcessed) {
+      <span
+        hlmBadge
+        class="bg-emerald-100 text-emerald-800"
+        [title]="
+          'Processed by ' +
+          (row.processedByName || 'unknown') +
+          ' at ' +
+          (row.processedAt | date: 'short')
+        "
+        >Processed</span
+      >
+    } @else {
+      <span hlmBadge class="bg-amber-100 text-amber-800">Pending</span>
+    }
+  </ng-template>
+
+  <ng-template feedbackCell="actions" let-row>
+    <div class="flex items-center justify-end gap-1">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="viewClicked.emit(row)"
+        [attr.aria-label]="'View feedback from ' + row.candidateName"
+      >
+        <ng-icon hlm name="lucideEye" size="sm" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        type="button"
+        (click)="toggleProcessedClicked.emit(row)"
+        [attr.aria-label]="
+          row.isProcessed
+            ? 'Mark feedback from ' + row.candidateName + ' as unprocessed'
+            : 'Mark feedback from ' + row.candidateName + ' as processed'
+        "
+        [title]="row.isProcessed ? 'Mark as unprocessed' : 'Mark as processed'"
+      >
+        @if (row.isProcessed) {
+          <ng-icon hlm name="lucideUndo2" size="sm" />
+        } @else {
+          <ng-icon hlm name="lucideCheckCheck" size="sm" class="text-emerald-700" />
+        }
+      </button>
+    </div>
+  </ng-template>
+</app-data-table>

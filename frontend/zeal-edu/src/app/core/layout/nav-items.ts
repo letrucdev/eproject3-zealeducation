@@ -79,6 +79,18 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideFolderOpen',
         roles: [UserRole.Incharge],
       },
+      {
+        label: 'Feedback',
+        route: '/app/incharge/feedback',
+        icon: 'lucideMessageSquare',
+        roles: [UserRole.Incharge],
+      },
+      {
+        label: 'Certificates',
+        route: '/app/incharge/certificates',
+        icon: 'lucideAward',
+        roles: [UserRole.Incharge],
+      },
     ],
   },
   {
@@ -125,6 +137,12 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         label: 'My Batches',
         route: '/app/candidate/batches',
         icon: 'lucideGraduationCap',
+        roles: [UserRole.Candidate],
+      },
+      {
+        label: 'My Certificates',
+        route: '/app/candidate/certificates',
+        icon: 'lucideAward',
         roles: [UserRole.Candidate],
       },
       {

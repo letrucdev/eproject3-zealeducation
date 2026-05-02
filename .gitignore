@@ -2,3 +2,4 @@
 skills-lock.json
 environment.ts
 .agents
+.env

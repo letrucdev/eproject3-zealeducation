@@ -15,6 +15,8 @@ using ZealEducation.Infrastructure.Data.Interceptors;
 using ZealEducation.Infrastructure.Pdf;
 using ZealEducation.Infrastructure.Repositories;
 using ZealEducation.Infrastructure.Services;
+using ZealEducation.Infrastructure.Services.Email;
+using ZealEducation.Infrastructure.Services.Scheduling;
 using ZealEducation.Infrastructure.Storage;
 
 namespace ZealEducation.Infrastructure;
@@ -42,9 +44,16 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUser, CurrentUserService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddSingleton<IReceiptPdfGenerator, QuestPdfReceiptGenerator>();
+        services.AddSingleton<ICertificatePdfGenerator, QuestPdfCertificateGenerator>();
 
         services.AddR2StorageServices(configuration);
         services.AddAuthenticationServices(configuration);
+
+        services.AddScoped<IEnquiryConvertedNotificationService, EnquiryConvertedNotificationService>();
+        services.AddScoped<ICandidatePasswordResetNotificationService, CandidatePasswordResetNotificationService>();
+        services.AddScoped<IInstallmentReminderNotificationService, InstallmentReminderNotificationService>();
+
+        services.AddScoped<SendInstallmentRemindersInvocable>();
 
         return services;
     }

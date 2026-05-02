@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ZealEducation.Application.Common.Exceptions;
+using ZealEducation.Application.Common.Helpers;
 using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Domain.Entities;
-using ZealEducation.Domain.Enums;
 using ZealEducation.Domain.Interfaces;
 
 namespace ZealEducation.Application.Features.ExamResults.Commands.OverrideExamResult;
@@ -35,8 +35,9 @@ public class OverrideExamResultCommandHandler(
 
 
         result.Score = request.Score;
-        result.Grade = string.IsNullOrWhiteSpace(request.Grade) ? null : request.Grade.Trim();
+        result.Grade = ExamGradeCalculator.Calculate(request.Score, examination.MaxScore, examination.PassScore);
         result.IsPassed = request.Score >= examination.PassScore;
+        result.IsFinalized = true;
         result.IsOverridden = true;
         result.OverrideById = staff.Id;
         result.OverrideReason = request.OverrideReason.Trim();

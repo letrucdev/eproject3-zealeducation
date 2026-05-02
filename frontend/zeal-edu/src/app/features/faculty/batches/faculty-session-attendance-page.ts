@@ -23,7 +23,7 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { AttendanceStatus, MarkAttendanceEntry } from '@core/models/attendance';
 import { ClassSessionStatus } from '@core/models/class-session';
-import { ATTENDANCE_STATUS_LABELS } from '@features/incharge/batches/components/session-labels';
+import { ATTENDANCE_STATUS_LABELS } from '@core/models/session-labels';
 import { FacultyService } from '../faculty.service';
 
 interface AttendanceFormRow {

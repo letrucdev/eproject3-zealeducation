@@ -8,8 +8,8 @@ import { PaginatedList } from '@core/models/paginated-list';
 import {
   MaterialCardAction,
   MaterialCardItem,
-} from '@features/incharge/materials/components/material-card-item';
-import { StudyMaterialListItem } from '@features/incharge/materials/models/material-payload';
+} from '@shared/components/material-card-item/material-card-item';
+import { StudyMaterialListItem } from '@core/models/study-material';
 
 @Component({
   selector: 'app-candidate-batch-materials-card',
@@ -93,7 +93,7 @@ export class CandidateBatchMaterialsCard {
 
   protected onCardAction(event: MaterialCardAction): void {
     if (event.kind === 'download') {
-      this.downloadClicked.emit(event.material);
+      this.downloadClicked.emit(event.material as StudyMaterialListItem);
     }
   }
 

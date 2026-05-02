@@ -3,11 +3,11 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { injectMutation, QueryClient } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { LoginRequest } from '@features/auth/models/login-request';
-import { LoginResponse } from '@features/auth/models/login-response';
 import { ApiResponse } from '@core/http/api-response';
 import { AuthToken } from './auth-token';
 import { CurrentUser } from './current-user';
+import { LoginRequest } from './login-request';
+import { LoginResponse } from './login-response';
 import { toast } from '@spartan-ng/brain/sonner';
 
 @Injectable({ providedIn: 'root' })

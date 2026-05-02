@@ -1,9 +1,9 @@
 import { HttpEventType, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs';
-import { LoginResponse } from '@features/auth/models/login-response';
 import { AuthToken } from '@core/auth/auth-token';
 import { CurrentUser } from '@core/auth/current-user';
+import { LoginResponse } from '@core/auth/login-response';
 import { ApiResponse } from './api-response';
 
 export const authPersistenceInterceptor: HttpInterceptorFn = (req, next) => {

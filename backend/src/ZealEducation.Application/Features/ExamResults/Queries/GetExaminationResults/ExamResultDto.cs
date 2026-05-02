@@ -10,6 +10,7 @@ public class ExamResultDto
     public decimal Score { get; set; }
     public string? Grade { get; set; }
     public bool IsPassed { get; set; }
+    public bool IsFinalized { get; set; }
     public Guid GradedById { get; set; }
     public string GradedByName { get; set; } = default!;
     public bool IsOverridden { get; set; }

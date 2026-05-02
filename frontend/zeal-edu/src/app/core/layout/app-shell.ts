@@ -2,11 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { toSignal } from '@angular/core/rxjs-interop';
 import { provideIcons } from '@ng-icons/core';
 import {
+  lucideAward,
   lucideBookOpen,
   lucideCalendarDays,
   lucideClipboardCheck,
   lucideFolderOpen,
   lucideGraduationCap,
+  lucideMessageSquare,
   lucidePanelLeft,
   lucideScrollText,
   lucideUser,
@@ -26,6 +28,7 @@ import { CurrentUser } from '@core/auth/current-user';
 import { buildBreadcrumbs } from './breadcrumbs';
 import { navMenusForRole, ROLE_LABELS } from './nav-items';
 import { SidebarUserCard } from './sidebar-user-card';
+import { ThemeToggle } from './theme-toggle';
 import { environment } from '@/environments/environment';
 
 @Component({
@@ -39,6 +42,7 @@ import { environment } from '@/environments/environment';
     HlmIconImports,
     HlmBreadcrumbImports,
     SidebarUserCard,
+    ThemeToggle,
   ],
   providers: [
     provideIcons({
@@ -55,6 +59,8 @@ import { environment } from '@/environments/environment';
       lucideFolderOpen,
       lucideCalendarDays,
       lucideClipboardCheck,
+      lucideMessageSquare,
+      lucideAward,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

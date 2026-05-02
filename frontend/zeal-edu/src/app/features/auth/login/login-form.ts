@@ -84,7 +84,7 @@ import { resolveMessage } from '@core/http/error-interceptor';
             <img
               src="/signinbg.jpg"
               alt="Login background image"
-              class="absolute inset-0 size-full object-cover dark:brightness-[0.2] dark:grayscale"
+              class="absolute inset-0 size-full object-cover"
             />
           </div>
         </div>

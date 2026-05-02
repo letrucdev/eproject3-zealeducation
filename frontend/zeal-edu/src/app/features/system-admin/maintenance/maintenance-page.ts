@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { MaintenanceService } from './maintenance.service';
 import { SystemAssetListItem } from '../../../core/models/system-asset-list-item';
 import { AssetConditionStatus } from '../../../core/models/asset-condition-status';
@@ -26,6 +27,7 @@ import AssetDeleteDialog from './components/asset-delete-dialog';
 @Component({
   selector: 'app-maintenance-page',
   imports: [
+    HlmCardImports,
     AssetStatsCards,
     AssetFilterBar,
     AssetTable,
