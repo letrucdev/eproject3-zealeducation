@@ -25,6 +25,20 @@
       (deleteClicked)="onDeleteBatch()"
     />
 
+    <div class="grid gap-6 xl:grid-cols-2">
+      <app-batch-exam-scores-trend-chart
+        [data]="examScoresTrendQuery.data()"
+        [isLoading]="examScoresTrendQuery.isPending()"
+        [range]="examScoresTrendRange()"
+        (rangeChanged)="onExamScoresTrendRangeChanged($event)"
+      />
+
+      <app-batch-grade-distribution-chart
+        [data]="gradeDistributionQuery.data()"
+        [isLoading]="gradeDistributionQuery.isPending()"
+      />
+    </div>
+
     <app-batch-examinations-card
       [page]="examinationsQuery.data()"
       [isLoading]="examinationsQuery.isPending()"

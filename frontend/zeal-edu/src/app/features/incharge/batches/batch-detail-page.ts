@@ -30,8 +30,10 @@ import {
   BatchAssignFacultySubmit,
 } from './components/batch-assign-faculty-dialog';
 import { BatchEnrollmentsCard } from './components/batch-enrollments-card';
+import { BatchExamScoresTrendChart } from './components/batch-exam-scores-trend-chart';
 import { BatchExaminationsCard } from './components/batch-examinations-card';
 import { BatchFormDialog, BatchFormSubmit } from './components/batch-form-dialog';
+import { BatchGradeDistributionChart } from './components/batch-grade-distribution-chart';
 import { BatchInfoCard } from './components/batch-info-card';
 import { BatchSessionsCard } from './components/batch-sessions-card';
 import {
@@ -53,6 +55,7 @@ import {
   BatchExaminationsQuery,
   BatchSessionsQuery,
 } from './models/batch-payload';
+import { BatchExamScoresTrendRange } from './models/batch-exam-scores-trend';
 import { ExamResultsQuery } from '@core/models/exam-result';
 import { DataTableSortChange } from '@shared/components/data-table';
 
@@ -67,6 +70,8 @@ import { DataTableSortChange } from '@shared/components/data-table';
     BatchEnrollmentsCard,
     BatchSessionsCard,
     BatchExaminationsCard,
+    BatchExamScoresTrendChart,
+    BatchGradeDistributionChart,
     BatchFormDialog,
     AssignCandidatesDialog,
     BatchAssignFacultyDialog,
@@ -124,6 +129,8 @@ export default class BatchDetailPage {
   protected readonly examinationsSortBy = signal<string | null>('examDate');
   protected readonly examinationsSortDirection = signal<'asc' | 'desc'>('desc');
 
+  protected readonly examScoresTrendRange = signal<BatchExamScoresTrendRange>(90);
+
   protected readonly activeExamination = signal<Examination | null>(null);
   protected readonly examResultsPage = signal(1);
   protected readonly examResultsPageSize = signal(10);
@@ -180,6 +187,13 @@ export default class BatchDetailPage {
   protected readonly examinationsQuery = this._service.examinationsQuery(
     this.currentBatchId,
     this._examinationsParams,
+  );
+  protected readonly examScoresTrendQuery = this._service.examScoresTrendQuery(
+    this.currentBatchId,
+    this.examScoresTrendRange,
+  );
+  protected readonly gradeDistributionQuery = this._service.gradeDistributionQuery(
+    this.currentBatchId,
   );
   protected readonly examResultsQuery = this._service.examResultsQuery(
     this._activeExaminationId,
@@ -549,5 +563,9 @@ export default class BatchDetailPage {
     this.examResultsSortBy.set(change.sortBy);
     this.examResultsSortDirection.set(change.sortDirection);
     this.examResultsPage.set(1);
+  }
+
+  protected onExamScoresTrendRangeChanged(range: BatchExamScoresTrendRange): void {
+    this.examScoresTrendRange.set(range);
   }
 }
