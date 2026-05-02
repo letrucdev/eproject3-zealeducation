@@ -49,9 +49,15 @@ export class BatchExamScoresTrendChart {
 
   protected readonly subtitle = computed(() => SUBTITLES[this.range()]);
 
-  protected readonly chartData = computed(() => this.data() ?? []);
+  protected readonly chartData = computed(() => {
+    const points = this.data() ?? [];
+    if (points.length === 1) {
+      return [points[0], points[0]];
+    }
+    return points;
+  });
 
-  protected readonly hasData = computed(() => this.chartData().length > 0);
+  protected readonly hasData = computed(() => (this.data() ?? []).length > 0);
 
   protected readonly categories = computed(() => ({
     averageScore: { name: 'Average', color: 'var(--chart-1)' },
