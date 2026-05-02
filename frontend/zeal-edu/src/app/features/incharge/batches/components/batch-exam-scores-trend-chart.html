@@ -1,4 +1,4 @@
-<section hlmCard>
+<section hlmCard class="h-full">
   <div hlmCardHeader class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
     <div>
       <h2 hlmCardTitle>Exam Scores</h2>
@@ -41,7 +41,9 @@
         />
       </div>
     } @else {
-      <div class="text-muted-foreground flex h-72 w-full items-center justify-center text-sm">
+      <div
+        class="text-muted-foreground flex min-h-72 h-full w-full items-center justify-center text-sm"
+      >
         No exam scores recorded in this period.
       </div>
     }

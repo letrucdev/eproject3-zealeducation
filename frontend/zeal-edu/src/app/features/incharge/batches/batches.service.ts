@@ -14,11 +14,7 @@ import {
   UpdateClassSessionPayload,
 } from '@core/models/class-session';
 import { MarkAttendancePayload, SessionAttendance } from '@core/models/attendance';
-import {
-  ExamResult,
-  ExamResultsQuery,
-  OverrideExamResultPayload,
-} from '@core/models/exam-result';
+import { ExamResult, ExamResultsQuery, OverrideExamResultPayload } from '@core/models/exam-result';
 import {
   CreateExaminationPayload,
   Examination,
@@ -38,10 +34,7 @@ import {
   CreateBulkSessionsResponse,
   UpdateBatchPayload,
 } from './models/batch-payload';
-import {
-  BatchCreationTrendPoint,
-  BatchCreationTrendRange,
-} from './models/batch-creation-trend';
+import { BatchCreationTrendPoint, BatchCreationTrendRange } from './models/batch-creation-trend';
 import {
   BatchExamScoresTrendPoint,
   BatchExamScoresTrendRange,
@@ -147,10 +140,7 @@ export class BatchesService {
     }));
   }
 
-  examScoresTrendQuery(
-    batchId: Signal<string | null>,
-    days: Signal<BatchExamScoresTrendRange>,
-  ) {
+  examScoresTrendQuery(batchId: Signal<string | null>, days: Signal<BatchExamScoresTrendRange>) {
     return injectQuery<BatchExamScoresTrendPoint[], HttpErrorResponse>(() => ({
       enabled: batchId() !== null,
       queryKey: [...BATCH_EXAM_SCORES_TREND_QUERY_KEY, batchId(), days()],
@@ -534,13 +524,9 @@ export class BatchesService {
 
   private async _fetchGradeDistribution(batchId: string): Promise<BatchGradeDistribution> {
     const response = await firstValueFrom(
-      this._http.get<ApiResponse<BatchGradeDistribution>>(
-        `/batches/${batchId}/grade-distribution`,
-      ),
+      this._http.get<ApiResponse<BatchGradeDistribution>>(`/batches/${batchId}/grade-distribution`),
     );
-    return (
-      response.data ?? { a: 0, b: 0, c: 0, d: 0, f: 0, ungraded: 0, total: 0 }
-    );
+    return response.data ?? { a: 0, b: 0, c: 0, d: 0, f: 0, ungraded: 0, total: 0 };
   }
 
   private async _fetchExaminations(
@@ -557,10 +543,9 @@ export class BatchesService {
     if (query.sortDirection) params = params.set('sortDirection', query.sortDirection);
 
     const response = await firstValueFrom(
-      this._http.get<ApiResponse<PaginatedList<Examination>>>(
-        `/batches/${batchId}/examinations`,
-        { params },
-      ),
+      this._http.get<ApiResponse<PaginatedList<Examination>>>(`/batches/${batchId}/examinations`, {
+        params,
+      }),
     );
     return response.data ?? emptyPaginated<Examination>(query);
   }

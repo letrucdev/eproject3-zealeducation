@@ -85,8 +85,8 @@
   --muted: oklch(0.28 0.035 245);
   --muted-foreground: oklch(0.72 0.025 240);
 
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.32 0.05 245);
+  --accent-foreground: oklch(0.96 0.01 240);
 
   --destructive: oklch(0.7 0.19 22);
 
@@ -108,6 +108,14 @@
   --chart-3: oklch(0.78 0.12 145);
   --chart-4: oklch(0.78 0.15 60);
   --chart-5: oklch(0.72 0.16 320);
+
+  /* Chart tooltip overrides for unovis / angular-chrts */
+  --vis-tooltip-background-color: var(--popover);
+  --vis-tooltip-text-color: var(--popover-foreground);
+  --vis-tooltip-border-color: var(--border);
+  --vis-tooltip-shadow-color: rgba(0, 0, 0, 0.5);
+  --vis-tooltip-title-color: var(--popover-foreground);
+  --vis-tooltip-title-border-bottom: 1px solid var(--border);
 }
 
 @layer base {
