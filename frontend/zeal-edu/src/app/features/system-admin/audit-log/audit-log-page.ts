@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { AuditLogListItem } from '@core/models/audit-log-list-item';
 import { AuditLogService } from './audit-log.service';
 import { AuditLogDetailDialog } from './components/audit-log-detail-dialog';
@@ -23,7 +24,7 @@ import { DataTableSortChange } from '@shared/components/data-table';
 
 @Component({
   selector: 'app-audit-log-page',
-  imports: [AuditLogFilterBar, AuditLogTable, AuditLogDetailDialog],
+  imports: [HlmCardImports, AuditLogFilterBar, AuditLogTable, AuditLogDetailDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="flex flex-col gap-6">
@@ -35,22 +36,27 @@ import { DataTableSortChange } from '@shared/components/data-table';
         </p>
       </header>
 
-      <app-audit-log-filter-bar
-        [initial]="initialFilter"
-        (filterChanged)="onFilterChanged($event)"
-      />
-
-      <app-audit-log-table
-        [page]="listQuery.data()"
-        [isLoading]="listQuery.isPending()"
-        [pageSize]="pageSize()"
-        [sortBy]="sortBy()"
-        [sortDirection]="sortDirection()"
-        (viewClicked)="onViewClicked($event)"
-        (pageChanged)="onPageChanged($event)"
-        (pageSizeChanged)="onPageSizeChanged($event)"
-        (sortChanged)="onSortChanged($event)"
-      />
+      <section hlmCard>
+        <div hlmCardHeader>
+          <app-audit-log-filter-bar
+            [initial]="initialFilter"
+            (filterChanged)="onFilterChanged($event)"
+          />
+        </div>
+        <div hlmCardContent>
+          <app-audit-log-table
+            [page]="listQuery.data()"
+            [isLoading]="listQuery.isPending()"
+            [pageSize]="pageSize()"
+            [sortBy]="sortBy()"
+            [sortDirection]="sortDirection()"
+            (viewClicked)="onViewClicked($event)"
+            (pageChanged)="onPageChanged($event)"
+            (pageSizeChanged)="onPageSizeChanged($event)"
+            (sortChanged)="onSortChanged($event)"
+          />
+        </div>
+      </section>
 
       <app-audit-log-detail-dialog
         #detailDialog

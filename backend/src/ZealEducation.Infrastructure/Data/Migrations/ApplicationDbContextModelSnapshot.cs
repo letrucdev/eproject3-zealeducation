@@ -1013,6 +1013,53 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.ToTable("installment_plan", (string)null);
                 });
 
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentReminderLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DaysOffset")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("InstallmentPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RecipientEmail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ReminderType")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<DateOnly>("SentForDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SentForDate");
+
+                    b.HasIndex("InstallmentPlanId", "SentForDate", "ReminderType")
+                        .IsUnique();
+
+                    b.ToTable("installment_reminder_log", (string)null);
+                });
+
             modelBuilder.Entity("ZealEducation.Domain.Entities.MaterialDownloadLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1719,6 +1766,17 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("FeeStructure");
+                });
+
+            modelBuilder.Entity("ZealEducation.Domain.Entities.InstallmentReminderLog", b =>
+                {
+                    b.HasOne("ZealEducation.Domain.Entities.InstallmentPlan", "InstallmentPlan")
+                        .WithMany()
+                        .HasForeignKey("InstallmentPlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InstallmentPlan");
                 });
 
             modelBuilder.Entity("ZealEducation.Domain.Entities.MaterialDownloadLog", b =>

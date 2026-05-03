@@ -28,6 +28,7 @@ import { CurrentUser } from '@core/auth/current-user';
 import { buildBreadcrumbs } from './breadcrumbs';
 import { navMenusForRole, ROLE_LABELS } from './nav-items';
 import { SidebarUserCard } from './sidebar-user-card';
+import { ThemeToggle } from './theme-toggle';
 import { environment } from '@/environments/environment';
 
 @Component({
@@ -41,6 +42,7 @@ import { environment } from '@/environments/environment';
     HlmIconImports,
     HlmBreadcrumbImports,
     SidebarUserCard,
+    ThemeToggle,
   ],
   providers: [
     provideIcons({

@@ -10,25 +10,30 @@
 
   <app-enquiry-stats-cards [stats]="statsQuery.data()" [isLoading]="statsQuery.isPending()" />
 
-  <app-enquiry-filter-bar
-    [initial]="initialFilter"
-    (filterChanged)="onFilterChanged($event)"
-    (createClicked)="onCreateClicked()"
-  />
-
-  <app-enquiry-table
-    [page]="listQuery.data()"
-    [isLoading]="listQuery.isPending()"
-    [pageSize]="pageSize()"
-    [sortBy]="sortBy()"
-    [sortDirection]="sortDirection()"
-    (viewClicked)="onViewClicked($event)"
-    (editClicked)="onEditClicked($event)"
-    (convertClicked)="onConvertClicked($event)"
-    (pageChanged)="onPageChanged($event)"
-    (pageSizeChanged)="onPageSizeChanged($event)"
-    (sortChanged)="onSortChanged($event)"
-  />
+  <section hlmCard>
+    <div hlmCardHeader>
+      <app-enquiry-filter-bar
+        [initial]="initialFilter"
+        (filterChanged)="onFilterChanged($event)"
+        (createClicked)="onCreateClicked()"
+      />
+    </div>
+    <div hlmCardContent>
+      <app-enquiry-table
+        [page]="listQuery.data()"
+        [isLoading]="listQuery.isPending()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        (viewClicked)="onViewClicked($event)"
+        (editClicked)="onEditClicked($event)"
+        (convertClicked)="onConvertClicked($event)"
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      />
+    </div>
+  </section>
 
   <app-enquiry-form-dialog
     #formDialog

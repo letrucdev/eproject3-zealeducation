@@ -1,0 +1,54 @@
+<section hlmCard>
+  <div hlmCardHeader>
+    <h2 hlmCardTitle>Grade Distribution</h2>
+    <p hlmCardDescription>Percentage of grades from A to F</p>
+  </div>
+  <div hlmCardContent class="min-w-0">
+    @if (isLoading()) {
+      <hlm-skeleton class="h-72 w-full" />
+    } @else if (hasData()) {
+      <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center">
+        <div class="w-full min-w-0 overflow-hidden">
+          <ngx-donut-chart
+            [data]="chartValues()"
+            [categories]="categories()"
+            [type]="donutType"
+            [height]="288"
+            [arcWidth]="40"
+            [legendPosition]="legendPosition"
+            [tooltipTitleFormatter]="tooltipTitleFormatter"
+          >
+            <div class="flex flex-col items-center">
+              <span class="text-2xl font-semibold">{{ total() }}</span>
+              <span class="text-muted-foreground text-xs">Total Results</span>
+            </div>
+          </ngx-donut-chart>
+        </div>
+
+        <ul class="flex flex-col gap-2 text-sm">
+          @for (row of rows(); track row.key) {
+            <li class="flex items-center gap-3">
+              <span class="flex items-center gap-2">
+                <span
+                  class="inline-block h-3 w-3 rounded-full"
+                  [style.background-color]="row.color"
+                  aria-hidden="true"
+                ></span>
+                <span>Grade {{ row.label }}</span>
+              </span>
+              <span class="text-muted-foreground tabular-nums">
+                {{ row.count }} ({{ row.percent | number: '1.1-1' }}%)
+              </span>
+            </li>
+          }
+        </ul>
+      </div>
+    } @else {
+      <div
+        class="text-muted-foreground flex min-h-72 h-full w-full items-center justify-center text-sm"
+      >
+        No exam results available yet.
+      </div>
+    }
+  </div>
+</section>

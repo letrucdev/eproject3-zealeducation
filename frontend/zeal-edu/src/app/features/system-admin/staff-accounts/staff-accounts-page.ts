@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from '@spartan-ng/brain/sonner';
+import { HlmCardImports } from '@spartan-ng/helm/card';
 import { StaffListItem } from '@core/models/staff-list-item';
 import { UserRole } from '@core/models/user-role';
 import {
@@ -29,6 +30,7 @@ import { DataTableSortChange } from '@shared/components/data-table';
 @Component({
   selector: 'app-staff-accounts-page',
   imports: [
+    HlmCardImports,
     StaffStatsCards,
     StaffFilterBar,
     StaffTable,
@@ -53,23 +55,28 @@ import { DataTableSortChange } from '@shared/components/data-table';
         [isLoading]="statsQuery.isPending()"
       />
 
-      <app-staff-filter-bar
-        [initial]="initialFilter"
-        (filterChanged)="onFilterChanged($event)"
-        (createClicked)="onCreateClicked()"
-      />
-
-      <app-staff-table
-        [page]="listQuery.data()"
-        [isLoading]="listQuery.isPending()"
-        [pageSize]="pageSize()"
-        [sortBy]="sortBy()"
-        [sortDirection]="sortDirection()"
-        (editClicked)="onEditClicked($event)"
-        (pageChanged)="onPageChanged($event)"
-        (pageSizeChanged)="onPageSizeChanged($event)"
-        (sortChanged)="onSortChanged($event)"
-      />
+      <section hlmCard>
+        <div hlmCardHeader>
+          <app-staff-filter-bar
+            [initial]="initialFilter"
+            (filterChanged)="onFilterChanged($event)"
+            (createClicked)="onCreateClicked()"
+          />
+        </div>
+        <div hlmCardContent>
+          <app-staff-table
+            [page]="listQuery.data()"
+            [isLoading]="listQuery.isPending()"
+            [pageSize]="pageSize()"
+            [sortBy]="sortBy()"
+            [sortDirection]="sortDirection()"
+            (editClicked)="onEditClicked($event)"
+            (pageChanged)="onPageChanged($event)"
+            (pageSizeChanged)="onPageSizeChanged($event)"
+            (sortChanged)="onSortChanged($event)"
+          />
+        </div>
+      </section>
 
       <app-staff-form-dialog
         #formDialog

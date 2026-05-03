@@ -18,9 +18,14 @@ import {
   ResetCandidatePasswordResponse,
   UpdateCandidatePayload,
 } from './models/candidate-payload';
+import {
+  CandidateRegistrationTrendPoint,
+  RegistrationsTrendRange,
+} from './models/candidate-registration-trend';
 
 export const CANDIDATE_QUERY_KEY = ['candidates'] as const;
 export const CANDIDATE_DETAIL_QUERY_KEY = ['candidate-detail'] as const;
+export const CANDIDATE_TREND_QUERY_KEY = ['candidate-registrations-trend'] as const;
 
 @Injectable({ providedIn: 'root' })
 export class CandidatesService {
@@ -33,6 +38,14 @@ export class CandidatesService {
       queryFn: () => this._fetchList(params()),
       staleTime: 30_000,
       placeholderData: keepPreviousData,
+    }));
+  }
+
+  registrationsTrendQuery(days: Signal<RegistrationsTrendRange>) {
+    return injectQuery(() => ({
+      queryKey: [...CANDIDATE_TREND_QUERY_KEY, days()],
+      queryFn: () => this._fetchTrend(days()),
+      staleTime: 60_000,
     }));
   }
 
@@ -122,6 +135,19 @@ export class CandidatesService {
         hasNextPage: false,
       }
     );
+  }
+
+  private async _fetchTrend(
+    days: RegistrationsTrendRange,
+  ): Promise<CandidateRegistrationTrendPoint[]> {
+    const params = new HttpParams().set('days', String(days));
+    const response = await firstValueFrom(
+      this._http.get<ApiResponse<CandidateRegistrationTrendPoint[]>>(
+        '/incharge/candidates/registrations-trend',
+        { params },
+      ),
+    );
+    return response.data ?? [];
   }
 
   private async _fetchDetail(candidateId: string): Promise<CandidateDetail> {

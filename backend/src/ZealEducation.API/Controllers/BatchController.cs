@@ -10,6 +10,7 @@ using ZealEducation.Application.Features.Batches.Commands.DeleteBatch;
 using ZealEducation.Application.Features.Batches.Commands.UpdateBatch;
 using ZealEducation.Application.Features.Batches.Queries.GetAssignableCandidates;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchById;
+using ZealEducation.Application.Features.Batches.Queries.GetBatchCreationTrend;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchEnrollments;
 using ZealEducation.Application.Features.Batches.Queries.GetBatches;
 using ZealEducation.Application.Features.Batches.Queries.GetBatchStatistics;
@@ -18,6 +19,8 @@ using ZealEducation.Application.Features.ClassSessions.Commands.CreateClassSessi
 using ZealEducation.Application.Features.ClassSessions.Queries.GetBatchSessions;
 using ZealEducation.Application.Features.Examinations.Commands.CreateExamination;
 using ZealEducation.Application.Features.Examinations.Queries.GetBatchExaminations;
+using ZealEducation.Application.Features.Examinations.Queries.GetBatchExamScoresTrend;
+using ZealEducation.Application.Features.Examinations.Queries.GetBatchGradeDistribution;
 using ZealEducation.Domain.Enums;
 
 namespace ZealEducation.API.Controllers;
@@ -51,6 +54,15 @@ public class BatchController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(new GetBatchStatisticsQuery());
         return Ok(ApiResponse<BatchStatisticsDto>.Success(result));
+    }
+
+    [HttpGet("creation-trend")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<List<BatchCreationTrendPointDto>>>> GetCreationTrend(
+        [FromQuery] int days = 90)
+    {
+        var result = await sender.Send(new GetBatchCreationTrendQuery(days));
+        return Ok(ApiResponse<List<BatchCreationTrendPointDto>>.Success(result));
     }
 
     [HttpGet("{id:guid}")]
@@ -246,4 +258,22 @@ public class BatchController(ISender sender) : ControllerBase
         string? Location,
         int MaxScore,
         int PassScore);
+
+    [HttpGet("{id:guid}/exam-scores-trend")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<List<BatchExamScoresTrendPointDto>>>> GetExamScoresTrend(
+        Guid id,
+        [FromQuery] int days = 90)
+    {
+        var result = await sender.Send(new GetBatchExamScoresTrendQuery(id, days));
+        return Ok(ApiResponse<List<BatchExamScoresTrendPointDto>>.Success(result));
+    }
+
+    [HttpGet("{id:guid}/grade-distribution")]
+    [Authorize(Roles = InchargeOnly)]
+    public async Task<ActionResult<ApiResponse<BatchGradeDistributionDto>>> GetGradeDistribution(Guid id)
+    {
+        var result = await sender.Send(new GetBatchGradeDistributionQuery(id));
+        return Ok(ApiResponse<BatchGradeDistributionDto>.Success(result));
+    }
 }
