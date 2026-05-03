@@ -1,0 +1,168 @@
+<section class="flex flex-col gap-6">
+  <header class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold tracking-tight">Financial Report</h1>
+      <p class="text-muted-foreground max-w-2xl text-sm">
+        Track revenue, monitor outstanding balances, and export detailed accounting reports.
+      </p>
+    </div>
+    <button
+      hlmBtn
+      type="button"
+      [disabled]="exporting()"
+      (click)="onExportExcel()"
+      aria-label="Export financial report to Excel"
+    >
+      @if (exporting()) {
+        <hlm-spinner class="mr-2 size-4" />
+      } @else {
+        <ng-icon hlm name="lucideDownload" size="sm" class="mr-2" />
+      }
+      {{ exporting() ? 'Exporting...' : 'Export Excel' }}
+    </button>
+  </header>
+
+  <app-financial-stats-cards [stats]="summary()" [isLoading]="revenueTrendQuery.isPending()" />
+
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <app-revenue-trend-chart
+      [data]="revenueTrendQuery.data()?.revenueTrend"
+      [isLoading]="revenueTrendQuery.isPending()"
+    >
+      <app-date-range-filter-bar
+        chartHeaderActions
+        [preset]="revenueTrendFilter.preset()"
+        [dateRange]="revenueTrendFilter.range()"
+        ariaLabel="Select date range for revenue trend"
+        (presetChanged)="revenueTrendFilter.onPresetChanged($event)"
+        (customRangeChanged)="revenueTrendFilter.onCustomRangeChanged($event)"
+      />
+    </app-revenue-trend-chart>
+
+    <app-payment-status-distribution-chart
+      [data]="paymentStatusQuery.data()?.paymentStatusDistribution"
+      [isLoading]="paymentStatusQuery.isPending()"
+    >
+      <app-date-range-filter-bar
+        chartHeaderActions
+        [preset]="paymentStatusFilter.preset()"
+        [dateRange]="paymentStatusFilter.range()"
+        ariaLabel="Select date range for payment status distribution"
+        (presetChanged)="paymentStatusFilter.onPresetChanged($event)"
+        (customRangeChanged)="paymentStatusFilter.onCustomRangeChanged($event)"
+      />
+    </app-payment-status-distribution-chart>
+
+    <app-revenue-by-fee-type-chart
+      [data]="revenueByFeeTypeQuery.data()?.revenueByFeeType"
+      [isLoading]="revenueByFeeTypeQuery.isPending()"
+    >
+      <app-date-range-filter-bar
+        chartHeaderActions
+        [preset]="revenueByFeeTypeFilter.preset()"
+        [dateRange]="revenueByFeeTypeFilter.range()"
+        ariaLabel="Select date range for revenue by fee type"
+        (presetChanged)="revenueByFeeTypeFilter.onPresetChanged($event)"
+        (customRangeChanged)="revenueByFeeTypeFilter.onCustomRangeChanged($event)"
+      />
+    </app-revenue-by-fee-type-chart>
+
+    <app-top-courses-revenue-chart
+      [data]="topCoursesQuery.data()?.topCoursesByRevenue"
+      [isLoading]="topCoursesQuery.isPending()"
+    >
+      <app-date-range-filter-bar
+        chartHeaderActions
+        [preset]="topCoursesFilter.preset()"
+        [dateRange]="topCoursesFilter.range()"
+        ariaLabel="Select date range for top courses by revenue"
+        (presetChanged)="topCoursesFilter.onPresetChanged($event)"
+        (customRangeChanged)="topCoursesFilter.onCustomRangeChanged($event)"
+      />
+    </app-top-courses-revenue-chart>
+  </div>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <h2 hlmCardTitle>Transactions</h2>
+      <p hlmCardDescription>Detailed list of payment transactions in the selected range</p>
+    </div>
+    <div hlmCardContent class="flex flex-col gap-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+        <app-financial-report-filter-bar
+          [search]="searchValue()"
+          [feeType]="feeTypeFilter()"
+          [method]="methodFilter()"
+          (filtersChanged)="onFiltersChanged($event)"
+        />
+
+        <app-date-range-filter-bar
+          [dateRange]="tableDateRange()"
+          [showPresets]="false"
+          ariaLabel="Select date range for transactions"
+          (customRangeChanged)="onTableCustomRangeChanged($event)"
+          (cleared)="onTableRangeCleared()"
+        />
+      </div>
+
+      <app-data-table
+        [columns]="columns"
+        [page]="transactionsQuery.data()"
+        [isLoading]="transactionsQuery.isPending()"
+        [pageSize]="pageSize()"
+        [sortBy]="sortBy()"
+        [sortDirection]="sortDirection()"
+        [trackBy]="trackById"
+        itemLabel="transactions"
+        emptyMessage="No transactions found in this range."
+        (pageChanged)="onPageChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"
+        (sortChanged)="onSortChanged($event)"
+      >
+        <ng-template transactionCell="receiptNumber" let-row>
+          <span class="font-mono text-sm">{{ row.receiptNumber }}</span>
+        </ng-template>
+
+        <ng-template transactionCell="paymentDate" let-row>
+          {{ formatDate(row.paymentDate) }}
+        </ng-template>
+
+        <ng-template transactionCell="candidateCode" let-row>
+          <span class="font-mono text-sm">{{ row.candidateCode }}</span>
+        </ng-template>
+
+        <ng-template transactionCell="candidateFullName" let-row>
+          <span class="font-medium">{{ row.candidateFullName }}</span>
+        </ng-template>
+
+        <ng-template transactionCell="courseTitle" let-row>
+          @if (row.courseTitle) {
+            <span>{{ row.courseTitle }}</span>
+          } @else {
+            <span class="text-muted-foreground italic text-xs">No course</span>
+          }
+        </ng-template>
+
+        <ng-template transactionCell="feeType" let-row>
+          <span hlmBadge variant="secondary">{{ row.feeType }}</span>
+        </ng-template>
+
+        <ng-template transactionCell="paymentMethod" let-row>
+          @if (row.paymentMethod === paymentMethods.Cash) {
+            <span hlmBadge class="bg-emerald-100 text-emerald-800">Cash</span>
+          } @else {
+            <span hlmBadge class="bg-sky-100 text-sky-800">Bank Transfer</span>
+          }
+        </ng-template>
+
+        <ng-template transactionCell="amount" let-row>
+          <span class="font-medium tabular-nums">{{ row.amount | vnd }}</span>
+        </ng-template>
+
+        <ng-template transactionCell="processedByStaffName" let-row>
+          {{ row.processedByStaffName }}
+        </ng-template>
+      </app-data-table>
+    </div>
+  </section>
+</section>
