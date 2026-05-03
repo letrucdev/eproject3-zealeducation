@@ -6,6 +6,7 @@ import { UserRole } from '@core/models/user-role';
 import { hasRole } from '@core/auth/role.guard';
 
 export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'app' },
   {
     path: '',
     loadChildren: () => import('@features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
@@ -61,6 +62,5 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },
-  { path: '', pathMatch: 'full', redirectTo: '/app' },
   { path: '**', redirectTo: '/app' },
 ];
