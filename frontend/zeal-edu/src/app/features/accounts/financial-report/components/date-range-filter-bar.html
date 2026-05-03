@@ -1,0 +1,32 @@
+<div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+  @if (showPresets()) {
+    <div hlmButtonGroup role="radiogroup" [attr.aria-label]="ariaLabel()">
+      @for (option of presetOptions; track option.value) {
+        <button
+          hlmToggle
+          type="button"
+          variant="outline"
+          [state]="presetState(option.value)"
+          (stateChange)="onPresetState(option.value, $event)"
+          [attr.aria-pressed]="presetState(option.value) === 'on'"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (showPicker()) {
+    <hlm-date-range-picker
+      class="bg-transparent"
+      [date]="pickerValue()"
+      [autoCloseOnEndSelection]="true"
+      [formatDates]="formatDates"
+      captionLayout="dropdown"
+      (dateChange)="onDateChange($event)"
+      [attr.aria-label]="ariaLabel()"
+    >
+      <span>Select date range</span>
+    </hlm-date-range-picker>
+  }
+</div>

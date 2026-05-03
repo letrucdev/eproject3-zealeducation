@@ -1,6 +1,5 @@
 using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Application.Features.Examinations.Commands.UpdateExamination;
-using ZealEducation.Application.UnitTests.Handlers.Batches;
 using ZealEducation.Application.UnitTests.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;

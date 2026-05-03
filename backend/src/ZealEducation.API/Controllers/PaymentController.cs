@@ -5,9 +5,12 @@ using ZealEducation.API.Common.Models;
 using ZealEducation.Application.Common.Models;
 using ZealEducation.Application.Features.Payments.Commands.ConfirmPayment;
 using ZealEducation.Application.Features.Payments.Commands.SetPaymentType;
+using ZealEducation.Application.Features.Payments.Queries.ExportFinancialReport;
 using ZealEducation.Application.Features.Payments.Queries.GetBankTransferProof;
 using ZealEducation.Application.Features.Payments.Queries.GetFeeStructureDetail;
 using ZealEducation.Application.Features.Payments.Queries.GetFeeStructures;
+using ZealEducation.Application.Features.Payments.Queries.GetFinancialReport;
+using ZealEducation.Application.Features.Payments.Queries.GetFinancialTransactions;
 using ZealEducation.Application.Features.Payments.Queries.GetPaymentReceipt;
 using ZealEducation.Domain.Enums;
 
@@ -94,6 +97,63 @@ public class PaymentController(ISender sender) : ControllerBase
         {
             proofStream?.Dispose();
         }
+    }
+
+    [HttpGet("financial-report")]
+    [Authorize(Roles = ReadRoles)]
+    public async Task<ActionResult<ApiResponse<FinancialReportDto>>> GetFinancialReport(
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to)
+    {
+        var result = await sender.Send(new GetFinancialReportQuery(from, to));
+        return Ok(ApiResponse<FinancialReportDto>.Success(result));
+    }
+
+    [HttpGet("financial-report/transactions")]
+    [Authorize(Roles = ReadRoles)]
+    public async Task<ActionResult<ApiResponse<PaginatedList<FinancialTransactionListItemDto>>>> GetFinancialTransactions(
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to,
+        [FromQuery] string? search = null,
+        [FromQuery] FeeType? feeType = null,
+        [FromQuery] PaymentMethod? method = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
+    {
+        var result = await sender.Send(new GetFinancialTransactionsQuery(
+            from, to, search, feeType, method, page, pageSize, sortBy, sortDirection));
+        return Ok(ApiResponse<PaginatedList<FinancialTransactionListItemDto>>.Success(result));
+    }
+
+    [HttpGet("financial-report/export")]
+    [Authorize(Roles = ReadRoles)]
+    public async Task<IActionResult> ExportFinancialReport(
+        [FromQuery] DateTime trendFrom,
+        [FromQuery] DateTime trendTo,
+        [FromQuery] DateTime statusFrom,
+        [FromQuery] DateTime statusTo,
+        [FromQuery] DateTime feeTypeFrom,
+        [FromQuery] DateTime feeTypeTo,
+        [FromQuery] DateTime topCoursesFrom,
+        [FromQuery] DateTime topCoursesTo,
+        [FromQuery] DateTime txFrom,
+        [FromQuery] DateTime txTo,
+        [FromQuery] string? search = null,
+        [FromQuery] FeeType? feeType = null,
+        [FromQuery] PaymentMethod? method = null)
+    {
+        var result = await sender.Send(new ExportFinancialReportQuery(
+            new DateRangeFilter(trendFrom, trendTo),
+            new DateRangeFilter(statusFrom, statusTo),
+            new DateRangeFilter(feeTypeFrom, feeTypeTo),
+            new DateRangeFilter(topCoursesFrom, topCoursesTo),
+            new DateRangeFilter(txFrom, txTo),
+            search,
+            feeType,
+            method));
+        return File(result.Content, result.ContentType, result.FileName);
     }
 
     [HttpGet("transactions/{transactionId:guid}/receipt")]

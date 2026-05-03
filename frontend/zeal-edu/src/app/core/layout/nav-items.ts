@@ -127,6 +127,12 @@ export const NAVIGATION_MENUS: readonly NavigationMenu[] = [
         icon: 'lucideWallet',
         roles: [UserRole.AccountsStaff],
       },
+      {
+        label: 'Financial Report',
+        route: '/app/accounts/financial-report',
+        icon: 'lucideChartColumn',
+        roles: [UserRole.AccountsStaff],
+      },
     ],
   },
   {

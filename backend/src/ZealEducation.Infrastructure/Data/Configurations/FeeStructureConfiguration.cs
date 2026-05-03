@@ -21,6 +21,11 @@ public class FeeStructureConfiguration : IEntityTypeConfiguration<FeeStructure>
             .HasColumnType("decimal(12,2)")
             .HasDefaultValue(0m);
 
+        builder.Property(f => f.PenaltyApplied)
+            .IsRequired()
+            .HasColumnType("decimal(12,2)")
+            .HasDefaultValue(0m);
+
         builder.Property(f => f.FeeType)
             .IsRequired()
             .HasMaxLength(20)
@@ -29,7 +34,7 @@ public class FeeStructureConfiguration : IEntityTypeConfiguration<FeeStructure>
 
         builder.Property(f => f.OutstandingBalance)
             .HasColumnType("decimal(12,2)")
-            .HasComputedColumnSql("[TotalFee] - [AmountPaid]", stored: true);
+            .HasComputedColumnSql("[TotalFee] + [PenaltyApplied] - [AmountPaid]", stored: true);
 
         builder.Property(f => f.PaymentStatus)
             .IsRequired()

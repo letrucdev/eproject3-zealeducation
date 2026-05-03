@@ -792,7 +792,7 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                     b.Property<decimal>("OutstandingBalance")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("decimal(12,2)")
-                        .HasComputedColumnSql("[TotalFee] - [AmountPaid]", true);
+                        .HasComputedColumnSql("[TotalFee] + [PenaltyApplied] - [AmountPaid]", true);
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
@@ -807,6 +807,11 @@ namespace ZealEducation.Infrastructure.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasDefaultValue("NotSet");
+
+                    b.Property<decimal>("PenaltyApplied")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<decimal>("TotalFee")
                         .HasColumnType("decimal(12,2)");

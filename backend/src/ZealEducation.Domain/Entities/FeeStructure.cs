@@ -8,6 +8,7 @@ public class FeeStructure : BaseAuditableEntity
     public Guid CandidateId { get; set; }
     public decimal TotalFee { get; set; }
     public decimal AmountPaid { get; set; }
+    public decimal PenaltyApplied { get; set; }
     public FeeType FeeType { get; set; } = FeeType.Tuition;
     public decimal OutstandingBalance { get; set; }
     public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;

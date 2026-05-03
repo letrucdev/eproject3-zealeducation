@@ -1,0 +1,65 @@
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideTrendingUp" size="sm" class="text-emerald-600" />
+        Monthly Profit
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-8 w-32" />
+      } @else {
+        <h3 hlmCardTitle class="text-2xl text-emerald-700">
+          {{ (stats()?.monthlyProfit ?? 0) | vnd }}
+        </h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideHandCoins" size="sm" class="text-sky-600" />
+        Yearly Income
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-8 w-32" />
+      } @else {
+        <h3 hlmCardTitle class="text-2xl text-sky-700">
+          {{ (stats()?.yearlyIncome ?? 0) | vnd }}
+        </h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideCircleDollarSign" size="sm" class="text-rose-600" />
+        Outstanding
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-8 w-32" />
+      } @else {
+        <h3 hlmCardTitle class="text-2xl text-rose-700">
+          {{ (stats()?.outstanding ?? 0) | vnd }}
+        </h3>
+      }
+    </div>
+  </section>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <p hlmCardDescription class="flex items-center gap-2">
+        <ng-icon hlm name="lucideReceipt" size="sm" class="text-slate-600" />
+        Transactions
+      </p>
+      @if (isLoading()) {
+        <hlm-skeleton class="mt-2 h-8 w-20" />
+      } @else {
+        <h3 hlmCardTitle class="text-2xl">
+          {{ stats()?.transactionCount ?? 0 }}
+        </h3>
+      }
+    </div>
+  </section>
+</div>
