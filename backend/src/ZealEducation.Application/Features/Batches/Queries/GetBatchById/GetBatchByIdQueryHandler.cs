@@ -27,6 +27,7 @@ public class GetBatchByIdQueryHandler(
                 Location = b.Location,
                 MaxCapacity = b.MaxCapacity,
                 EnrolledCount = b.Enrollments.Count,
+                SessionCount = b.ClassSessions.Count,
                 Status = b.Status,
                 CreatedAt = b.CreatedAt,
                 UpdatedAt = b.UpdatedAt

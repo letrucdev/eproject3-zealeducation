@@ -82,6 +82,8 @@ export class BatchExaminationsCard implements OnInit {
   readonly page = input<PaginatedList<Examination> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly canMutate = input<boolean>(true);
+  readonly canAddExamination = input<boolean>(true);
+  readonly hasSchedule = input<boolean>(true);
   readonly pageSize = input<number>(10);
   readonly search = input<string>('');
   readonly sortBy = input<string | null>(null);

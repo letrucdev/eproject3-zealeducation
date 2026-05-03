@@ -1,0 +1,73 @@
+@model BatchFacultyAssignedEmailModel
+@{
+    ViewData["Title"] = "Batch assignment";
+    ViewData["HeaderSubtitle"] = "Batch assignment";
+
+    string FormatDate(DateOnly date) => date.ToString("dd MMM yyyy", CultureInfo.InvariantCulture);
+    string FormatTime(TimeOnly time) => time.ToString("HH:mm", CultureInfo.InvariantCulture);
+}
+<p style="margin:0 0 16px;">Hi <strong>@Model.RecipientName</strong>,</p>
+<p style="margin:0 0 16px;">You have been assigned as the instructor for the batch below. The full class schedule is included for your reference.</p>
+
+<h2 style="margin:24px 0 8px;font-size:16px;color:@MailTheme.Primary;border-bottom:1px solid @MailTheme.Border;padding-bottom:6px;">Batch details</h2>
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;width:40%;">Batch code</td>
+        <td style="padding:6px 0;font-family:Consolas,monospace;">@Model.BatchCode</td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">Course</td>
+        <td style="padding:6px 0;"><strong>@Model.CourseName</strong></td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">Faculty code</td>
+        <td style="padding:6px 0;font-family:Consolas,monospace;">@Model.FacultyCode</td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">Start date</td>
+        <td style="padding:6px 0;">@FormatDate(Model.BatchStartDate)</td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">End date</td>
+        <td style="padding:6px 0;">@FormatDate(Model.BatchEndDate)</td>
+    </tr>
+    <tr>
+        <td style="padding:6px 0;color:@MailTheme.MutedFg;">Default location</td>
+        <td style="padding:6px 0;">@(string.IsNullOrWhiteSpace(Model.BatchLocation) ? "-" : Model.BatchLocation)</td>
+    </tr>
+</table>
+
+<h2 style="margin:24px 0 8px;font-size:16px;color:@MailTheme.Primary;border-bottom:1px solid @MailTheme.Border;padding-bottom:6px;">Class schedule</h2>
+@if (Model.Sessions.Count == 0)
+{
+    <p style="margin:0;color:@MailTheme.MutedFg;">No class sessions have been scheduled yet.</p>
+}
+else
+{
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid @MailTheme.Border;border-radius:6px;overflow:hidden;">
+        <thead>
+            <tr style="background:@MailTheme.Primary;color:@MailTheme.PrimaryFg;">
+                <th align="left" style="padding:10px 12px;font-weight:600;">Date</th>
+                <th align="left" style="padding:10px 12px;font-weight:600;">Time</th>
+                <th align="left" style="padding:10px 12px;font-weight:600;">Topic</th>
+                <th align="left" style="padding:10px 12px;font-weight:600;">Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ var rowIndex = 0; }
+            @foreach (var session in Model.Sessions)
+            {
+                var rowBg = rowIndex % 2 == 0 ? MailTheme.Card : MailTheme.Muted;
+                rowIndex++;
+                <tr style="background:@rowBg;">
+                    <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">@FormatDate(session.SessionDate)</td>
+                    <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">@FormatTime(session.StartTime) - @FormatTime(session.EndTime)</td>
+                    <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">@(string.IsNullOrWhiteSpace(session.Topic) ? "-" : session.Topic)</td>
+                    <td style="padding:10px 12px;border-top:1px solid @MailTheme.Border;">@(string.IsNullOrWhiteSpace(session.Location) ? "-" : session.Location)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p style="margin:32px 0 0;color:@MailTheme.MutedFg;font-size:13px;">If you believe this assignment is in error, please contact the program coordinator.</p>

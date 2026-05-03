@@ -1,5 +1,7 @@
 using ZealEducation.Application.Common.Exceptions;
+using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Application.Features.Batches.Commands.AssignFaculty;
+using ZealEducation.Application.Features.Batches.Notifications;
 using ZealEducation.Application.UnitTests.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;
@@ -11,10 +13,23 @@ public class AssignFacultyCommandHandlerTests
 {
     private readonly Mock<IRepository<Batch>> _batchRepo = new();
     private readonly Mock<IRepository<Faculty>> _facultyRepo = new();
+    private readonly Mock<IRepository<Course>> _courseRepo = new();
+    private readonly Mock<IRepository<ClassSession>> _sessionRepo = new();
+    private readonly Mock<IBatchFacultyAssignedNotificationService> _notificationService = new();
     private readonly Mock<IUnitOfWork> _uow = MockRepositoryExtensions.CreateUnitOfWork();
 
     private AssignFacultyCommandHandler CreateHandler() =>
-        new(_batchRepo.Object, _facultyRepo.Object, _uow.Object);
+        new(_batchRepo.Object, _facultyRepo.Object, _courseRepo.Object, _sessionRepo.Object,
+            _notificationService.Object, _uow.Object);
+
+    public AssignFacultyCommandHandlerTests()
+    {
+        _notificationService
+            .Setup(s => s.QueueAsync(It.IsAny<BatchFacultyAssignedEmailModel>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _facultyRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Faculty>([]));
+        _courseRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Course>([]));
+    }
 
     private static Batch ExistingBatch(
         Guid batchId,
@@ -30,6 +45,14 @@ public class AssignFacultyCommandHandlerTests
         MaxCapacity = 30,
         Status = status
     };
+
+    private void SetupSessions(Guid batchId, bool hasSessions)
+    {
+        var data = hasSessions
+            ? new[] { new ClassSession { Id = Guid.NewGuid(), BatchId = batchId } }
+            : Array.Empty<ClassSession>();
+        _sessionRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<ClassSession>(data));
+    }
 
     [Fact]
     public async Task Throws_NotFoundException_when_batch_does_not_exist()
@@ -75,11 +98,30 @@ public class AssignFacultyCommandHandlerTests
     }
 
     [Fact]
+    public async Task Throws_ConflictException_when_batch_has_no_class_schedule()
+    {
+        var batchId = Guid.NewGuid();
+        var facultyId = Guid.NewGuid();
+        _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: false);
+
+        var act = async () => await CreateHandler().Handle(
+            new AssignFacultyCommand(batchId, facultyId),
+            default);
+
+        await act.Should().ThrowAsync<ConflictException>()
+            .Where(e => e.Message.Contains("no class schedule"));
+        _facultyRepo.Verify(r => r.ExistsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Throws_NotFoundException_when_faculty_does_not_exist()
     {
         var batchId = Guid.NewGuid();
         var facultyId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         _facultyRepo.SetupExists(facultyId, false);
 
         var act = async () => await CreateHandler().Handle(
@@ -96,6 +138,7 @@ public class AssignFacultyCommandHandlerTests
         var batchId = Guid.NewGuid();
         var facultyId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         _facultyRepo.SetupExists(facultyId, true);
         _batchRepo.SetupFind(new[] { new Batch { Id = Guid.NewGuid(), BatchCode = "OTHER" } });
 
@@ -115,6 +158,7 @@ public class AssignFacultyCommandHandlerTests
         var facultyId = Guid.NewGuid();
         var batch = ExistingBatch(batchId, status: BatchStatus.NeedsInstructor);
         _batchRepo.SetupGetById(batchId, batch);
+        SetupSessions(batchId, hasSessions: true);
         _facultyRepo.SetupExists(facultyId, true);
         _batchRepo.SetupFind(Array.Empty<Batch>());
 
@@ -133,6 +177,7 @@ public class AssignFacultyCommandHandlerTests
         var facultyId = Guid.NewGuid();
         var batch = ExistingBatch(batchId, facultyId: Guid.NewGuid(), status: BatchStatus.Active);
         _batchRepo.SetupGetById(batchId, batch);
+        SetupSessions(batchId, hasSessions: true);
         _facultyRepo.SetupExists(facultyId, true);
         _batchRepo.SetupFind(Array.Empty<Batch>());
 

@@ -14,7 +14,6 @@ export interface BatchListQuery {
 export interface CreateBatchPayload {
   batchCode: string;
   courseId: string;
-  facultyId: string | null;
   startDate: string;
   endDate: string;
   location: string | null;
