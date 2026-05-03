@@ -12,6 +12,7 @@ using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Domain.Interfaces;
 using ZealEducation.Infrastructure.Data;
 using ZealEducation.Infrastructure.Data.Interceptors;
+using ZealEducation.Infrastructure.Excel;
 using ZealEducation.Infrastructure.Pdf;
 using ZealEducation.Infrastructure.Repositories;
 using ZealEducation.Infrastructure.Services;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddSingleton<IReceiptPdfGenerator, QuestPdfReceiptGenerator>();
         services.AddSingleton<ICertificatePdfGenerator, QuestPdfCertificateGenerator>();
+        services.AddSingleton<IFinancialReportExcelGenerator, ClosedXmlFinancialReportExcelGenerator>();
 
         services.AddR2StorageServices(configuration);
         services.AddAuthenticationServices(configuration);

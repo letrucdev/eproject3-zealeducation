@@ -1,0 +1,34 @@
+<section hlmCard class="h-full">
+  <div hlmCardHeader class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <div class="flex flex-col gap-1.5">
+      <h2 hlmCardTitle>Revenue Trend</h2>
+      <p hlmCardDescription>Daily collected amount in the selected range</p>
+    </div>
+    <ng-content select="[chartHeaderActions]" />
+  </div>
+  <div hlmCardContent>
+    @if (isLoading()) {
+      <hlm-skeleton class="h-72 w-full" />
+    } @else if (hasData()) {
+      <ngx-area-chart
+        [data]="chartData()"
+        [categories]="categories()"
+        [height]="288"
+        [hideLegend]="true"
+        [yGridLine]="false"
+        [xGridLine]="false"
+        [xDomainLine]="false"
+        [xTickLine]="false"
+        [minMaxTicksOnly]="false"
+        [xNumTicks]="6"
+        [xFormatter]="xFormatter"
+        [yFormatter]="yFormatter"
+        [tooltipTitleFormatter]="tooltipTitleFormatter"
+      />
+    } @else {
+      <div class="text-muted-foreground flex h-72 w-full items-center justify-center text-sm">
+        No revenue recorded in this period.
+      </div>
+    }
+  </div>
+</section>

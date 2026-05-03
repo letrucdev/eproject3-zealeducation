@@ -6,16 +6,19 @@ import {
   inject,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
 import { lucideSearch } from '@ng-icons/lucide';
+import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuditAction } from '@core/models/audit-action';
+import { fromIsoDate, toIsoDate, formatDateRange } from '@shared/utils/date-range';
 
 export interface AuditLogFilterValue {
   search: string;
@@ -27,7 +30,13 @@ export interface AuditLogFilterValue {
 
 @Component({
   selector: 'app-audit-log-filter-bar',
-  imports: [ReactiveFormsModule, HlmInputImports, HlmSelectImports, HlmIconImports],
+  imports: [
+    ReactiveFormsModule,
+    HlmInputImports,
+    HlmSelectImports,
+    HlmIconImports,
+    HlmDatePickerImports,
+  ],
   providers: [provideIcons({ lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'audit-log-filter-bar.html',
@@ -71,8 +80,32 @@ export class AuditLogFilterBar implements OnInit {
     toDate: '',
   });
 
+  protected readonly dateRange = signal<[Date, Date] | undefined>(undefined);
+
+  protected readonly formatDates = formatDateRange;
+
+  protected onDateRangeChange(value: [Date, Date] | null): void {
+    if (!value) {
+      this.dateRange.set(undefined);
+      this.form.controls.fromDate.setValue('', { emitEvent: false });
+      this.form.controls.toDate.setValue('', { emitEvent: false });
+    } else {
+      this.dateRange.set(value);
+      const [start, end] = value;
+      this.form.controls.fromDate.setValue(toIsoDate(start), { emitEvent: false });
+      this.form.controls.toDate.setValue(toIsoDate(end), { emitEvent: false });
+    }
+    this._emit();
+  }
+
   ngOnInit(): void {
-    this.form.patchValue(this.initial(), { emitEvent: false });
+    const v = this.initial();
+    this.form.patchValue(v, { emitEvent: false });
+    const initialStart = fromIsoDate(v.fromDate);
+    const initialEnd = fromIsoDate(v.toDate);
+    if (initialStart && initialEnd) {
+      this.dateRange.set([initialStart, initialEnd]);
+    }
 
     this.form.controls.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
@@ -83,14 +116,6 @@ export class AuditLogFilterBar implements OnInit {
       .subscribe(() => this._emit());
 
     this.form.controls.action.valueChanges
-      .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => this._emit());
-
-    this.form.controls.fromDate.valueChanges
-      .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => this._emit());
-
-    this.form.controls.toDate.valueChanges
       .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this._emit());
   }

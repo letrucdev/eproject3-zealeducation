@@ -105,6 +105,7 @@ public class ConfirmPaymentCommandHandler(
         await paymentRepository.AddAsync(transaction, cancellationToken);
 
         fee.AmountPaid += totalAmount;
+        fee.PenaltyApplied += penaltyAmount;
         if (installment != null)
         {
             installment.AmountPaid += totalAmount;
@@ -114,9 +115,10 @@ public class ConfirmPaymentCommandHandler(
             installmentRepository.Update(installment);
         }
 
-        transaction.OutstandingBalanceAfter = fee.TotalFee - fee.AmountPaid;
+        var owedToDate = fee.TotalFee + fee.PenaltyApplied;
+        transaction.OutstandingBalanceAfter = owedToDate - fee.AmountPaid;
 
-        var newStatus = fee.AmountPaid >= fee.TotalFee
+        var newStatus = fee.AmountPaid >= owedToDate
             ? PaymentStatus.Paid
             : (fee.AmountPaid > 0 ? PaymentStatus.Partial : PaymentStatus.Unpaid);
         fee.PaymentStatus = newStatus;

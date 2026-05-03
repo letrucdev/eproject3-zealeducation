@@ -12,11 +12,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HlmComboboxImports } from '@spartan-ng/helm/combobox';
+import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { distinctUntilChanged } from 'rxjs';
 import { BatchListItem } from '@core/models/batch-list-item';
+import { fromIsoDate, toIsoDate, formatDateRange } from '@shared/utils/date-range';
 import { FacultyService } from '../../faculty.service';
 import { FacultyCourseOption } from '../../models/faculty-models';
 
@@ -32,6 +34,7 @@ export interface FacultyScheduleFilterValue {
   imports: [
     ReactiveFormsModule,
     HlmComboboxImports,
+    HlmDatePickerImports,
     HlmFieldImports,
     HlmInputImports,
     HlmSpinnerImports,
@@ -85,6 +88,24 @@ export class FacultyScheduleFilterBar implements OnInit {
     batch: this._fb.control<BatchListItem | null>(null),
   });
 
+  protected readonly dateRange = signal<[Date, Date] | undefined>(undefined);
+
+  protected readonly formatDates = formatDateRange;
+
+  protected onDateRangeChange(value: [Date, Date] | null): void {
+    if (!value) {
+      this.dateRange.set(undefined);
+      this.form.controls.fromDate.setValue('', { emitEvent: false });
+      this.form.controls.toDate.setValue('', { emitEvent: false });
+    } else {
+      this.dateRange.set(value);
+      const [start, end] = value;
+      this.form.controls.fromDate.setValue(toIsoDate(start), { emitEvent: false });
+      this.form.controls.toDate.setValue(toIsoDate(end), { emitEvent: false });
+    }
+    this._emit();
+  }
+
   ngOnInit(): void {
     const v = this.initial();
     this.form.patchValue(
@@ -97,26 +118,11 @@ export class FacultyScheduleFilterBar implements OnInit {
       { emitEvent: false },
     );
     this.selectedCourseId.set(v.course?.courseId ?? null);
-
-    this.form.controls.fromDate.valueChanges
-      .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
-      .subscribe((value) => {
-        if (!value) return;
-        if (value > this.form.controls.toDate.value) {
-          this.form.controls.toDate.setValue(value, { emitEvent: false });
-        }
-        this._emit();
-      });
-
-    this.form.controls.toDate.valueChanges
-      .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
-      .subscribe((value) => {
-        if (!value) return;
-        if (value < this.form.controls.fromDate.value) {
-          this.form.controls.fromDate.setValue(value, { emitEvent: false });
-        }
-        this._emit();
-      });
+    const initialStart = fromIsoDate(v.fromDate);
+    const initialEnd = fromIsoDate(v.toDate);
+    if (initialStart && initialEnd) {
+      this.dateRange.set([initialStart, initialEnd]);
+    }
 
     this.form.controls.course.valueChanges
       .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))

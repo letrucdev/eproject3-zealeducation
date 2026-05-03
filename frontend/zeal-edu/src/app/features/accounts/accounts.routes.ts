@@ -13,5 +13,11 @@ export const ACCOUNTS_ROUTES: Routes = [
     data: { breadcrumb: 'Detail' },
     loadComponent: () => import('./payments/payment-detail-page'),
   },
+  {
+    path: 'financial-report',
+    title: 'Financial Report',
+    data: { breadcrumb: 'Financial Report' },
+    loadComponent: () => import('./financial-report/financial-report-page'),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'payments' },
 ];

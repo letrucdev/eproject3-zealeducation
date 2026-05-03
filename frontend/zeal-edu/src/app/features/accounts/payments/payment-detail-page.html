@@ -33,22 +33,58 @@
           }
         </p>
       </div>
-      <div hlmCardContent class="grid gap-4 md:grid-cols-3">
-        <div class="flex flex-col">
-          <span class="text-xs uppercase text-muted-foreground">Total Fee</span>
-          <span class="text-xl font-semibold">{{ detail.totalFee | vnd }}</span>
+      <div hlmCardContent class="flex flex-col gap-4">
+        <div class="grid gap-4">
+
+          <div class="rounded-md border p-4">
+            <div class="text-xs uppercase text-muted-foreground">Fee Breakdown</div>
+            <dl class="mt-2 space-y-1 text-sm">
+              <div class="flex items-center justify-between">
+                <dt class="text-muted-foreground">Original Total Fee</dt>
+                <dd class="font-medium">{{ detail.totalFee | vnd }}</dd>
+              </div>
+              @if (detail.penaltyApplied > 0) {
+                <div class="flex items-center justify-between">
+                  <dt class="text-rose-600">+ Penalty applied (overdue paid)</dt>
+                  <dd class="font-medium text-rose-600">{{ detail.penaltyApplied | vnd }}</dd>
+                </div>
+              }
+              @if (detail.projectedPenalty > 0) {
+                <div class="flex items-center justify-between">
+                  <dt class="text-rose-600">+ Projected penalty (overdue unpaid)</dt>
+                  <dd class="font-medium text-rose-600">{{ detail.projectedPenalty | vnd }}</dd>
+                </div>
+              }
+              <div
+                class="flex items-center justify-between border-t pt-2"
+                [class.text-rose-700]="detail.penaltyApplied + detail.projectedPenalty > 0"
+              >
+                <dt class="font-semibold">Adjusted Total Fee</dt>
+                <dd class="text-lg font-semibold">{{ detail.adjustedTotalFee | vnd }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="rounded-md border p-4">
+            <div class="text-xs uppercase text-muted-foreground">Payment Status</div>
+            <dl class="mt-2 space-y-1 text-sm h-full">
+              <div class="flex items-center justify-between">
+                <dt class="text-muted-foreground">Paid</dt>
+                <dd class="font-medium text-emerald-700">{{ detail.amountPaid | vnd }}</dd>
+              </div>
+              <div class="flex items-center justify-between border-t pt-2">
+                <dt class="font-semibold">Outstanding</dt>
+                <dd
+                  class="text-lg font-semibold"
+                  [class.text-rose-600]="detail.outstandingBalance > 0"
+                >
+                  {{ detail.outstandingBalance | vnd }}
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
-        <div class="flex flex-col">
-          <span class="text-xs uppercase text-muted-foreground">Paid</span>
-          <span class="text-xl font-semibold text-emerald-700">{{ detail.amountPaid | vnd }}</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-xs uppercase text-muted-foreground">Outstanding</span>
-          <span class="text-xl font-semibold" [class.text-rose-600]="detail.outstandingBalance > 0">
-            {{ detail.outstandingBalance | vnd }}
-          </span>
-        </div>
-        <div class="flex items-center gap-2 md:col-span-3">
+        <div class="flex items-center gap-2">
           <span class="text-xs text-muted-foreground">Status:</span>
           @switch (detail.paymentStatus) {
             @case (paymentStatuses.Unpaid) {
