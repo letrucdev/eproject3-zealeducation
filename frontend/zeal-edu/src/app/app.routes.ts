@@ -17,6 +17,7 @@ export const routes: Routes = [
     loadComponent: () => import('@core/layout/app-shell').then((m) => m.AppShell),
     data: { breadcrumb: 'Home' },
     children: [
+      { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
       {
         path: 'system',
         canMatch: [hasRole(UserRole.SystemAdmin)],
@@ -59,7 +60,6 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@features/candidate/candidate.routes').then((m) => m.CANDIDATE_ROUTES),
       },
-      { path: '', pathMatch: 'full', canMatch: [defaultRoleRedirect], children: [] },
     ],
   },
   { path: '**', redirectTo: '/app' },

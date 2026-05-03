@@ -1,6 +1,7 @@
 using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Application.Features.Examinations.Commands.CreateExamination;
+using ZealEducation.Application.Features.Examinations.Notifications;
 using ZealEducation.Application.UnitTests.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;
@@ -13,11 +14,36 @@ public class CreateExaminationCommandHandlerTests
     private readonly Mock<IRepository<Batch>> _batchRepo = new();
     private readonly Mock<IRepository<Examination>> _examRepo = new();
     private readonly Mock<IRepository<Staff>> _staffRepo = new();
+    private readonly Mock<IRepository<Faculty>> _facultyRepo = new();
+    private readonly Mock<IRepository<Enrollment>> _enrollmentRepo = new();
+    private readonly Mock<IRepository<Course>> _courseRepo = new();
+    private readonly Mock<IRepository<ClassSession>> _sessionRepo = new();
+    private readonly Mock<IExaminationCreatedNotificationService> _notificationService = new();
     private readonly Mock<ICurrentUser> _currentUser = new();
     private readonly Mock<IUnitOfWork> _uow = MockRepositoryExtensions.CreateUnitOfWork();
 
     private CreateExaminationCommandHandler CreateHandler() =>
-        new(_batchRepo.Object, _examRepo.Object, _staffRepo.Object, _currentUser.Object, _uow.Object);
+        new(_batchRepo.Object, _examRepo.Object, _staffRepo.Object, _facultyRepo.Object,
+            _enrollmentRepo.Object, _courseRepo.Object, _sessionRepo.Object,
+            _notificationService.Object, _currentUser.Object, _uow.Object);
+
+    public CreateExaminationCommandHandlerTests()
+    {
+        _notificationService
+            .Setup(s => s.QueueAsync(It.IsAny<ExaminationCreatedEmailModel>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _facultyRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Faculty>([]));
+        _enrollmentRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Enrollment>([]));
+        _courseRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Course>([]));
+    }
+
+    private void SetupSessions(Guid batchId, bool hasSessions)
+    {
+        var data = hasSessions
+            ? new[] { new ClassSession { Id = Guid.NewGuid(), BatchId = batchId } }
+            : Array.Empty<ClassSession>();
+        _sessionRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<ClassSession>(data));
+    }
 
     private static CreateExaminationCommand Cmd(
         Guid? batchId = null,
@@ -122,12 +148,29 @@ public class CreateExaminationCommandHandlerTests
     }
 
     [Fact]
+    public async Task Throws_ConflictException_when_batch_has_no_class_schedule()
+    {
+        var batchId = Guid.NewGuid();
+        _currentUser.Setup(c => c.UserId).Returns(Guid.NewGuid());
+        _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: false);
+
+        var act = async () => await CreateHandler().Handle(Cmd(batchId), default);
+
+        await act.Should().ThrowAsync<ConflictException>()
+            .Where(e => e.Message.Contains("no class schedule"));
+        _examRepo.Verify(r => r.AddAsync(It.IsAny<Examination>(), It.IsAny<CancellationToken>()), Times.Never);
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Throws_ConflictException_when_exam_date_is_before_batch_start()
     {
         var batchId = Guid.NewGuid();
         _currentUser.Setup(c => c.UserId).Returns(Guid.NewGuid());
         _batchRepo.SetupGetById(batchId,
             ExistingBatch(batchId, start: new DateOnly(2030, 1, 1), end: new DateOnly(2030, 6, 1)));
+        SetupSessions(batchId, hasSessions: true);
 
         var act = async () => await CreateHandler().Handle(
             Cmd(batchId, examDate: new DateOnly(2029, 12, 31)),
@@ -144,6 +187,7 @@ public class CreateExaminationCommandHandlerTests
         _currentUser.Setup(c => c.UserId).Returns(Guid.NewGuid());
         _batchRepo.SetupGetById(batchId,
             ExistingBatch(batchId, start: new DateOnly(2030, 1, 1), end: new DateOnly(2030, 6, 1)));
+        SetupSessions(batchId, hasSessions: true);
 
         var act = async () => await CreateHandler().Handle(
             Cmd(batchId, examDate: new DateOnly(2030, 7, 1)),
@@ -160,6 +204,7 @@ public class CreateExaminationCommandHandlerTests
         var userId = Guid.NewGuid();
         _currentUser.Setup(c => c.UserId).Returns(userId);
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         SetupStaffQuery(Array.Empty<Staff>());
 
         var act = async () => await CreateHandler().Handle(Cmd(batchId), default);
@@ -176,6 +221,7 @@ public class CreateExaminationCommandHandlerTests
         var examDate = new DateOnly(2030, 3, 15);
         _currentUser.Setup(c => c.UserId).Returns(userId);
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         SetupStaffQuery(new[] { ExistingStaff(userId) });
         SetupExamQuery(new[]
         {
@@ -206,6 +252,7 @@ public class CreateExaminationCommandHandlerTests
         var staff = ExistingStaff(userId);
         _currentUser.Setup(c => c.UserId).Returns(userId);
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         SetupStaffQuery(new[] { staff });
         SetupExamQuery(Array.Empty<Examination>());
 
@@ -240,6 +287,7 @@ public class CreateExaminationCommandHandlerTests
         var userId = Guid.NewGuid();
         _currentUser.Setup(c => c.UserId).Returns(userId);
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         SetupStaffQuery(new[] { ExistingStaff(userId) });
         SetupExamQuery(Array.Empty<Examination>());
 
@@ -263,6 +311,7 @@ public class CreateExaminationCommandHandlerTests
         var userId = Guid.NewGuid();
         _currentUser.Setup(c => c.UserId).Returns(userId);
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         SetupStaffQuery(new[] { ExistingStaff(userId) });
         SetupExamQuery(Array.Empty<Examination>());
 
@@ -283,6 +332,7 @@ public class CreateExaminationCommandHandlerTests
         var userId = Guid.NewGuid();
         _currentUser.Setup(c => c.UserId).Returns(userId);
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId));
+        SetupSessions(batchId, hasSessions: true);
         SetupStaffQuery(new[] { ExistingStaff(userId) });
         SetupExamQuery(Array.Empty<Examination>());
 

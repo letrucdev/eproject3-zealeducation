@@ -20,6 +20,8 @@
   } @else if (detailQuery.data(); as detail) {
     <app-batch-info-card
       [detail]="detail"
+      [canAssignFaculty]="canAssignFaculty()"
+      [hasSchedule]="hasSchedule()"
       (editClicked)="onEditBatch()"
       (assignFacultyClicked)="onAssignFaculty()"
       (deleteClicked)="onDeleteBatch()"
@@ -47,6 +49,8 @@
       [sortBy]="examinationsSortBy()"
       [sortDirection]="examinationsSortDirection()"
       [canMutate]="canMutate()"
+      [canAddExamination]="canAddExamination()"
+      [hasSchedule]="hasSchedule()"
       (addClicked)="onAddExamination()"
       (viewResultsClicked)="onViewResults($event)"
       (editClicked)="onEditExamination($event)"
@@ -65,6 +69,7 @@
       [sortBy]="enrollmentsSortBy()"
       [sortDirection]="enrollmentsSortDirection()"
       [canAddCandidate]="canAddCandidate()"
+      [hasSchedule]="hasSchedule()"
       (addClicked)="onAddCandidate()"
       (viewClicked)="onViewCandidate($event)"
       (searchChanged)="onEnrollmentsSearchChanged($event)"

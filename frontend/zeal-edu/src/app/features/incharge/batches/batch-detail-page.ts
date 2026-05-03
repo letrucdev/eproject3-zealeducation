@@ -227,10 +227,20 @@ export default class BatchDetailPage {
     return detail.status !== BatchStatus.Completed && detail.status !== BatchStatus.Cancelled;
   });
 
+  protected readonly hasSchedule = computed(() => {
+    const detail = this.detailQuery.data();
+    return (detail?.sessionCount ?? 0) > 0;
+  });
+
+  protected readonly canAssignFaculty = computed(() => this.canMutate() && this.hasSchedule());
+
+  protected readonly canAddExamination = computed(() => this.canMutate() && this.hasSchedule());
+
   protected readonly canAddCandidate = computed(() => {
     const detail = this.detailQuery.data();
     if (!detail) return false;
     if (!this.canMutate()) return false;
+    if (!this.hasSchedule()) return false;
     return detail.enrolledCount < detail.maxCapacity;
   });
 
