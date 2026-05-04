@@ -1,0 +1,44 @@
+<form
+  [formGroup]="form"
+  class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center"
+  (ngSubmit)="$event.preventDefault()"
+>
+  <div class="relative w-full md:w-96">
+    <ng-icon
+      hlm
+      name="lucideSearch"
+      size="sm"
+      class="text-muted-foreground pointer-events-none absolute inset-y-0 inset-s-3 my-auto"
+    />
+    <input
+      hlmInput
+      type="search"
+      class="w-full ps-9"
+      placeholder="Search by candidate, course, receipt no..."
+      formControlName="search"
+      aria-label="Search transactions"
+    />
+  </div>
+
+  <hlm-select formControlName="feeType" [itemToString]="feeTypeLabel" class="w-full md:w-44">
+    <hlm-select-trigger>
+      <hlm-select-value placeholder="Type: All" />
+    </hlm-select-trigger>
+    <hlm-select-content *hlmSelectPortal>
+      <hlm-select-item value="all">All Types</hlm-select-item>
+      <hlm-select-item [value]="feeTypes.Tuition">Tuition</hlm-select-item>
+      <hlm-select-item [value]="feeTypes.Fine">Fine</hlm-select-item>
+    </hlm-select-content>
+  </hlm-select>
+
+  <hlm-select formControlName="method" [itemToString]="methodLabel" class="w-full md:w-44">
+    <hlm-select-trigger>
+      <hlm-select-value placeholder="Method: All" />
+    </hlm-select-trigger>
+    <hlm-select-content *hlmSelectPortal>
+      <hlm-select-item value="all">All Methods</hlm-select-item>
+      <hlm-select-item [value]="paymentMethods.Cash">Cash</hlm-select-item>
+      <hlm-select-item [value]="paymentMethods.BankTransfer">Bank Transfer</hlm-select-item>
+    </hlm-select-content>
+  </hlm-select>
+</form>

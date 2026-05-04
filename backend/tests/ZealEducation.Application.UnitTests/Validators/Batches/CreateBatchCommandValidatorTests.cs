@@ -10,14 +10,12 @@ public class CreateBatchCommandValidatorTests
     private static CreateBatchCommand Valid(
         string? batchCode = "B-001",
         Guid? courseId = null,
-        Guid? facultyId = null,
         DateOnly? start = null,
         DateOnly? end = null,
         string? location = "Room A",
         int maxCapacity = 30) => new(
             batchCode!,
             courseId ?? Guid.NewGuid(),
-            facultyId,
             start ?? DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(7)),
             end ?? DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(60)),
             location,

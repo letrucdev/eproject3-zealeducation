@@ -2,17 +2,21 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideSchool2 } from '@ng-icons/lucide';
+import { ThemeToggle } from '@core/layout/theme-toggle';
 import { LoginForm } from './login-form';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, LoginForm, NgIcon],
+  imports: [RouterLink, LoginForm, NgIcon, ThemeToggle],
   providers: [provideIcons({ lucideSchool2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
-      class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
+      class="bg-muted relative flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
     >
+      <div class="absolute top-4 right-4 md:top-6 md:right-6">
+        <app-theme-toggle />
+      </div>
       <div class="flex w-full max-w-sm flex-col gap-6 md:max-w-4xl">
         <a routerLink="." class="flex items-center gap-2 self-center font-medium">
           <div

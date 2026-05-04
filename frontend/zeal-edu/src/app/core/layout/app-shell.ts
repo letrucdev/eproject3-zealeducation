@@ -5,6 +5,7 @@ import {
   lucideAward,
   lucideBookOpen,
   lucideCalendarDays,
+  lucideChartColumn,
   lucideClipboardCheck,
   lucideFolderOpen,
   lucideGraduationCap,
@@ -61,6 +62,7 @@ import { environment } from '@/environments/environment';
       lucideClipboardCheck,
       lucideMessageSquare,
       lucideAward,
+      lucideChartColumn
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

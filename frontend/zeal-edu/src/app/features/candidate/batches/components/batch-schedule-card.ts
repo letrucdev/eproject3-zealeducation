@@ -1,8 +1,16 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Directive, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Directive,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { ClassSession, ClassSessionStatus } from '@core/models/class-session';
@@ -15,6 +23,7 @@ import {
   DataTableSortChange,
   SortDirection,
 } from '@shared/components/data-table';
+import { fromIsoDate, toIsoDate, formatDateRange } from '@shared/utils/date-range';
 
 export interface BatchDateRange {
   fromDate: string;
@@ -45,6 +54,7 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
     HlmCardImports,
     HlmBadgeImports,
     HlmButtonImports,
+    HlmDatePickerImports,
     HlmFieldImports,
     HlmInputImports,
   ],
@@ -58,28 +68,18 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
         </div>
         <div class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end mt-2">
           <div class="flex flex-col gap-1.5">
-            <label hlmFieldLabel for="schedule-from-date">From</label>
-            <input
-              hlmInput
-              id="schedule-from-date"
-              type="date"
-              class="w-full md:w-44"
-              [value]="fromDate()"
-              [max]="toDate() || null"
-              (change)="onFromDateChange($event)"
-            />
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label hlmFieldLabel for="schedule-to-date">To</label>
-            <input
-              hlmInput
-              id="schedule-to-date"
-              type="date"
-              class="w-full md:w-44"
-              [value]="toDate()"
-              [min]="fromDate() || null"
-              (change)="onToDateChange($event)"
-            />
+            <label hlmFieldLabel>Date range</label>
+            <hlm-date-range-picker
+              class="w-full md:w-72"
+              [date]="dateRange()"
+              [autoCloseOnEndSelection]="true"
+              [formatDates]="formatDates"
+              captionLayout="dropdown"
+              (dateChange)="onDateRangeChange($event)"
+              aria-label="Filter schedule by date range"
+            >
+              <span>Select date range</span>
+            </hlm-date-range-picker>
           </div>
           @if (fromDate() || toDate()) {
             <button hlmBtn variant="secondary" size="sm" type="button" (click)="onClearRange()">
@@ -157,6 +157,24 @@ export class CandidateBatchScheduleCard {
 
   protected readonly sessionStatuses = ClassSessionStatus;
 
+  protected readonly dateRange = computed<[Date, Date] | undefined>(() => {
+    const start = fromIsoDate(this.fromDate());
+    const end = fromIsoDate(this.toDate());
+    if (!start || !end) return undefined;
+    return [start, end];
+  });
+
+  protected readonly formatDates = formatDateRange;
+
+  protected onDateRangeChange(value: [Date, Date] | null): void {
+    if (!value) {
+      this.dateRangeChanged.emit({ fromDate: '', toDate: '' });
+      return;
+    }
+    const [start, end] = value;
+    this.dateRangeChanged.emit({ fromDate: toIsoDate(start), toDate: toIsoDate(end) });
+  }
+
   protected readonly columns: DataTableColumn<ClassSession>[] = [
     { key: 'sessionDate', header: 'Date', sortable: true, width: 'w-32' },
     { key: 'time', header: 'Time', width: 'w-36' },
@@ -169,20 +187,6 @@ export class CandidateBatchScheduleCard {
 
   protected formatTime(value: string): string {
     return value?.length >= 5 ? value.substring(0, 5) : value;
-  }
-
-  protected onFromDateChange(event: Event): void {
-    const next = (event.target as HTMLInputElement).value;
-    const to = this.toDate();
-    const adjustedTo = to && next && to < next ? next : to;
-    this.dateRangeChanged.emit({ fromDate: next, toDate: adjustedTo });
-  }
-
-  protected onToDateChange(event: Event): void {
-    const next = (event.target as HTMLInputElement).value;
-    const from = this.fromDate();
-    const adjustedFrom = from && next && from > next ? next : from;
-    this.dateRangeChanged.emit({ fromDate: adjustedFrom, toDate: next });
   }
 
   protected onClearRange(): void {

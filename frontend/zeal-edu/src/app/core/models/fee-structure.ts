@@ -59,6 +59,9 @@ export interface FeeStructureDetail {
   durationWeeks: number | null;
   feeType: FeeType;
   totalFee: number;
+  penaltyApplied: number;
+  projectedPenalty: number;
+  adjustedTotalFee: number;
   amountPaid: number;
   outstandingBalance: number;
   paymentStatus: PaymentStatus;

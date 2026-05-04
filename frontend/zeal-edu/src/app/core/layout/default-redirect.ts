@@ -16,6 +16,10 @@ export const defaultRoleRedirect: CanMatchFn = () => {
       return router.parseUrl('/app/incharge/courses');
     case UserRole.Faculty:
       return router.parseUrl('/app/faculty/schedule');
+    case UserRole.Candidate:
+      return router.parseUrl('/app/candidate/batches');
+    case UserRole.AccountsStaff:
+      return router.parseUrl('/app/accounts/financial-report');
     default:
       return router.parseUrl('/login');
   }

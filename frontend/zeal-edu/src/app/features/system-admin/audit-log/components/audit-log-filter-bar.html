@@ -38,19 +38,15 @@
     aria-label="Filter by table name"
   />
 
-  <input
-    hlmInput
-    type="date"
-    class="w-full md:w-44"
-    formControlName="fromDate"
-    aria-label="From date"
-  />
-
-  <input
-    hlmInput
-    type="date"
-    class="w-full md:w-44"
-    formControlName="toDate"
-    aria-label="To date"
-  />
+  <hlm-date-range-picker
+    class="w-full md:w-72"
+    [date]="dateRange()"
+    [autoCloseOnEndSelection]="true"
+    [formatDates]="formatDates"
+    captionLayout="dropdown"
+    (dateChange)="onDateRangeChange($event)"
+    aria-label="Filter by date range"
+  >
+    <span>Select date range</span>
+  </hlm-date-range-picker>
 </form>
