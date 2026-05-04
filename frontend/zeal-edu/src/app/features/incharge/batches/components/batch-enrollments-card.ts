@@ -73,6 +73,7 @@ export class BatchEnrollmentsCard implements OnInit {
   readonly page = input<PaginatedList<BatchEnrollmentItem> | null | undefined>(null);
   readonly isLoading = input<boolean>(false);
   readonly canAddCandidate = input<boolean>(true);
+  readonly hasSchedule = input<boolean>(true);
   readonly pageSize = input<number>(10);
   readonly search = input<string>('');
   readonly sortBy = input<string | null>(null);

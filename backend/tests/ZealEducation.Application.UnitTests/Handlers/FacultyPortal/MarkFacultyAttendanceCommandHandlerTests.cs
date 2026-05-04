@@ -3,7 +3,7 @@ using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Application.Features.ClassSessions.Commands.MarkAttendance;
 using ZealEducation.Application.Features.FacultyPortal.Commands.MarkFacultyAttendance;
-using ZealEducation.Application.UnitTests.Handlers.Batches;
+using ZealEducation.Application.UnitTests.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;
 using ZealEducation.Domain.Interfaces;

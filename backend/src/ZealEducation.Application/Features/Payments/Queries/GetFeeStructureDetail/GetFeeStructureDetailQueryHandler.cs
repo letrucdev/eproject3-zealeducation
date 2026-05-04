@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Domain.Entities;
+using ZealEducation.Domain.Enums;
 using ZealEducation.Domain.Interfaces;
 
 namespace ZealEducation.Application.Features.Payments.Queries.GetFeeStructureDetail;
@@ -16,6 +17,8 @@ public class GetFeeStructureDetailQueryHandler(
     IRepository<PaymentTransaction> paymentRepository,
     IRepository<Staff> staffRepository) : IRequestHandler<GetFeeStructureDetailQuery, FeeStructureDetailDto>
 {
+    private const decimal PenaltyRate = 0.05m;
+
     public async Task<FeeStructureDetailDto> Handle(GetFeeStructureDetailQuery request, CancellationToken cancellationToken)
     {
         var fee = await feeRepository.Query().FirstOrDefaultAsync(f => f.Id == request.FeeId, cancellationToken)
@@ -75,6 +78,14 @@ public class GetFeeStructureDetailQueryHandler(
                 HasBankTransferProof = t.BankTransferProofPath != null
             }).ToListAsync(cancellationToken);
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var projectedPenalty = installments
+            .Where(i => i.Status != InstallmentStatus.Paid && today > i.DueDate)
+            .Sum(i => Math.Round(i.AmountDue * PenaltyRate, 2, MidpointRounding.AwayFromZero));
+
+        var adjustedTotalFee = fee.TotalFee + fee.PenaltyApplied + projectedPenalty;
+        var outstandingBalance = adjustedTotalFee - fee.AmountPaid;
+
         return new FeeStructureDetailDto
         {
             FeeId = fee.Id,
@@ -91,8 +102,11 @@ public class GetFeeStructureDetailQueryHandler(
             DurationWeeks = course?.DurationWeeks,
             FeeType = fee.FeeType,
             TotalFee = fee.TotalFee,
+            PenaltyApplied = fee.PenaltyApplied,
+            ProjectedPenalty = projectedPenalty,
+            AdjustedTotalFee = adjustedTotalFee,
             AmountPaid = fee.AmountPaid,
-            OutstandingBalance = fee.OutstandingBalance,
+            OutstandingBalance = outstandingBalance,
             PaymentStatus = fee.PaymentStatus,
             PaymentType = fee.PaymentType,
             Notes = fee.Notes,

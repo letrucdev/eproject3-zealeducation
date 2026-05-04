@@ -18,6 +18,9 @@ public class FeeStructureDetailDto
     public int? DurationWeeks { get; set; }
     public FeeType FeeType { get; set; }
     public decimal TotalFee { get; set; }
+    public decimal PenaltyApplied { get; set; }
+    public decimal ProjectedPenalty { get; set; }
+    public decimal AdjustedTotalFee { get; set; }
     public decimal AmountPaid { get; set; }
     public decimal OutstandingBalance { get; set; }
     public PaymentStatus PaymentStatus { get; set; }

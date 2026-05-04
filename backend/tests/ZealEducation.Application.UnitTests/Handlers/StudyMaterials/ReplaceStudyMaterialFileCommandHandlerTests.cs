@@ -1,7 +1,6 @@
 using ZealEducation.Application.Common.Exceptions;
 using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Application.Features.StudyMaterials.Commands.ReplaceStudyMaterialFile;
-using ZealEducation.Application.UnitTests.Handlers.Batches;
 using ZealEducation.Application.UnitTests.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Interfaces;

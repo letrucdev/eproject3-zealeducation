@@ -116,6 +116,7 @@
   --vis-tooltip-shadow-color: rgba(0, 0, 0, 0.5);
   --vis-tooltip-title-color: var(--popover-foreground);
   --vis-tooltip-title-border-bottom: 1px solid var(--border);
+  --vis-donut-background-color: var(--background)
 }
 
 @layer base {

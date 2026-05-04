@@ -13,6 +13,7 @@ export interface BatchDetail {
   location: string | null;
   maxCapacity: number;
   enrolledCount: number;
+  sessionCount: number;
   status: BatchStatus;
   createdAt: string;
   updatedAt: string | null;

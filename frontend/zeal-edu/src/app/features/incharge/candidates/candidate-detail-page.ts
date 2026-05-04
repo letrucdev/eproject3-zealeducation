@@ -8,6 +8,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { CandidatesService } from './candidates.service';
+import { AddEnrollmentDialog, AddEnrollmentSubmit } from './components/add-enrollment-dialog';
 import { ApplyFineDialog, ApplyFineSubmit } from './components/apply-fine-dialog';
 import { CandidateEnrollmentsCard } from './components/candidate-enrollments-card';
 import { CandidateInfoCard } from './components/candidate-info-card';
@@ -32,6 +33,7 @@ import { CandidateFeeStructureSummary } from '@core/models/candidate-detail';
     FeeDetailDialog,
     CandidateUpdateDialog,
     ApplyFineDialog,
+    AddEnrollmentDialog,
   ],
   providers: [provideIcons({ lucideArrowLeft })],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +46,8 @@ export default class CandidateDetailPage {
   protected readonly updateDialog = viewChild.required<CandidateUpdateDialog>('updateDialog');
   protected readonly fineDialog = viewChild.required<ApplyFineDialog>('fineDialog');
   protected readonly feeDetailDialog = viewChild.required<FeeDetailDialog>('feeDetailDialog');
+  protected readonly addEnrollmentDialog =
+    viewChild.required<AddEnrollmentDialog>('addEnrollmentDialog');
 
   private readonly _routeParam = toSignal(this._route.paramMap, { initialValue: null });
   protected readonly currentCandidateId = computed<string | null>(() => {
@@ -54,6 +58,7 @@ export default class CandidateDetailPage {
   protected readonly detailQuery = this._service.detailQuery(this.currentCandidateId);
   protected readonly updateMutation = this._service.updateMutation();
   protected readonly applyFineMutation = this._service.applyFineMutation();
+  protected readonly addEnrollmentMutation = this._service.addEnrollmentMutation();
 
   protected onEditClicked(): void {
     const detail = this.detailQuery.data();
@@ -89,6 +94,25 @@ export default class CandidateDetailPage {
       onSuccess: () => {
         toast.success('Fine applied successfully.');
         this.fineDialog().close();
+      },
+    });
+  }
+
+  protected onAddEnrollmentClicked(): void {
+    const detail = this.detailQuery.data();
+    if (!detail) return;
+    this.addEnrollmentDialog().open({
+      candidateId: detail.candidateId,
+      candidateCode: detail.candidateCode,
+      candidateName: detail.fullName,
+    });
+  }
+
+  protected onAddEnrollmentSubmitted(event: AddEnrollmentSubmit): void {
+    this.addEnrollmentMutation.mutate(event, {
+      onSuccess: (res) => {
+        toast.success(`Enrollment added for ${res.courseName}.`);
+        this.addEnrollmentDialog().close();
       },
     });
   }

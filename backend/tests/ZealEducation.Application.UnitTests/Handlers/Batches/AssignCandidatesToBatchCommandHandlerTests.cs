@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query;
 using ZealEducation.Application.Common.Exceptions;
+using ZealEducation.Application.Common.Interfaces;
 using ZealEducation.Application.Features.Batches.Commands.AssignCandidatesToBatch;
+using ZealEducation.Application.Features.Batches.Notifications;
 using ZealEducation.Application.UnitTests.Helpers;
 using ZealEducation.Domain.Entities;
 using ZealEducation.Domain.Enums;
@@ -14,10 +13,32 @@ public class AssignCandidatesToBatchCommandHandlerTests
 {
     private readonly Mock<IRepository<Batch>> _batchRepo = new();
     private readonly Mock<IRepository<Enrollment>> _enrollmentRepo = new();
+    private readonly Mock<IRepository<Candidate>> _candidateRepo = new();
+    private readonly Mock<IRepository<Course>> _courseRepo = new();
+    private readonly Mock<IRepository<ClassSession>> _sessionRepo = new();
+    private readonly Mock<IBatchCandidateEnrolledNotificationService> _notificationService = new();
     private readonly Mock<IUnitOfWork> _uow = MockRepositoryExtensions.CreateUnitOfWork();
 
     private AssignCandidatesToBatchCommandHandler CreateHandler() =>
-        new(_batchRepo.Object, _enrollmentRepo.Object, _uow.Object);
+        new(_batchRepo.Object, _enrollmentRepo.Object, _candidateRepo.Object, _courseRepo.Object,
+            _sessionRepo.Object, _notificationService.Object, _uow.Object);
+
+    public AssignCandidatesToBatchCommandHandlerTests()
+    {
+        _notificationService
+            .Setup(s => s.QueueAsync(It.IsAny<BatchCandidateEnrolledEmailModel>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _candidateRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Candidate>([]));
+        _courseRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<Course>([]));
+    }
+
+    private void SetupSessions(Guid batchId, bool hasSessions)
+    {
+        var data = hasSessions
+            ? new[] { new ClassSession { Id = Guid.NewGuid(), BatchId = batchId } }
+            : Array.Empty<ClassSession>();
+        _sessionRepo.Setup(r => r.Query()).Returns(new TestAsyncEnumerable<ClassSession>(data));
+    }
 
     private static Batch ExistingBatch(
         Guid batchId,
@@ -94,12 +115,30 @@ public class AssignCandidatesToBatchCommandHandlerTests
     }
 
     [Fact]
+    public async Task Throws_ConflictException_when_batch_has_no_class_schedule()
+    {
+        var batchId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId));
+        SetupSessions(batchId, hasSessions: false);
+
+        var cmd = new AssignCandidatesToBatchCommand(batchId, [Guid.NewGuid()]);
+        var act = async () => await CreateHandler().Handle(cmd, default);
+
+        await act.Should().ThrowAsync<ConflictException>()
+            .Where(e => e.Message.Contains("no class schedule"));
+        _enrollmentRepo.Verify(r => r.Update(It.IsAny<Enrollment>()), Times.Never);
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Throws_ConflictException_when_batch_capacity_would_be_exceeded()
     {
         var batchId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         var batch = ExistingBatch(batchId, courseId, maxCapacity: 2);
         _batchRepo.SetupGetById(batchId, batch);
+        SetupSessions(batchId, hasSessions: true);
 
         var existing1 = NewEnrollment(Guid.NewGuid(), courseId, batchId: batchId, status: EnrollmentStatus.Enrolled);
         var existing2 = NewEnrollment(Guid.NewGuid(), courseId, batchId: batchId, status: EnrollmentStatus.Enrolled);
@@ -119,6 +158,7 @@ public class AssignCandidatesToBatchCommandHandlerTests
         var batchId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId, maxCapacity: 30));
+        SetupSessions(batchId, hasSessions: true);
 
         var existingEnrollmentId = Guid.NewGuid();
         var missingEnrollmentId = Guid.NewGuid();
@@ -141,6 +181,7 @@ public class AssignCandidatesToBatchCommandHandlerTests
         var courseId = Guid.NewGuid();
         var otherCourseId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId));
+        SetupSessions(batchId, hasSessions: true);
 
         var enrollmentId = Guid.NewGuid();
         SetupQuery(new[]
@@ -161,6 +202,7 @@ public class AssignCandidatesToBatchCommandHandlerTests
         var batchId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId));
+        SetupSessions(batchId, hasSessions: true);
 
         var enrollmentId = Guid.NewGuid();
         SetupQuery(new[]
@@ -181,6 +223,7 @@ public class AssignCandidatesToBatchCommandHandlerTests
         var batchId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId));
+        SetupSessions(batchId, hasSessions: true);
 
         var enrollmentId = Guid.NewGuid();
         SetupQuery(new[]
@@ -201,6 +244,7 @@ public class AssignCandidatesToBatchCommandHandlerTests
         var batchId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId, maxCapacity: 10));
+        SetupSessions(batchId, hasSessions: true);
 
         var e1 = NewEnrollment(Guid.NewGuid(), courseId);
         var e2 = NewEnrollment(Guid.NewGuid(), courseId);
@@ -225,6 +269,7 @@ public class AssignCandidatesToBatchCommandHandlerTests
         var batchId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         _batchRepo.SetupGetById(batchId, ExistingBatch(batchId, courseId, maxCapacity: 1));
+        SetupSessions(batchId, hasSessions: true);
 
         var e1 = NewEnrollment(Guid.NewGuid(), courseId);
         SetupQuery(new[] { e1 });
@@ -235,71 +280,5 @@ public class AssignCandidatesToBatchCommandHandlerTests
         e1.BatchId.Should().Be(batchId);
         e1.Status.Should().Be(EnrollmentStatus.Enrolled);
         _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-    }
-}
-
-internal sealed class TestAsyncEnumerable<T> : IOrderedQueryable<T>, IAsyncEnumerable<T>
-{
-    private readonly IQueryable<T> _inner;
-
-    public TestAsyncEnumerable(IEnumerable<T> source) => _inner = source.AsQueryable();
-    public TestAsyncEnumerable(Expression expression) => _inner = new EnumerableQuery<T>(expression);
-
-    public Type ElementType => typeof(T);
-    public Expression Expression => _inner.Expression;
-    public IQueryProvider Provider => new TestAsyncQueryProvider<T>(_inner.Provider);
-
-    public IEnumerator<T> GetEnumerator() => _inner.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => _inner.GetEnumerator();
-
-    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-        => new TestAsyncEnumerator<T>(_inner.GetEnumerator());
-}
-
-internal sealed class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
-{
-    private readonly IEnumerator<T> _inner;
-
-    public TestAsyncEnumerator(IEnumerator<T> inner) => _inner = inner;
-
-    public T Current => _inner.Current;
-
-    public ValueTask<bool> MoveNextAsync() => new(_inner.MoveNext());
-
-    public ValueTask DisposeAsync()
-    {
-        _inner.Dispose();
-        return ValueTask.CompletedTask;
-    }
-}
-
-internal sealed class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
-{
-    private readonly IQueryProvider _inner;
-
-    public TestAsyncQueryProvider(IQueryProvider inner) => _inner = inner;
-
-    public IQueryable CreateQuery(Expression expression) => new TestAsyncEnumerable<TEntity>(expression);
-
-    public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
-        => new TestAsyncEnumerable<TElement>(expression);
-
-    public object? Execute(Expression expression) => _inner.Execute(expression);
-
-    public TResult Execute<TResult>(Expression expression) => _inner.Execute<TResult>(expression);
-
-    public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-    {
-        var expectedResultType = typeof(TResult).GetGenericArguments().FirstOrDefault();
-        if (expectedResultType is null)
-        {
-            return (TResult)(object)Task.FromResult(_inner.Execute(expression));
-        }
-
-        var executionResult = _inner.Execute(expression);
-        return (TResult)typeof(Task)
-            .GetMethod(nameof(Task.FromResult))!
-            .MakeGenericMethod(expectedResultType)
-            .Invoke(null, new[] { executionResult })!;
     }
 }

@@ -12,7 +12,7 @@
         {{
           isEdit()
             ? 'Update batch schedule, capacity, and status.'
-            : 'Create a new batch, link it to a course, and optionally assign a faculty.'
+            : 'Create a new batch and link it to a course. Schedule and faculty are added afterwards.'
         }}
       </p>
     </div>
@@ -87,53 +87,6 @@
           </hlm-combobox>
           <hlm-field-error validator="required">Course is required.</hlm-field-error>
         </hlm-field>
-
-        @if (!isEdit()) {
-          <hlm-field>
-            <label hlmFieldLabel>Faculty (optional)</label>
-            <hlm-combobox
-              formControlName="faculty"
-              [(search)]="facultySearch"
-              [itemToString]="facultyItemToString"
-              class="w-full"
-            >
-              <hlm-combobox-input
-                placeholder="Search faculty by name, code, or specialization..."
-                showClear
-              />
-              <hlm-combobox-content *hlmComboboxPortal>
-                @if (faculties.isError()) {
-                  <hlm-combobox-status>Failed to load faculty.</hlm-combobox-status>
-                } @else if (faculties.isPending()) {
-                  <hlm-combobox-status>
-                    <hlm-spinner />
-                    Loading...
-                  </hlm-combobox-status>
-                } @else {
-                  @let items = faculties.data()?.items ?? [];
-                  @if (items.length === 0) {
-                    <hlm-combobox-empty>No faculty found.</hlm-combobox-empty>
-                  }
-                  <div hlmComboboxList>
-                    @for (faculty of items; track faculty.facultyId) {
-                      <hlm-combobox-item [value]="faculty">
-                        <div class="flex flex-col">
-                          <span>{{ faculty.fullName }} ({{ faculty.facultyCode }})</span>
-                          <span class="text-muted-foreground text-xs">
-                            {{ faculty.specialization }}
-                          </span>
-                        </div>
-                      </hlm-combobox-item>
-                    }
-                  </div>
-                }
-              </hlm-combobox-content>
-            </hlm-combobox>
-            <p class="text-muted-foreground text-xs">
-              Leave empty to create as "Needs Instructor" and assign later.
-            </p>
-          </hlm-field>
-        }
 
         <div class="grid gap-4 sm:grid-cols-2">
           <hlm-field>
