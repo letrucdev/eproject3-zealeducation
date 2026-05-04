@@ -1,0 +1,80 @@
+<hlm-dialog #dlg>
+  <hlm-dialog-content
+    *hlmDialogPortal
+    class="sm:max-w-xl w-xl flex flex-col"
+    [showCloseButton]="true"
+  >
+    <div hlmDialogHeader>
+      <h2 hlmDialogTitle>Add Enrollment</h2>
+      @if (target(); as t) {
+        <p class="text-muted-foreground text-sm">
+          Adding a new course enrollment for
+          <span class="font-medium">{{ t.candidateName }}</span> ({{ t.candidateCode }}). A new fee
+          structure will be created and a confirmation email will be sent to the candidate.
+        </p>
+      }
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-2 flex flex-col gap-4">
+      <hlm-field-group>
+        <hlm-field>
+          <label hlmFieldLabel>Course</label>
+          <hlm-combobox
+            formControlName="course"
+            [(search)]="courseSearch"
+            [itemToString]="courseItemToString"
+            class="w-full"
+          >
+            <hlm-combobox-input placeholder="Search for a course..." showClear />
+            <hlm-combobox-content *hlmComboboxPortal>
+              @if (courses.isError()) {
+                <hlm-combobox-status>Failed to load courses.</hlm-combobox-status>
+              } @else if (courses.isPending()) {
+                <hlm-combobox-status>
+                  <hlm-spinner />
+                  Loading...
+                </hlm-combobox-status>
+              } @else {
+                @let items = courses.data()?.items ?? [];
+                @if (items.length === 0) {
+                  <hlm-combobox-empty>No courses found.</hlm-combobox-empty>
+                }
+                <div hlmComboboxList>
+                  @for (course of items; track course.courseId) {
+                    <hlm-combobox-item [value]="course">
+                      {{ course.courseName }} - {{ course.baseFee | vnd }}
+                    </hlm-combobox-item>
+                  }
+                </div>
+              }
+            </hlm-combobox-content>
+          </hlm-combobox>
+          <hlm-field-error validator="required">Course is required.</hlm-field-error>
+        </hlm-field>
+
+        @if (selectedCourse(); as course) {
+          <div class="rounded-md border bg-muted/50 p-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Tuition fee</span>
+              <span class="font-medium">{{ course.baseFee | vnd }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Duration</span>
+              <span>{{ course.durationWeeks }} weeks</span>
+            </div>
+          </div>
+        }
+      </hlm-field-group>
+
+      <div hlmDialogFooter>
+        <button hlmBtn variant="outline" type="button" hlmDialogClose>Cancel</button>
+        <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <hlm-spinner class="mr-2" />
+          }
+          {{ submitting() ? 'Adding...' : 'Add enrollment' }}
+        </button>
+      </div>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

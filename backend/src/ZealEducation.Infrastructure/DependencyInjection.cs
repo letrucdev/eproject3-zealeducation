@@ -52,6 +52,7 @@ public static class DependencyInjection
         services.AddAuthenticationServices(configuration);
 
         services.AddScoped<IEnquiryConvertedNotificationService, EnquiryConvertedNotificationService>();
+        services.AddScoped<ICourseAddedNotificationService, CourseAddedNotificationService>();
         services.AddScoped<ICandidatePasswordResetNotificationService, CandidatePasswordResetNotificationService>();
         services.AddScoped<IInstallmentReminderNotificationService, InstallmentReminderNotificationService>();
         services.AddScoped<IBatchFacultyAssignedNotificationService, BatchFacultyAssignedNotificationService>();
