@@ -35,3 +35,14 @@ export interface ResetCandidatePasswordResponse {
   username: string;
   temporaryPassword: string;
 }
+
+export interface AddEnrollmentPayload {
+  courseId: string;
+}
+
+export interface AddEnrollmentResponse {
+  enrollmentId: string;
+  feeId: string;
+  courseName: string;
+  totalFee: number;
+}
