@@ -23,7 +23,6 @@ export class FacultiesService {
     return injectQuery(() => ({
       queryKey: [...FACULTY_QUERY_KEY, params()],
       queryFn: () => this._fetchList(params()),
-      staleTime: 60_000,
       placeholderData: keepPreviousData,
     }));
   }

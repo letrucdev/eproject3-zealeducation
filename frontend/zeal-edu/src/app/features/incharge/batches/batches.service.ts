@@ -94,7 +94,6 @@ export class BatchesService {
     return injectQuery(() => ({
       queryKey: [...BATCH_CREATION_TREND_QUERY_KEY, days()],
       queryFn: () => this._fetchCreationTrend(days()),
-      staleTime: 60_000,
     }));
   }
 
@@ -145,7 +144,6 @@ export class BatchesService {
       enabled: batchId() !== null,
       queryKey: [...BATCH_EXAM_SCORES_TREND_QUERY_KEY, batchId(), days()],
       queryFn: () => this._fetchExamScoresTrend(batchId() as string, days()),
-      staleTime: 60_000,
     }));
   }
 
@@ -154,7 +152,6 @@ export class BatchesService {
       enabled: batchId() !== null,
       queryKey: [...BATCH_GRADE_DISTRIBUTION_QUERY_KEY, batchId()],
       queryFn: () => this._fetchGradeDistribution(batchId() as string),
-      staleTime: 60_000,
     }));
   }
 
