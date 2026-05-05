@@ -68,7 +68,12 @@
           size="sm"
           type="button"
           (click)="onSave()"
-          [disabled]="data.rows.length === 0 || markMutation.isPending() || isLocked()"
+          [disabled]="
+            data.rows.length === 0 ||
+            markMutation.isPending() ||
+            isLocked() ||
+            hasInvalidPracticalHours()
+          "
         >
           <ng-icon hlm name="lucideSave" size="sm" />
           {{ markMutation.isPending() ? 'Saving...' : 'Save Attendance' }}
@@ -81,7 +86,14 @@
               <th class="px-3 py-2 w-36">Code</th>
               <th class="px-3 py-2 w-36">Name</th>
               <th class="px-3 py-2 w-40">Status</th>
-              <th class="px-3 py-2 w-36">Practical Hours</th>
+              <th class="px-3 py-2 w-36">
+                Practical Hours
+                @if (maxPracticalHours(); as max) {
+                  <span class="block text-[10px] font-normal normal-case text-muted-foreground">
+                    Max {{ max }}h
+                  </span>
+                }
+              </th>
               <th class="px-3 py-2">Remarks</th>
             </tr>
           </thead>
@@ -115,14 +127,21 @@
                     type="number"
                     inputmode="decimal"
                     min="0"
-                    max="999.99"
+                    [max]="maxPracticalHours() ?? 999.99"
                     step="0.25"
                     class="w-full"
+                    [class.border-rose-500]="isPracticalHoursRowInvalid(row.enrollmentId)"
                     placeholder="0"
+                    [attr.aria-invalid]="isPracticalHoursRowInvalid(row.enrollmentId) || null"
                     [value]="getPracticalHours(row.enrollmentId)"
                     (input)="onPracticalHoursChanged(row.enrollmentId, $any($event.target).value)"
                     [disabled]="isLocked()"
                   />
+                  @if (isPracticalHoursRowInvalid(row.enrollmentId)) {
+                    <p class="mt-1 text-xs text-rose-600">
+                      Max {{ maxPracticalHours() }}h
+                    </p>
+                  }
                 </td>
                 <td class="px-3 py-2">
                   <input
