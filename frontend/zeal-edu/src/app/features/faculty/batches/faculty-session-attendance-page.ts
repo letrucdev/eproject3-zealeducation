@@ -32,6 +32,31 @@ interface AttendanceFormRow {
   remarks: string;
 }
 
+function computeDurationHours(startTime: string, endTime: string): number | null {
+  const parse = (value: string): number | null => {
+    const [h, m] = value.split(':');
+    const hours = Number(h);
+    const minutes = Number(m);
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
+    return hours + minutes / 60;
+  };
+  const start = parse(startTime);
+  const end = parse(endTime);
+  if (start == null || end == null) return null;
+  const diff = end - start;
+  if (diff <= 0) return null;
+  return Math.round(diff * 100) / 100;
+}
+
+function isPracticalHoursValid(raw: string, max: number): boolean {
+  const trimmed = raw.trim();
+  if (trimmed === '') return true;
+  const value = Number(trimmed);
+  if (!Number.isFinite(value)) return false;
+  if (value < 0) return false;
+  return value <= max;
+}
+
 @Component({
   selector: 'app-faculty-session-attendance-page',
   imports: [
@@ -85,6 +110,21 @@ export default class FacultySessionAttendancePage {
     return data?.status === ClassSessionStatus.Cancelled;
   });
 
+  protected readonly maxPracticalHours = computed<number | null>(() => {
+    const data = this.attendanceQuery.data();
+    if (!data) return null;
+    return computeDurationHours(data.startTime, data.endTime);
+  });
+
+  protected readonly hasInvalidPracticalHours = computed(() => {
+    const max = this.maxPracticalHours();
+    if (max == null) return false;
+    for (const row of this._formState().values()) {
+      if (!isPracticalHoursValid(row.practicalHours, max)) return true;
+    }
+    return false;
+  });
+
   constructor() {
     effect(() => {
       const data = this.attendanceQuery.data();
@@ -113,6 +153,13 @@ export default class FacultySessionAttendancePage {
 
   protected getPracticalHours(enrollmentId: string): string {
     return this._formState().get(enrollmentId)?.practicalHours ?? '';
+  }
+
+  protected isPracticalHoursRowInvalid(enrollmentId: string): boolean {
+    const max = this.maxPracticalHours();
+    if (max == null) return false;
+    const raw = this._formState().get(enrollmentId)?.practicalHours ?? '';
+    return !isPracticalHoursValid(raw, max);
   }
 
   protected onStatusChanged(enrollmentId: string, status: AttendanceStatus | null): void {
@@ -156,6 +203,12 @@ export default class FacultySessionAttendancePage {
     if (!sessionId) return;
     const data = this.attendanceQuery.data();
     if (!data) return;
+
+    const max = this.maxPracticalHours();
+    if (max != null && this.hasInvalidPracticalHours()) {
+      toast.error(`Practical hours cannot exceed the session duration (${max} hours).`);
+      return;
+    }
 
     const entries: MarkAttendanceEntry[] = data.rows.map((row) => {
       const formRow = this._formState().get(row.enrollmentId);

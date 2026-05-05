@@ -32,6 +32,11 @@ public class MarkAttendanceCommandHandler(
         if (validEnrollmentIds.Count != enrollmentIds.Count)
             throw new ConflictException("One or more enrollments do not belong to this session's batch.");
 
+        var maxPracticalHours = Math.Round((decimal)(session.EndTime - session.StartTime).TotalHours, 2);
+        if (entries.Any(e => e.PracticalHours.HasValue && e.PracticalHours.Value > maxPracticalHours))
+            throw new ConflictException(
+                $"Practical hours cannot exceed the session duration ({maxPracticalHours:0.##} hours).");
+
         var existing = await attendanceRepository.Query()
             .Where(a => a.ClassSessionId == session.Id)
             .ToListAsync(cancellationToken);
