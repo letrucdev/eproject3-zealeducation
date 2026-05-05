@@ -41,9 +41,18 @@ public class UpdateEnquiryCommandHandler(
                 throw new ConflictException("An enquiry with this phone number already exists.");
         }
 
+        var email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim();
+        if (email is not null && enquiry.Email != email)
+        {
+            var emailDuplicates = await enquiryRepository.FindAsync(
+                e => e.Email == email && e.Id != enquiry.Id, cancellationToken);
+            if (emailDuplicates.Count > 0)
+                throw new ConflictException("An enquiry with this email already exists.");
+        }
+
         enquiry.FullName = request.FullName.Trim();
         enquiry.Phone = phone;
-        enquiry.Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim();
+        enquiry.Email = email;
         enquiry.Source = request.Source;
         enquiry.Status = request.Status;
         enquiry.NextFollowUpDate = request.NextFollowUpDate;
