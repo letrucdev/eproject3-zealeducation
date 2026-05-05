@@ -73,6 +73,7 @@ services:
   mailhog:
     image: mailhog/mailhog:latest
     container_name: zeal-mailhog
+    profiles: ["dev"]
     ports:
       - "1025:1025"  # SMTP
       - "8025:8025"  # Web UI
