@@ -47,7 +47,6 @@ export class CandidatesService {
     return injectQuery(() => ({
       queryKey: [...CANDIDATE_TREND_QUERY_KEY, days()],
       queryFn: () => this._fetchTrend(days()),
-      staleTime: 60_000,
     }));
   }
 

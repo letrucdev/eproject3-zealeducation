@@ -27,7 +27,13 @@ export const appConfig: ApplicationConfig = {
         errorInterceptor,
       ]),
     ),
-    provideTanStackQuery(new QueryClient()),
+    provideTanStackQuery(
+      new QueryClient({
+        defaultOptions: {
+          queries: { staleTime: 60_000 },
+        },
+      }),
+    ),
     { provide: OVERLAY_DEFAULT_CONFIG, useValue: { usePopover: false } },
     { provide: TitleStrategy, useClass: AppTitleStrategy },
   ],
