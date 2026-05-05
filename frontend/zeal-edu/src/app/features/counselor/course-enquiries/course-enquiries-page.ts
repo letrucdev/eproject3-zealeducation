@@ -173,24 +173,30 @@ export default class CourseEnquiriesPage {
     if (event.mode === 'create') {
       this.createMutation.mutate(event.payload, {
         onSuccess: () => this.formDialog().close(),
-        onError: (err) => {
-          if (err.status === 409) {
-            this.formDialog().markPhoneTaken(event.payload.phone);
-          }
-        },
+        onError: (err) => this._handleFormConflict(err, event.payload.phone, event.payload.email),
       });
     } else {
       this.updateMutation.mutate(
         { enquiryId: event.enquiryId, payload: event.payload },
         {
           onSuccess: () => this.formDialog().close(),
-          onError: (err) => {
-            if (err.status === 409) {
-              this.formDialog().markPhoneTaken(event.payload.phone);
-            }
-          },
+          onError: (err) => this._handleFormConflict(err, event.payload.phone, event.payload.email),
         },
       );
+    }
+  }
+
+  private _handleFormConflict(
+    err: { status: number; error?: { message?: string } | null },
+    phone: string,
+    email: string | null,
+  ): void {
+    if (err.status !== 409) return;
+    const message = err.error?.message?.toLowerCase() ?? '';
+    if (message.includes('email') && email) {
+      this.formDialog().markEmailTaken(email);
+    } else {
+      this.formDialog().markPhoneTaken(phone);
     }
   }
 
