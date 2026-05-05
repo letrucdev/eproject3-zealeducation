@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZealEducation.API.Common.Models;
 using ZealEducation.Application.Common.Models;
+using ZealEducation.Application.Features.Candidates.Commands.AddEnrollment;
 using ZealEducation.Application.Features.Candidates.Commands.ApplyFine;
 using ZealEducation.Application.Features.Candidates.Commands.ResetCandidatePassword;
 using ZealEducation.Application.Features.Candidates.Commands.UpdateCandidate;
@@ -70,6 +71,15 @@ public class CandidateController(ISender sender) : ControllerBase
         return Ok(ApiResponse<ResetCandidatePasswordResponse>.Success(result, "Candidate password reset successfully"));
     }
 
+    [HttpPost("{id:guid}/enrollments")]
+    public async Task<ActionResult<ApiResponse<AddEnrollmentResponse>>> AddEnrollment(
+        Guid id,
+        [FromBody] AddEnrollmentRequest body)
+    {
+        var result = await sender.Send(new AddEnrollmentCommand(id, body.CourseId));
+        return Ok(ApiResponse<AddEnrollmentResponse>.Success(result, "Enrollment added successfully"));
+    }
+
     public record UpdateCandidateRequest(
         string FullName,
         string Email,
@@ -80,4 +90,6 @@ public class CandidateController(ISender sender) : ControllerBase
         CandidateStatus Status);
 
     public record ApplyFineRequest(string ViolationReason, decimal PenaltyAmount);
+
+    public record AddEnrollmentRequest(Guid CourseId);
 }

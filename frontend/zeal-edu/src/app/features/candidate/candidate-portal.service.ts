@@ -44,7 +44,6 @@ export class CandidatePortalService {
     return injectQuery<CandidateDetail, HttpErrorResponse>(() => ({
       queryKey: MY_PROFILE_QUERY_KEY,
       queryFn: () => this._fetchProfile(),
-      staleTime: 60_000,
     }));
   }
 

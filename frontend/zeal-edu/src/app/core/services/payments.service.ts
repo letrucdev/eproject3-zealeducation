@@ -35,7 +35,8 @@ export class PaymentsService {
     return injectQuery(() => ({
       queryKey: [...PAYMENTS_LIST_KEY, params()],
       queryFn: () => this._fetchList(params()),
-      staleTime: 30_000,
+      refetchInterval: 30_000,
+      refetchIntervalInBackground: true,
       placeholderData: keepPreviousData,
     }));
   }
@@ -140,8 +141,9 @@ export class PaymentsService {
       }),
     );
     const blob = response.body as Blob;
-    const fileName = this._extractFileName(response.headers.get('Content-Disposition'))
-      ?? `financial-report-${params.transactions.from}-${params.transactions.to}.xlsx`;
+    const fileName =
+      this._extractFileName(response.headers.get('Content-Disposition')) ??
+      `financial-report-${params.transactions.from}-${params.transactions.to}.xlsx`;
 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -179,11 +181,14 @@ export class PaymentsService {
       }),
     );
     const blob = response.body as Blob;
-    const contentType = response.headers.get('Content-Type') ?? blob.type ?? 'application/octet-stream';
+    const contentType =
+      response.headers.get('Content-Type') ?? blob.type ?? 'application/octet-stream';
     return { objectUrl: URL.createObjectURL(blob), contentType };
   }
 
-  private async _fetchList(query: FeeStructureListQuery): Promise<PaginatedList<FeeStructureListItem>> {
+  private async _fetchList(
+    query: FeeStructureListQuery,
+  ): Promise<PaginatedList<FeeStructureListItem>> {
     let params = new HttpParams()
       .set('page', String(query.page ?? 1))
       .set('pageSize', String(query.pageSize ?? 10));

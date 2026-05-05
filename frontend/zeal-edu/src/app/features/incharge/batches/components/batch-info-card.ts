@@ -18,6 +18,8 @@ import { BatchStatus } from '@core/models/batch-status';
 })
 export class BatchInfoCard {
   readonly detail = input.required<BatchDetail>();
+  readonly canAssignFaculty = input<boolean>(true);
+  readonly hasSchedule = input<boolean>(true);
   readonly editClicked = output<void>();
   readonly assignFacultyClicked = output<void>();
   readonly deleteClicked = output<void>();

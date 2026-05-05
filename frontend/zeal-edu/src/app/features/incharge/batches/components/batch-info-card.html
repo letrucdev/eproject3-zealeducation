@@ -27,8 +27,9 @@
         size="sm"
         type="button"
         (click)="assignFacultyClicked.emit()"
-        [disabled]="
-          detail().status === statuses.Completed || detail().status === statuses.Cancelled
+        [disabled]="!canAssignFaculty()"
+        [attr.title]="
+          !hasSchedule() ? 'Add at least one class session first' : null
         "
       >
         <ng-icon hlm name="lucideUserPlus" size="sm" />
@@ -61,6 +62,15 @@
       </button>
     </div>
   </div>
+  @if (!hasSchedule()) {
+    <div
+      class="mx-6 -mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800"
+      role="status"
+    >
+      No class schedule yet — add sessions to enable faculty assignment, candidate enrollment, and
+      exam scheduling.
+    </div>
+  }
   <div hlmCardContent class="grid gap-4 md:grid-cols-2">
     <div class="flex flex-col">
       <span class="text-xs uppercase text-muted-foreground">Faculty</span>

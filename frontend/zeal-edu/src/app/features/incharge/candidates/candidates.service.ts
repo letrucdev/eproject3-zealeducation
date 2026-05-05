@@ -12,6 +12,8 @@ import {
 import { CandidateDetail } from '@core/models/candidate-detail';
 import { CandidateListItem } from './models/candidate-list-item';
 import {
+  AddEnrollmentPayload,
+  AddEnrollmentResponse,
   ApplyFinePayload,
   ApplyFineResponse,
   CandidateListQuery,
@@ -45,7 +47,6 @@ export class CandidatesService {
     return injectQuery(() => ({
       queryKey: [...CANDIDATE_TREND_QUERY_KEY, days()],
       queryFn: () => this._fetchTrend(days()),
-      staleTime: 60_000,
     }));
   }
 
@@ -100,6 +101,28 @@ export class CandidatesService {
           ),
         );
         if (!response.data) throw new Error(response.message || 'Failed to apply fine');
+        return response.data;
+      },
+      onSuccess: () => {
+        this._invalidateAll();
+      },
+    }));
+  }
+
+  addEnrollmentMutation() {
+    return injectMutation<
+      AddEnrollmentResponse,
+      HttpErrorResponse,
+      { candidateId: string; payload: AddEnrollmentPayload }
+    >(() => ({
+      mutationFn: async ({ candidateId, payload }) => {
+        const response = await firstValueFrom(
+          this._http.post<ApiResponse<AddEnrollmentResponse>>(
+            `/candidates/${candidateId}/enrollments`,
+            payload,
+          ),
+        );
+        if (!response.data) throw new Error(response.message || 'Failed to add enrollment');
         return response.data;
       },
       onSuccess: () => {

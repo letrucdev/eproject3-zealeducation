@@ -28,9 +28,7 @@ import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { BatchDetail } from '@core/models/batch-detail';
 import { BatchStatus } from '@core/models/batch-status';
 import { CourseListItem } from '@core/models/course-list-item';
-import { FacultyListItem } from '@core/models/faculty-list-item';
 import { CoursesService } from '@core/services/courses.service';
-import { FacultiesService } from '@core/services/faculties.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { CreateBatchPayload, UpdateBatchPayload } from '../models/batch-payload';
 import { BATCH_STATUS_LABELS } from '@core/models/batch-labels';
@@ -96,7 +94,6 @@ const startNotPastValidator =
 export class BatchFormDialog {
   private readonly _fb = inject(FormBuilder);
   private readonly _coursesService = inject(CoursesService);
-  private readonly _facultiesService = inject(FacultiesService);
 
   readonly submitting = input<boolean>(false);
   readonly submitted = output<BatchFormSubmit>();
@@ -123,7 +120,6 @@ export class BatchFormDialog {
   readonly form = this._fb.group({
     batchCode: this._fb.nonNullable.control('', [Validators.required, Validators.maxLength(30)]),
     course: this._fb.control<CourseListItem | null>(null, [Validators.required]),
-    faculty: this._fb.control<FacultyListItem | null>(null),
     startDate: this._fb.nonNullable.control('', [
       Validators.required,
       startNotPastValidator(() => this.initial()),
@@ -143,7 +139,6 @@ export class BatchFormDialog {
   });
 
   protected readonly courseSearch = signal('');
-  protected readonly facultySearch = signal('');
 
   constructor() {
     this.form.controls.startDate.valueChanges
@@ -170,28 +165,15 @@ export class BatchFormDialog {
     })),
   );
 
-  protected readonly faculties = this._facultiesService.listQuery(
-    computed(() => ({
-      page: 1,
-      pageSize: 20,
-      search: this.facultySearch(),
-    })),
-  );
-
   protected readonly courseItemToString = (c: CourseListItem | null): string => c?.courseName ?? '';
-
-  protected readonly facultyItemToString = (f: FacultyListItem | null): string =>
-    f ? `${f.fullName} (${f.facultyCode})` : '';
 
   openCreate(): void {
     this.mode.set('create');
     this.initial.set(null);
     this.courseSearch.set('');
-    this.facultySearch.set('');
     this.form.reset({
       batchCode: '',
       course: null,
-      faculty: null,
       startDate: '',
       endDate: '',
       location: '',
@@ -205,7 +187,6 @@ export class BatchFormDialog {
     this.mode.set('edit');
     this.initial.set(detail);
     this.courseSearch.set('');
-    this.facultySearch.set('');
     this.form.reset({
       batchCode: detail.batchCode,
       course: {
@@ -218,7 +199,6 @@ export class BatchFormDialog {
         createdAt: '',
         updatedAt: null,
       },
-      faculty: null,
       startDate: detail.startDate,
       endDate: detail.endDate,
       location: detail.location ?? '',
@@ -274,7 +254,6 @@ export class BatchFormDialog {
       const payload: CreateBatchPayload = {
         batchCode,
         courseId: v.course.courseId,
-        facultyId: v.faculty?.facultyId ?? null,
         startDate: v.startDate,
         endDate: v.endDate,
         location,

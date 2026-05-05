@@ -17,6 +17,9 @@
         type="button"
         (click)="addClicked.emit()"
         [disabled]="!canAddCandidate()"
+        [attr.title]="
+          !hasSchedule() ? 'Add at least one class session first' : null
+        "
       >
         <ng-icon hlm name="lucideUserPlus" size="sm" />
         Add Candidate

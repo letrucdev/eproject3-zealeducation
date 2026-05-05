@@ -24,7 +24,10 @@
       (fineClicked)="onFineClicked()"
     />
 
-    <app-candidate-enrollments-card [enrollments]="detail.enrollments" />
+    <app-candidate-enrollments-card
+      [enrollments]="detail.enrollments"
+      (addClicked)="onAddEnrollmentClicked()"
+    />
 
     <app-fee-history-table
       [feeStructures]="detail.feeStructures"
@@ -43,6 +46,12 @@
   #fineDialog
   [submitting]="applyFineMutation.isPending()"
   (submitted)="onApplyFineSubmitted($event)"
+/>
+
+<app-add-enrollment-dialog
+  #addEnrollmentDialog
+  [submitting]="addEnrollmentMutation.isPending()"
+  (submitted)="onAddEnrollmentSubmitted($event)"
 />
 
 <app-fee-detail-dialog #feeDetailDialog />

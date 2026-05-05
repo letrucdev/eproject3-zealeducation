@@ -117,7 +117,6 @@ export class FacultyService {
     return injectQuery<PaginatedList<FacultyCourseOption>, HttpErrorResponse>(() => ({
       queryKey: [...FACULTY_COURSES_KEY, params()],
       queryFn: () => this._fetchCourses(params()),
-      staleTime: 60_000,
       placeholderData: keepPreviousData,
     }));
   }
