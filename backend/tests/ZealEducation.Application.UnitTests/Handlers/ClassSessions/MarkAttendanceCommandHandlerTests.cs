@@ -17,13 +17,13 @@ public class MarkAttendanceCommandHandlerTests
     private MarkAttendanceCommandHandler CreateHandler() =>
         new(_sessionRepo.Object, _enrollmentRepo.Object, _attendanceRepo.Object, _uow.Object);
 
-    private static ClassSession ExistingSession(Guid sessionId, Guid batchId) => new()
+    private static ClassSession ExistingSession(Guid sessionId, Guid batchId, TimeOnly? endTime = null) => new()
     {
         Id = sessionId,
         BatchId = batchId,
         SessionDate = new DateOnly(2030, 1, 15),
         StartTime = new TimeOnly(9, 0),
-        EndTime = new TimeOnly(11, 0),
+        EndTime = endTime ?? new TimeOnly(13, 0),
         Status = ClassSessionStatus.Scheduled
     };
 
@@ -87,6 +87,52 @@ public class MarkAttendanceCommandHandlerTests
         await act.Should().ThrowAsync<ConflictException>()
             .WithMessage("One or more enrollments do not belong to this session's batch.");
         _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Throws_ConflictException_when_practical_hours_exceeds_session_duration()
+    {
+        var sessionId = Guid.NewGuid();
+        var batchId = Guid.NewGuid();
+        // Session is 9:00 -> 11:00 (2 hours)
+        _sessionRepo.SetupGetById(sessionId, ExistingSession(sessionId, batchId, new TimeOnly(11, 0)));
+
+        var enrollmentId = Guid.NewGuid();
+        SetupEnrollmentQuery(new[] { Enrollment(enrollmentId, batchId) });
+
+        var cmd = new MarkAttendanceCommand(sessionId, [
+            new AttendanceEntry(enrollmentId, AttendanceStatus.Present, 2.25m, null)
+        ]);
+        var act = async () => await CreateHandler().Handle(cmd, default);
+
+        await act.Should().ThrowAsync<ConflictException>()
+            .WithMessage("Practical hours cannot exceed the session duration (2 hours).");
+        _attendanceRepo.Verify(r => r.AddAsync(It.IsAny<AttendanceRecord>(), It.IsAny<CancellationToken>()), Times.Never);
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Allows_practical_hours_equal_to_session_duration()
+    {
+        var sessionId = Guid.NewGuid();
+        var batchId = Guid.NewGuid();
+        // Session is 9:00 -> 11:00 (2 hours)
+        _sessionRepo.SetupGetById(sessionId, ExistingSession(sessionId, batchId, new TimeOnly(11, 0)));
+
+        var enrollmentId = Guid.NewGuid();
+        SetupEnrollmentQuery(new[] { Enrollment(enrollmentId, batchId) });
+        SetupAttendanceQuery(Array.Empty<AttendanceRecord>());
+
+        _attendanceRepo.Setup(r => r.AddAsync(It.IsAny<AttendanceRecord>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((AttendanceRecord a, CancellationToken _) => a);
+
+        var cmd = new MarkAttendanceCommand(sessionId, [
+            new AttendanceEntry(enrollmentId, AttendanceStatus.Present, 2.0m, null)
+        ]);
+
+        await CreateHandler().Handle(cmd, default);
+
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

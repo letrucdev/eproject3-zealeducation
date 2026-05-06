@@ -86,11 +86,18 @@ export class EnquiryFormDialog {
   readonly isEdit = computed(() => this.mode() === 'edit');
 
   private readonly _takenPhones = signal<ReadonlySet<string>>(new Set());
+  private readonly _takenEmails = signal<ReadonlySet<string>>(new Set());
 
   private readonly _phoneTakenValidator: ValidatorFn = (control: AbstractControl) => {
     const value = (control.value as string | null)?.trim();
     if (!value) return null;
     return this._takenPhones().has(value) ? { phoneTaken: true } : null;
+  };
+
+  private readonly _emailTakenValidator: ValidatorFn = (control: AbstractControl) => {
+    const value = (control.value as string | null)?.trim().toLowerCase();
+    if (!value) return null;
+    return this._takenEmails().has(value) ? { emailTaken: true } : null;
   };
 
   readonly form = this._fb.group({
@@ -102,7 +109,11 @@ export class EnquiryFormDialog {
       Validators.pattern(/^\d+$/),
       this._phoneTakenValidator,
     ]),
-    email: this._fb.nonNullable.control('', [Validators.email, Validators.maxLength(100)]),
+    email: this._fb.nonNullable.control('', [
+      Validators.email,
+      Validators.maxLength(100),
+      this._emailTakenValidator,
+    ]),
     courseInterested: this._fb.control<CourseListItem | null>(null, [Validators.required]),
     source: this._fb.nonNullable.control(EnquirySource.WalkIn, [Validators.required]),
     status: this._fb.nonNullable.control(EnquiryStatus.New, [Validators.required]),
@@ -133,11 +144,22 @@ export class EnquiryFormDialog {
     this.form.controls.phone.markAsTouched();
   }
 
+  markEmailTaken(email: string): void {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed) return;
+    const next = new Set(this._takenEmails());
+    next.add(trimmed);
+    this._takenEmails.set(next);
+    this.form.controls.email.updateValueAndValidity();
+    this.form.controls.email.markAsTouched();
+  }
+
   openCreate(): void {
     this.mode.set('create');
     this.initial.set(null);
     this.courseSearch.set('');
     this._takenPhones.set(new Set());
+    this._takenEmails.set(new Set());
     this.form.reset({
       fullName: '',
       phone: '',
@@ -155,6 +177,7 @@ export class EnquiryFormDialog {
     this.initial.set(detail);
     this.courseSearch.set('');
     this._takenPhones.set(new Set());
+    this._takenEmails.set(new Set());
     this.form.reset({
       fullName: detail.fullName,
       phone: detail.phone,

@@ -33,12 +33,20 @@ public class CreateEnquiryCommandHandler(
         if (phoneDuplicates.Count > 0)
             throw new ConflictException("An enquiry with this phone number already exists.");
 
+        var email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim();
+        if (email is not null)
+        {
+            var emailDuplicates = await enquiryRepository.FindAsync(e => e.Email == email, cancellationToken);
+            if (emailDuplicates.Count > 0)
+                throw new ConflictException("An enquiry with this email already exists.");
+        }
+
         var enquiry = new CourseEnquiry
         {
             Id = Guid.NewGuid(),
             FullName = request.FullName.Trim(),
             Phone = phone,
-            Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
+            Email = email,
             CourseInterestedId = course.Id,
             Source = request.Source,
             Status = request.Status,

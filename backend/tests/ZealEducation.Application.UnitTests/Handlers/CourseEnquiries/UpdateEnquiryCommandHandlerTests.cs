@@ -133,12 +133,31 @@ public class UpdateEnquiryCommandHandlerTests
     }
 
     [Fact]
+    public async Task Throws_ConflictException_when_email_changed_and_duplicate_exists()
+    {
+        var enquiryId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        var existing = Existing(enquiryId, courseId);
+        existing.Email = "old@example.com";
+        _enquiryRepo.SetupGetById(enquiryId, existing);
+        _enquiryRepo.SetupFind(new[] { new CourseEnquiry { Id = Guid.NewGuid(), Email = "new@example.com" } });
+
+        var act = async () => await CreateHandler().Handle(
+            Cmd(enquiryId, courseId: courseId, email: "new@example.com"), default);
+
+        await act.Should().ThrowAsync<ConflictException>()
+            .WithMessage("An enquiry with this email already exists.");
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Updates_enquiry_and_trims_fields_when_command_is_valid()
     {
         var enquiryId = Guid.NewGuid();
         var courseId = Guid.NewGuid();
         var enquiry = Existing(enquiryId, courseId, phone: "0123456789");
         _enquiryRepo.SetupGetById(enquiryId, enquiry);
+        _enquiryRepo.SetupFind(Array.Empty<CourseEnquiry>());
 
         var followUp = new DateOnly(2031, 1, 1);
         var cmd = new UpdateEnquiryCommand(
