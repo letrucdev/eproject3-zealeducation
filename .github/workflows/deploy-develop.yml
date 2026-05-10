@@ -13,6 +13,20 @@ jobs:
     environment: develop
 
     steps:
+      - name: Notify Telegram on start
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *Develop deploy started*
+            *Repo:* [`${{ github.repository }}`](${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }})
+            *Branch:* `${{ github.ref_name }}`
+            *Commit:* [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            *Message:* ${{ github.event.head_commit.message }}
+            *By:* ${{ github.actor }}
+
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
@@ -33,3 +47,32 @@ jobs:
             chmod 600 .env
             docker compose up -d --build
             docker image prune -f
+
+      - name: Notify Telegram on success
+        if: success()
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✅ *Develop deploy succeeded*
+            *Repo:* [`${{ github.repository }}`](${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }})
+            *Branch:* `${{ github.ref_name }}`
+            *Commit:* [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            *Message:* ${{ github.event.head_commit.message }}
+            *By:* ${{ github.actor }}
+
+      - name: Notify Telegram on failure
+        if: failure()
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ❌ *Develop deploy failed*
+            *Repo:* [`${{ github.repository }}`](${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }})
+            *Commit:* [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            *By:* ${{ github.actor }}
+            [View logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

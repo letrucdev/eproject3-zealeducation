@@ -99,6 +99,27 @@ public class CreateEnquiryCommandHandlerTests
     }
 
     [Fact]
+    public async Task Throws_ConflictException_when_email_duplicate_exists()
+    {
+        var userId = Guid.NewGuid();
+        var courseId = Guid.NewGuid();
+        _currentUser.SetupGet(u => u.UserId).Returns(userId);
+        _staffRepo.SetupFind(new[] { new Staff { Id = Guid.NewGuid(), UserAccountId = userId } });
+        _courseRepo.SetupGetById(courseId, new Course { Id = courseId, CourseName = "X", IsActive = true });
+        _enquiryRepo.SetupSequence(r => r.FindAsync(
+                It.IsAny<System.Linq.Expressions.Expression<Func<CourseEnquiry, bool>>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<CourseEnquiry>())
+            .ReturnsAsync(new List<CourseEnquiry> { new() { Id = Guid.NewGuid(), Email = "jane@example.com" } });
+
+        var act = async () => await CreateHandler().Handle(Cmd(courseId: courseId), default);
+
+        await act.Should().ThrowAsync<ConflictException>()
+            .WithMessage("An enquiry with this email already exists.");
+        _uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Creates_enquiry_with_trimmed_fields_and_returns_response()
     {
         var userId = Guid.NewGuid();

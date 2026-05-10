@@ -56,6 +56,9 @@
           <label hlmFieldLabel for="enquiry-email">Email (optional)</label>
           <input hlmInput id="enquiry-email" type="email" formControlName="email" class="w-full" />
           <hlm-field-error validator="email">Invalid email format.</hlm-field-error>
+          <hlm-field-error validator="emailTaken">
+            An enquiry with this email already exists.
+          </hlm-field-error>
         </hlm-field>
 
         <hlm-field>
