@@ -1,9 +1,20 @@
+```
+ ============================================================
+ Project   : EProject 3 - Zeal Education
+ Author    : Lê Chính Trực - Student1557161 (C2403L0751)
+ Email     : letruc.work@gmail.com - truc.lc.2427@aptechlearning.edu.vn
+ Created   : 2026-19-04
+ Course    : ADSE - Aptech Vietnam (https://aptechvietnam.com.vn)
+ License   : All rights reserved. Unauthorized use prohibited.
+ ============================================================
+```
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## Language for UI text
 
 **ALL user-facing text in the frontend MUST be in English** — including:
+
 - Labels, placeholders, button text, headings, table column titles
 - Toast messages, dialog titles/content, validation/error messages
 - Empty-state copy, tooltips, aria-labels
@@ -39,6 +50,7 @@ Use path aliases instead of relative `../` paths. Aliases are configured in `tsc
 - `@/*` → `src/*` (fallback for paths outside the above)
 
 Rules:
+
 - Prefer the most specific alias (e.g. use `@core/auth/auth-service`, not `@app/core/auth/auth-service`).
 - Use aliases for any cross-folder import (anything that would otherwise need `../`).
 - Keep `./` for sibling files in the same folder or local subfolders within the same feature module (e.g. `./login/login` inside `auth.routes.ts`).
@@ -108,9 +120,8 @@ Dialogs that emit a `submitted` event for the parent to mutate MUST surface the 
   ```html
   <button hlmBtn type="submit" [disabled]="form.invalid || submitting()">
     @if (submitting()) {
-      <hlm-spinner class="mr-2" />
-    }
-    {{ submitting() ? 'Saving...' : 'Save' }}
+    <hlm-spinner class="mr-2" />
+    } {{ submitting() ? 'Saving...' : 'Save' }}
   </button>
   ```
 - Guard the submit handler too: `if (this.submitting()) return;` at the top of `submit()` to prevent re-entry from rapid clicks.
