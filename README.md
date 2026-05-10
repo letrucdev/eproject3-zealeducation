@@ -19,6 +19,36 @@ from enquiry to enrollment, classes, exams, fees, and certificates.**
 
 ---
 
+## 📌 Project info
+
+```
+============================================================
+ Project   : EProject 3 - Zeal Education
+ Author    : Lê Chính Trực - Student1557161 (C2403L0751)
+ Email     : letruc.work@gmail.com - truc.lc.2427@aptechlearning.edu.vn
+ Created   : 2026-19-04
+ Course    : ADSE - Aptech Vietnam (https://aptechvietnam.com.vn)
+ License   : All rights reserved. Unauthorized use prohibited.
+============================================================
+```
+
+| | |
+|---|---|
+| 🎓 **Project** | EProject 3 - Zeal Education |
+| 👤 **Author** | Lê Chính Trực — Student1557161 (C2403L0751) |
+| 📧 **Email** | [letruc.work@gmail.com](mailto:letruc.work@gmail.com) · [truc.lc.2427@aptechlearning.edu.vn](mailto:truc.lc.2427@aptechlearning.edu.vn) |
+| 📅 **Created** | 2026-19-04 |
+| 🏫 **Course** | ADSE — [Aptech Vietnam](https://aptechvietnam.com.vn) |
+| 📜 **License** | All rights reserved. Unauthorized use prohibited. |
+
+### 🤝 Contributors
+
+- Trịnh Minh Quang - Student1562811 (C2403L0760) - quang.tm.2437@aptechlearning.edu.vn
+- Lê Trung Thủy - Student1557918 (C2403L0754) - thuy.lt.2432@aptechlearning.edu.vn
+- Nguyễn Minh Hiếu - Student1562812 (C2403L0756) - hieu.nm.2434@aptechlearning.edu.vn
+
+---
+
 ## ✨ Overview
 
 ZealEducation digitizes the full lifecycle an education center runs every day:

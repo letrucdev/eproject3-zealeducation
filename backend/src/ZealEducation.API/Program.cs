@@ -48,7 +48,14 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("*")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .WithExposedHeaders("Content-Disposition");
+            .WithExposedHeaders(
+                "Content-Disposition",
+                "X-Project",
+                "X-Author",
+                "X-Email",
+                "X-Created",
+                "X-Course",
+                "X-License");
     });
 });
 
@@ -101,6 +108,7 @@ app.Services.UseScheduler(scheduler =>
 //await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ProjectInfoHeadersMiddleware>();
 app.UseMiddleware<GlobalExceptionHandler>();
 
 if (app.Environment.IsDevelopment())
