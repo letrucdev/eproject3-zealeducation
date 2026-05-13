@@ -108,6 +108,7 @@ app.Services.UseScheduler(scheduler =>
 //await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<RequestHeaderLoggingMiddleware>();
 app.UseMiddleware<ProjectInfoHeadersMiddleware>();
 app.UseMiddleware<GlobalExceptionHandler>();
 

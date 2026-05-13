@@ -35,7 +35,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
                 if (!string.IsNullOrWhiteSpace(first)) return first;
             }
 
-            Console.WriteLine(context.Request.Headers);
+        
 
             return context.Connection.RemoteIpAddress?.ToString();
         }
