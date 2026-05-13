@@ -28,12 +28,14 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
             var context = httpContextAccessor.HttpContext;
             if (context is null) return null;
 
-            var forwarded = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            var forwarded = context.Request.Headers["X-Real-IP"].FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(forwarded))
             {
                 var first = forwarded.Split(',')[0].Trim();
                 if (!string.IsNullOrWhiteSpace(first)) return first;
             }
+
+            Console.WriteLine(context.Request.Headers);
 
             return context.Connection.RemoteIpAddress?.ToString();
         }
