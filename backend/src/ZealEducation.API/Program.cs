@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using Coravel;
 using Coravel.Queuing.Interfaces;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 using ZealEducation.API.Middleware;
@@ -21,16 +20,6 @@ builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = MaxRequestBytes;
     options.ValueLengthLimit = int.MaxValue;
-});
-
-// Trust Cloudflare's CF-Connecting-IP header so HttpContext.Connection.RemoteIpAddress
-// reflects the real client IP. Origin must be locked down to Cloudflare-only traffic.
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.ForwardedForHeaderName = "CF-Connecting-IP";
-    options.KnownNetworks.Clear();
-    options.KnownProxies.Clear();
 });
 
 // Add services to the container.
@@ -119,7 +108,6 @@ app.Services.UseScheduler(scheduler =>
 //await app.Services.InitialiseDatabaseAsync();
 
 // Configure the HTTP request pipeline.
-app.UseForwardedHeaders();
 app.UseMiddleware<ProjectInfoHeadersMiddleware>();
 app.UseMiddleware<GlobalExceptionHandler>();
 

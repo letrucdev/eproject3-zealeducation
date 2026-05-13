@@ -28,15 +28,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
             var context = httpContextAccessor.HttpContext;
             if (context is null) return null;
 
-            var headers = context.Request.Headers;
-
-            var cfConnectingIp = headers["CF-Connecting-IP"].FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(cfConnectingIp)) return cfConnectingIp.Trim();
-
-            var trueClientIp = headers["True-Client-IP"].FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(trueClientIp)) return trueClientIp.Trim();
-
-            var forwarded = headers["X-Forwarded-For"].FirstOrDefault();
+            var forwarded = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(forwarded))
             {
                 var first = forwarded.Split(',')[0].Trim();
