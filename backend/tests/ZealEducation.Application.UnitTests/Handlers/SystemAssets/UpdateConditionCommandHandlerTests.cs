@@ -22,7 +22,7 @@ public class UpdateConditionCommandHandlerTests
             "Electronics",
             "SN-OG-1",
             "Room A",
-            new DateTime(2023, 1, 1),
+            new DateOnly(2023, 1, 1),
             Guid.NewGuid());
         asset.Id = id;
         return asset;
@@ -88,7 +88,7 @@ public class UpdateConditionCommandHandlerTests
         var asset = BuildAsset(assetId);
         _assetRepo.SetupGetById(assetId, asset);
 
-        var before = DateTime.UtcNow.AddSeconds(-1);
+        var before = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
 
         await CreateHandler().Handle(
             new UpdateConditionCommand(assetId, ConditionStatus.Maintenance), default);

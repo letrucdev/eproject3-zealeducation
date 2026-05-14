@@ -22,7 +22,7 @@ public class DecommissionAssetCommandHandlerTests
             "Electronics",
             "SN-OG-1",
             "Room A",
-            new DateTime(2023, 1, 1),
+            new DateOnly(2023, 1, 1),
             Guid.NewGuid());
         asset.Id = id;
         return asset;

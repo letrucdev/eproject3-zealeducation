@@ -38,19 +38,16 @@
     aria-label="Filter by table name"
   />
 
-  <div class="flex flex-col gap-1.5">
-    <label hlmFieldLabel>Date range</label>
-    <hlm-date-range-picker
-      class="w-full md:w-72"
-      [date]="dateRange()"
-      [autoCloseOnEndSelection]="true"
-      [formatDates]="formatDates"
-      [showClear]="true"
-      captionLayout="dropdown"
-      (dateChange)="onDateRangeChange($event)"
-      aria-label="Filter by date range"
-    >
-      <span>Select date range</span>
-    </hlm-date-range-picker>
-  </div>
+  <hlm-date-range-picker
+    class="w-full md:w-72"
+    [date]="dateRange()"
+    [autoCloseOnEndSelection]="true"
+    [formatDates]="formatDates"
+    [showClear]="true"
+    captionLayout="dropdown"
+    (dateChange)="onDateRangeChange($event)"
+    aria-label="Filter by date range"
+  >
+    <span>Select date range</span>
+  </hlm-date-range-picker>
 </form>

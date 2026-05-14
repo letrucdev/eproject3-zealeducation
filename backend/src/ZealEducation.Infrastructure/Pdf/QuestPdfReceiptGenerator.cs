@@ -11,6 +11,8 @@ namespace ZealEducation.Infrastructure.Pdf;
 public class QuestPdfReceiptGenerator : IReceiptPdfGenerator
 {
     private static readonly CultureInfo VndCulture = new("vi-VN");
+    private static readonly TimeZoneInfo VietnamTimeZone = ResolveVietnamTimeZone();
+
     public byte[] Generate(ReceiptPdfModel model)
     {
         var document = Document.Create(container =>
@@ -33,7 +35,7 @@ public class QuestPdfReceiptGenerator : IReceiptPdfGenerator
                     col.Spacing(6);
 
                     KeyValue(col, "Receipt No.", model.ReceiptNumber);
-                    KeyValue(col, "Date", model.PaymentDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm"));
+                    KeyValue(col, "Date", FormatVietnamTime(model.PaymentDate));
                     KeyValue(col, "Candidate", $"{model.CandidateFullName} ({model.CandidateCode})");
                     if (!string.IsNullOrWhiteSpace(model.CourseTitle))
                         KeyValue(col, "Course", model.CourseTitle!);
@@ -62,7 +64,7 @@ public class QuestPdfReceiptGenerator : IReceiptPdfGenerator
                 page.Footer().AlignCenter().Text(t =>
                 {
                     t.Span("Thank you. — Generated ").FontSize(9);
-                    t.Span(DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-dd HH:mm")).FontSize(9);
+                    t.Span(FormatVietnamTime(DateTime.UtcNow)).FontSize(9);
                 });
             });
         });
@@ -87,4 +89,27 @@ public class QuestPdfReceiptGenerator : IReceiptPdfGenerator
         PaymentMethod.BankTransfer => "Bank Transfer",
         _ => method.ToString(),
     };
+
+    // Receipt la chung tu chinh thuc cua doanh nghiep VN — luon hien thi gio VN
+    // bat ke server chay o TZ nao, bat ke client o dau.
+    private static string FormatVietnamTime(DateTime value)
+    {
+        // EF tra DateTime voi Kind = Unspecified; UtcDateTimeConverter chi tac dong tang JSON.
+        // O day phai ep Utc thu cong truoc khi convert sang Asia/Ho_Chi_Minh.
+        var utc = value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc),
+        };
+        var local = TimeZoneInfo.ConvertTimeFromUtc(utc, VietnamTimeZone);
+        return local.ToString("yyyy-MM-dd HH:mm");
+    }
+
+    private static TimeZoneInfo ResolveVietnamTimeZone()
+    {
+        // .NET 8+ ho tro IANA tren ca Linux va Windows, nhung fallback de chac chan.
+        try { return TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh"); }
+        catch (TimeZoneNotFoundException) { return TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); }
+    }
 }

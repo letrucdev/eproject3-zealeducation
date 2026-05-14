@@ -5,7 +5,7 @@ export interface CreateAssetPayload {
   assetType: string;
   serialNumber: string;
   location: string;
-  purchaseDate: string;   // ISO 8601
+  purchaseDate: string;   // yyyy-MM-dd
   notes: string;
 }
 

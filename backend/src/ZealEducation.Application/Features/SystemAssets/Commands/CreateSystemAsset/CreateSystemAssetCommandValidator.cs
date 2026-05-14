@@ -14,7 +14,7 @@ public class CreateSystemAssetCommandValidator : AbstractValidator<CreateSystemA
             .NotEmpty().WithMessage("Serial Number is required.");
 
         RuleFor(x => x.PurchaseDate)
-            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Purchase Date cannot be in the future.");
+            .LessThanOrEqualTo(_ => DateOnly.FromDateTime(DateTime.UtcNow)).WithMessage("Purchase Date cannot be in the future.");
 
         RuleFor(x => x.AssetType)
             .NotEmpty().WithMessage("Asset Type is required.");

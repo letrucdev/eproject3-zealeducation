@@ -11,8 +11,8 @@ public class SystemAssetDto
     public string SerialNumber { get; init; } = default!;
     public string Location { get; init; } = default!;
     public ConditionStatus ConditionStatus { get; init; }
-    public DateTime PurchaseDate { get; init; }
-    public DateTime? LastMaintenance { get; init; }
+    public DateOnly PurchaseDate { get; init; }
+    public DateOnly? LastMaintenance { get; init; }
     public string? Notes { get; init; }
     public Guid ManagedBy { get; init; }
     public string? ManagedByName { get; init; }
