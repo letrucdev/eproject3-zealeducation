@@ -21,6 +21,7 @@
       [date]="pickerValue()"
       [autoCloseOnEndSelection]="true"
       [formatDates]="formatDates"
+      [showClear]="showClear()"
       captionLayout="dropdown"
       (dateChange)="onDateChange($event)"
       [attr.aria-label]="ariaLabel()"

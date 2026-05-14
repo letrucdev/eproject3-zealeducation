@@ -8,7 +8,6 @@ import {
   output,
 } from '@angular/core';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
@@ -50,7 +49,6 @@ export class AttendanceCellDef extends DataTableCellDef<MyAttendanceRow> {
     DecimalPipe,
     HlmCardImports,
     HlmBadgeImports,
-    HlmButtonImports,
     HlmDatePickerImports,
     HlmFieldImports,
     HlmInputImports,
@@ -91,6 +89,7 @@ export class AttendanceCellDef extends DataTableCellDef<MyAttendanceRow> {
               [date]="dateRange()"
               [autoCloseOnEndSelection]="true"
               [formatDates]="formatDates"
+              [showClear]="true"
               captionLayout="dropdown"
               (dateChange)="onDateRangeChange($event)"
               aria-label="Filter attendance by date range"
@@ -98,9 +97,6 @@ export class AttendanceCellDef extends DataTableCellDef<MyAttendanceRow> {
               <span>Select date range</span>
             </hlm-date-range-picker>
           </div>
-          @if (fromDate() || toDate()) {
-            <button hlmBtn type="button" (click)="onClearRange()">Clear range</button>
-          }
         </div>
       </div>
       <div hlmCardContent>
@@ -215,8 +211,4 @@ export class CandidateBatchAttendanceCard {
   ];
 
   protected readonly trackById = (row: MyAttendanceRow): string => row.sessionId;
-
-  protected onClearRange(): void {
-    this.dateRangeChanged.emit({ fromDate: '', toDate: '' });
-  }
 }

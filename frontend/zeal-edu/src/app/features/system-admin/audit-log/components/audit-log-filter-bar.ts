@@ -12,7 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
 import { lucideSearch } from '@ng-icons/lucide';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
@@ -34,7 +33,6 @@ export interface AuditLogFilterValue {
   selector: 'app-audit-log-filter-bar',
   imports: [
     ReactiveFormsModule,
-    HlmButtonImports,
     HlmInputImports,
     HlmSelectImports,
     HlmIconImports,
@@ -99,13 +97,6 @@ export class AuditLogFilterBar implements OnInit {
       this.form.controls.fromDate.setValue(toIsoDate(start), { emitEvent: false });
       this.form.controls.toDate.setValue(toIsoDate(end), { emitEvent: false });
     }
-    this._emit();
-  }
-
-  protected onClearRange(): void {
-    this.dateRange.set(undefined);
-    this.form.controls.fromDate.setValue('', { emitEvent: false });
-    this.form.controls.toDate.setValue('', { emitEvent: false });
     this._emit();
   }
 

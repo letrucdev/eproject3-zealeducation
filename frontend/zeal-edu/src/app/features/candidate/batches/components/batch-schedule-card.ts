@@ -8,7 +8,6 @@ import {
   output,
 } from '@angular/core';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
@@ -53,7 +52,6 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
     DatePipe,
     HlmCardImports,
     HlmBadgeImports,
-    HlmButtonImports,
     HlmDatePickerImports,
     HlmFieldImports,
     HlmInputImports,
@@ -76,6 +74,7 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
               [date]="dateRange()"
               [autoCloseOnEndSelection]="true"
               [formatDates]="formatDates"
+              [showClear]="true"
               captionLayout="dropdown"
               (dateChange)="onDateRangeChange($event)"
               aria-label="Filter schedule by date range"
@@ -83,9 +82,6 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
               <span>Select date range</span>
             </hlm-date-range-picker>
           </div>
-          @if (fromDate() || toDate()) {
-            <button hlmBtn type="button" (click)="onClearRange()">Clear range</button>
-          }
         </div>
       </div>
       <div hlmCardContent>
@@ -187,9 +183,5 @@ export class CandidateBatchScheduleCard {
 
   protected formatTime(value: string): string {
     return value?.length >= 5 ? value.substring(0, 5) : value;
-  }
-
-  protected onClearRange(): void {
-    this.dateRangeChanged.emit({ fromDate: '', toDate: '' });
   }
 }

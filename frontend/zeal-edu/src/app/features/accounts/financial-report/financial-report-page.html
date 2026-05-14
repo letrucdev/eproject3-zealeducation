@@ -99,6 +99,7 @@
         <app-date-range-filter-bar
           [dateRange]="tableDateRange()"
           [showPresets]="false"
+          [showClear]="true"
           ariaLabel="Select date range for transactions"
           (customRangeChanged)="onTableCustomRangeChanged($event)"
           (cleared)="onTableRangeCleared()"

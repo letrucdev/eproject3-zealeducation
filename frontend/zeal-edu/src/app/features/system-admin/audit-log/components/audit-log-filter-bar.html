@@ -45,6 +45,7 @@
       [date]="dateRange()"
       [autoCloseOnEndSelection]="true"
       [formatDates]="formatDates"
+      [showClear]="true"
       captionLayout="dropdown"
       (dateChange)="onDateRangeChange($event)"
       aria-label="Filter by date range"
@@ -52,8 +53,4 @@
       <span>Select date range</span>
     </hlm-date-range-picker>
   </div>
-
-  @if (dateRange()) {
-    <button hlmBtn type="button" (click)="onClearRange()">Clear range</button>
-  }
 </form>
