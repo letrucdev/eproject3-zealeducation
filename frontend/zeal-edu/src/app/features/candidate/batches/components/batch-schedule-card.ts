@@ -66,7 +66,9 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
           <h3 hlmCardTitle>Schedule</h3>
           <p hlmCardDescription>Class sessions for this batch.</p>
         </div>
-        <div class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end mt-2">
+        <div
+          class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end mt-2 justify-center items-center"
+        >
           <div class="flex flex-col gap-1.5">
             <label hlmFieldLabel>Date range</label>
             <hlm-date-range-picker
@@ -82,9 +84,7 @@ export class ScheduleCellDef extends DataTableCellDef<ClassSession> {
             </hlm-date-range-picker>
           </div>
           @if (fromDate() || toDate()) {
-            <button hlmBtn variant="secondary" size="sm" type="button" (click)="onClearRange()">
-              Clear range
-            </button>
+            <button hlmBtn type="button" (click)="onClearRange()">Clear range</button>
           }
         </div>
       </div>

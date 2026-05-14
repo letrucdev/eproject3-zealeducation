@@ -81,7 +81,9 @@ export class AttendanceCellDef extends DataTableCellDef<MyAttendanceRow> {
             </div>
           }
         </div>
-        <div class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end mt-2">
+        <div
+          class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end mt-2 justify-center items-center"
+        >
           <div class="flex flex-col gap-1.5">
             <label hlmFieldLabel>Date range</label>
             <hlm-date-range-picker
@@ -97,9 +99,7 @@ export class AttendanceCellDef extends DataTableCellDef<MyAttendanceRow> {
             </hlm-date-range-picker>
           </div>
           @if (fromDate() || toDate()) {
-            <button hlmBtn variant="ghost" size="sm" type="button" (click)="onClearRange()">
-              Clear range
-            </button>
+            <button hlmBtn type="button" (click)="onClearRange()">Clear range</button>
           }
         </div>
       </div>

@@ -17,6 +17,10 @@
     </hlm-date-range-picker>
   </div>
 
+  @if (dateRange()) {
+    <button hlmBtn type="button" (click)="onClearRange()">Clear range</button>
+  }
+
   <hlm-combobox
     formControlName="course"
     [(search)]="courseSearch"

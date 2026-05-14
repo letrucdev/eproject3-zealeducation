@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmComboboxImports } from '@spartan-ng/helm/combobox';
 import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
 import { HlmFieldImports } from '@spartan-ng/helm/field';
@@ -33,6 +34,7 @@ export interface FacultyScheduleFilterValue {
   selector: 'app-faculty-schedule-filter-bar',
   imports: [
     ReactiveFormsModule,
+    HlmButtonImports,
     HlmComboboxImports,
     HlmDatePickerImports,
     HlmFieldImports,
@@ -103,6 +105,13 @@ export class FacultyScheduleFilterBar implements OnInit {
       this.form.controls.fromDate.setValue(toIsoDate(start), { emitEvent: false });
       this.form.controls.toDate.setValue(toIsoDate(end), { emitEvent: false });
     }
+    this._emit();
+  }
+
+  protected onClearRange(): void {
+    this.dateRange.set(undefined);
+    this.form.controls.fromDate.setValue('', { emitEvent: false });
+    this.form.controls.toDate.setValue('', { emitEvent: false });
     this._emit();
   }
 
