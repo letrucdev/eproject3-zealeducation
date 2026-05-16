@@ -22,13 +22,13 @@ public class CreateSystemAssetCommandHandlerTests
         string assetType = "Electronics",
         string serialNumber = "SN-001",
         string location = "Room A",
-        DateTime? purchaseDate = null,
+        DateOnly? purchaseDate = null,
         string? notes = null) => new(
             assetName,
             assetType,
             serialNumber,
             location,
-            purchaseDate ?? new DateTime(2024, 1, 1),
+            purchaseDate ?? new DateOnly(2024, 1, 1),
             notes);
 
     private static Staff ExistingStaff(Guid userAccountId) => new()
@@ -72,7 +72,7 @@ public class CreateSystemAssetCommandHandlerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<SystemAsset>
             {
-                new SystemAsset("Existing", "Electronics", "SN-001", "Room B", new DateTime(2023, 1, 1), Guid.NewGuid())
+                new SystemAsset("Existing", "Electronics", "SN-001", "Room B", new DateOnly(2023, 1, 1), Guid.NewGuid())
             });
 
         var act = async () => await CreateHandler().Handle(Cmd(serialNumber: "SN-001"), default);
@@ -105,7 +105,7 @@ public class CreateSystemAssetCommandHandlerTests
             .Callback<SystemAsset, CancellationToken>((a, _) => captured = a)
             .ReturnsAsync((SystemAsset a, CancellationToken _) => a);
 
-        var purchaseDate = new DateTime(2024, 2, 10);
+        var purchaseDate = new DateOnly(2024, 2, 10);
         var resultId = await CreateHandler().Handle(
             Cmd(assetName: "Laptop", assetType: "Electronics", serialNumber: "SN-LP-9",
                 location: "Lab 1", purchaseDate: purchaseDate, notes: "Spare unit"),

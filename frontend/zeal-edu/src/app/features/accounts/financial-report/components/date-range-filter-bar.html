@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+<div class="flex flex-col gap-3 lg:flex-row lg:items-center justify-end flex-wrap">
   @if (showPresets()) {
     <div hlmButtonGroup role="radiogroup" [attr.aria-label]="ariaLabel()">
       @for (option of presetOptions; track option.value) {
@@ -18,10 +18,10 @@
 
   @if (showPicker()) {
     <hlm-date-range-picker
-      class="bg-transparent"
       [date]="pickerValue()"
       [autoCloseOnEndSelection]="true"
       [formatDates]="formatDates"
+      [showClear]="showClear()"
       captionLayout="dropdown"
       (dateChange)="onDateChange($event)"
       [attr.aria-label]="ariaLabel()"

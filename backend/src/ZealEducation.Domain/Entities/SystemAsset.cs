@@ -12,8 +12,8 @@ public class SystemAsset : BaseAuditableEntity
     public string SerialNumber { get; private set; } = default!;
     public string Location { get; private set; } = default!;
     public ConditionStatus ConditionStatus { get; private set; } = ConditionStatus.Good;
-    public DateTime PurchaseDate { get; private set; }
-    public DateTime? LastMaintenance { get; private set; }
+    public DateOnly PurchaseDate { get; private set; }
+    public DateOnly? LastMaintenance { get; private set; }
     public string? Notes { get; private set; }
     public Guid ManagedBy { get; private set; }
 
@@ -25,7 +25,7 @@ public class SystemAsset : BaseAuditableEntity
         string assetType,
         string serialNumber,
         string location,
-        DateTime purchaseDate,
+        DateOnly purchaseDate,
         Guid managedBy,
         string? notes = null)
     {
@@ -69,7 +69,7 @@ public class SystemAsset : BaseAuditableEntity
 
         if (newStatus == ConditionStatus.Maintenance)
         {
-            LastMaintenance = DateTime.UtcNow;
+            LastMaintenance = DateOnly.FromDateTime(DateTime.UtcNow);
         }
     }
 
@@ -81,7 +81,7 @@ public class SystemAsset : BaseAuditableEntity
         }
 
         ConditionStatus = ConditionStatus.Good;
-        LastMaintenance = DateTime.UtcNow;
+        LastMaintenance = DateOnly.FromDateTime(DateTime.UtcNow);
     }
 
     public void Decommission()

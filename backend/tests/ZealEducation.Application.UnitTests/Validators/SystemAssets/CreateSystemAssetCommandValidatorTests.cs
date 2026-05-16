@@ -12,13 +12,13 @@ public class CreateSystemAssetCommandValidatorTests
         string assetType = "Electronics",
         string serialNumber = "SN-001",
         string location = "Room A",
-        DateTime? purchaseDate = null,
+        DateOnly? purchaseDate = null,
         string? notes = null) => new(
             assetName,
             assetType,
             serialNumber,
             location,
-            purchaseDate ?? DateTime.UtcNow.AddDays(-1),
+            purchaseDate ?? DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1),
             notes);
 
     [Fact]
@@ -67,7 +67,7 @@ public class CreateSystemAssetCommandValidatorTests
     [Fact]
     public void Should_fail_when_purchase_date_is_in_the_future()
     {
-        var future = DateTime.UtcNow.AddDays(1);
+        var future = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1);
         var result = _validator.TestValidate(Valid(purchaseDate: future));
         result.ShouldHaveValidationErrorFor(c => c.PurchaseDate);
     }
@@ -75,7 +75,7 @@ public class CreateSystemAssetCommandValidatorTests
     [Fact]
     public void Should_pass_when_purchase_date_is_in_the_past()
     {
-        var result = _validator.TestValidate(Valid(purchaseDate: DateTime.UtcNow.AddSeconds(-5)));
+        var result = _validator.TestValidate(Valid(purchaseDate: DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1)));
         result.ShouldNotHaveValidationErrorFor(c => c.PurchaseDate);
     }
 }

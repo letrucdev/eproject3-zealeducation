@@ -49,7 +49,7 @@ public class UpdateSystemAssetCommandHandlerTests
             "Original Type",
             "SN-OG-1",
             "Room A",
-            new DateTime(2023, 1, 1),
+            new DateOnly(2023, 1, 1),
             managedBy,
             "Original notes");
         asset.Id = id;

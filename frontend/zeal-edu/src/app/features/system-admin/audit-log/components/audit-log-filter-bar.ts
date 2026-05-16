@@ -13,6 +13,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
 import { lucideSearch } from '@ng-icons/lucide';
 import { HlmDatePickerImports } from '@spartan-ng/helm/date-picker';
+import { HlmFieldImports } from '@spartan-ng/helm/field';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
@@ -36,6 +37,7 @@ export interface AuditLogFilterValue {
     HlmSelectImports,
     HlmIconImports,
     HlmDatePickerImports,
+    HlmFieldImports,
   ],
   providers: [provideIcons({ lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -52,7 +52,7 @@
       @if (isLoading()) {
         <hlm-skeleton class="mt-2 h-7 w-20" />
       } @else {
-        <h3 hlmCardTitle class="text-3xl text-slate-700">{{ stats()?.completed ?? 0 }}</h3>
+        <h3 hlmCardTitle class="text-3xl">{{ stats()?.completed ?? 0 }}</h3>
       }
     </div>
   </section>

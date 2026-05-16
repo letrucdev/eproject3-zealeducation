@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { provideIcons } from '@ng-icons/core';
-import { lucideChevronDown } from '@ng-icons/lucide';
+import { lucideChevronDown, lucideX } from '@ng-icons/lucide';
 import type { BrnDialogState } from '@spartan-ng/brain/dialog';
 import {
   BrnFieldControl,
@@ -42,7 +42,7 @@ let nextId = 0;
   imports: [HlmIconImports, HlmPopoverImports, HlmCalendarRange, BrnFieldControlDescribedBy],
   providers: [
     HLM_DATE_RANGE_PICKER_VALUE_ACCESSOR,
-    provideIcons({ lucideChevronDown }),
+    provideIcons({ lucideChevronDown, lucideX }),
     provideBrnLabelable(HlmDateRangePicker),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,7 +78,27 @@ let nextId = 0;
           }
         </span>
 
-        <ng-icon hlm size="sm" name="lucideChevronDown" />
+        @if (showClear() && _formattedDate()) {
+          <span
+            role="button"
+            tabindex="0"
+            data-slot="date-range-clear"
+            aria-label="Clear date range"
+            class="hover:bg-accent inline-flex size-5 items-center justify-center rounded-sm focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none"
+            (click)="_handleClear($event)"
+            (keydown.enter)="_handleClear($event)"
+            (keydown.space)="_handleClear($event)"
+          >
+            <ng-icon hlm size="xs" name="lucideX" />
+          </span>
+        }
+
+        <ng-icon
+          hlm
+          size="sm"
+          name="lucideChevronDown"
+          class="group-has-data-[slot=date-range-clear]:hidden"
+        />
       </button>
 
       <hlm-popover-content class="w-fit p-0" *hlmPopoverPortal="let ctx">
@@ -116,7 +136,7 @@ export class HlmDateRangePicker<T> implements ControlValueAccessor {
   public readonly userClass = input<ClassValue>('', { alias: 'class' });
   protected readonly _computedClass = computed(() =>
     hlm(
-      'ring-offset-background border-input bg-background hover:bg-accent dark:bg-input/30 dark:hover:bg-input/50 inline-flex h-9 w-[280px] cursor-default items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm font-normal whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50',
+      'group ring-offset-background border-input bg-transparent hover:bg-accent dark:bg-input/30 dark:hover:bg-input/50 inline-flex h-9 w-[280px] cursor-default items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm font-normal whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50',
       'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
       'disabled:pointer-events-none disabled:opacity-50',
       '[&_ng-icon]:pointer-events-none [&_ng-icon]:shrink-0',
@@ -141,6 +161,11 @@ export class HlmDateRangePicker<T> implements ControlValueAccessor {
 
   /** Determine if the date picker is disabled. */
   public readonly disabled = input<boolean, BooleanInput>(false, {
+    transform: booleanAttribute,
+  });
+
+  /** Show an inline clear (×) button when a value is selected. */
+  public readonly showClear = input<boolean, BooleanInput>(false, {
     transform: booleanAttribute,
   });
 
@@ -243,5 +268,15 @@ export class HlmDateRangePicker<T> implements ControlValueAccessor {
       this._start.set(dates[0]);
       this._end.set(dates[1]);
     }
+  }
+
+  protected _handleClear(event: Event): void {
+    event.stopPropagation();
+    if (this._mutableDisabled()) return;
+    this._mutableDate.set(undefined);
+    this._start.set(undefined);
+    this._end.set(undefined);
+    this.dateChange.emit(null);
+    this._onChange?.(null);
   }
 }

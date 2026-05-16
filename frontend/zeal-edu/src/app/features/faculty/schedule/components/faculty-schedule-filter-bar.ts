@@ -153,7 +153,7 @@ export class FacultyScheduleFilterBar implements OnInit {
 
   private _emit(): void {
     const { fromDate, toDate, course, batch } = this.form.getRawValue();
-    if (!fromDate || !toDate) return;
+    //if (!fromDate || !toDate) return;
     this.filterChanged.emit({
       fromDate,
       toDate,

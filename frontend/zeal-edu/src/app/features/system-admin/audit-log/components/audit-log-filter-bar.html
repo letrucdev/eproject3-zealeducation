@@ -1,4 +1,4 @@
-<form [formGroup]="form" class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+<form [formGroup]="form" class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
   <div class="relative w-full md:w-72">
     <ng-icon
       hlm
@@ -43,6 +43,7 @@
     [date]="dateRange()"
     [autoCloseOnEndSelection]="true"
     [formatDates]="formatDates"
+    [showClear]="true"
     captionLayout="dropdown"
     (dateChange)="onDateRangeChange($event)"
     aria-label="Filter by date range"

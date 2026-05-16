@@ -8,7 +8,7 @@ public record CreateSystemAssetCommand(
     string AssetType,
     string SerialNumber,
     string Location,
-    DateTime PurchaseDate,
+    DateOnly PurchaseDate,
     string? Notes = null) : IRequest<Guid>;
     
 // No ManagedBy — automatically retrieved from JWT token

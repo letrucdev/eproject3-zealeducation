@@ -35,6 +35,7 @@ export class DateRangeFilterBar {
   readonly dateRange = input.required<FinancialReportRange>();
   readonly ariaLabel = input<string>('Select date range preset');
   readonly showPresets = input<boolean>(true);
+  readonly showClear = input<boolean>(false);
 
   readonly presetChanged = output<DateRangePreset>();
   readonly customRangeChanged = output<FinancialReportRange>();

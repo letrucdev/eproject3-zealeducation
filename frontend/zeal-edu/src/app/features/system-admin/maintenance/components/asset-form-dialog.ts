@@ -58,7 +58,7 @@ export default class AssetFormDialog {
       assetType: detail.assetType,
       serialNumber: detail.serialNumber,
       location: detail.location,
-      purchaseDate: detail.purchaseDate.substring(0, 10),
+      purchaseDate: detail.purchaseDate,
       notes: detail.notes || '',
     });
     this.form.controls.serialNumber.disable();
@@ -77,10 +77,7 @@ export default class AssetFormDialog {
     }
     const val = this.form.getRawValue();
     if (this.mode() === 'create') {
-      const payload: CreateAssetPayload = {
-        ...val,
-        purchaseDate: new Date(val.purchaseDate).toISOString()
-      };
+      const payload: CreateAssetPayload = { ...val };
       this.submitted.emit({ mode: 'create', payload });
     } else {
       const payload: UpdateAssetPayload = {
